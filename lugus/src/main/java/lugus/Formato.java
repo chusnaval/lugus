@@ -13,7 +13,7 @@ public enum Formato {
 	 * Constructor por defecto
 	 * @param i
 	 */
-	Formato(short i) {
+	private Formato(short i) {
 		this.id = i;
 	}
 	

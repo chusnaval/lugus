@@ -19,13 +19,21 @@ class PeliculaRepositoryTest {
         Pelicula padre = new Pelicula();
         padre.setTitulo("Colección Marvel");
         padre.setAnyo(2020);
+        padre.setFormato(Formato.BLURAY);
+        padre.setGenero(Genero.AVENTURA);
+        padre.calcularCodigo();
         repo.save(padre);
 
         Pelicula child = new Pelicula();
         child.setTitulo("Iron Man");
         child.setAnyo(2008);
-        child.setPadre(padre);
+        child.setFormato(Formato.BLURAY);
+        child.setGenero(Genero.AVENTURA);
+        child.calcularCodigo();
         repo.save(child);
+        
+        padre.addHijo(child); 
+        repo.save(padre);
 
         // --- Act -------------------------------------------------------------
         Pelicula fetchedParent = repo.findById(padre.getId()).orElseThrow();
