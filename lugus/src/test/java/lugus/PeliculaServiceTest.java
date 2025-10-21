@@ -5,6 +5,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import lugus.dto.PeliculaCreateDto;
+import lugus.model.Formato;
+import lugus.model.Genero;
+import lugus.model.Pelicula;
+import lugus.repository.PeliculaRepository;
+import lugus.service.LocalizacionService;
+import lugus.service.PeliculaService;
+
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,12 +21,13 @@ import static org.mockito.Mockito.*;
 class PeliculaServiceTest {
 
     private PeliculaRepository repo;
+	private LocalizacionService locService;
     private PeliculaService service;
 
     @BeforeEach
     void setUp() {
         repo = mock(PeliculaRepository.class);
-        service = new PeliculaService(repo);
+        service = new PeliculaService(repo, locService);
     }
 
     @Test
@@ -33,7 +42,11 @@ class PeliculaServiceTest {
         Pelicula child = new Pelicula();
         child.setTitulo("Parte 1");
         child.setPadre(padre);
-
+        child.setFormato(Formato.BLURAY);
+        child.setGenero(Genero.ACCION);
+        child.setAnyo(1990);
+        child.calcularCodigo();
+        
         // --- Act -------------------------------------------------------------
         Pelicula saved = service.save(child);
 
@@ -52,8 +65,11 @@ class PeliculaServiceTest {
         padre.setId(10);
         padre.setTitulo("Colección");
 
-        Pelicula child = new Pelicula();
+        PeliculaCreateDto child = new PeliculaCreateDto();
         child.setTitulo("Capítulo 2");
+        child.setFormatoCodigo(Formato.BLURAY.getId());
+        child.setGeneroCodigo(Genero.ACCION.getCodigo());
+        child.setAnyo(1990);
 
         when(repo.findById(10)).thenReturn(Optional.of(padre));
         when(repo.save(any(Pelicula.class))).thenAnswer(i -> i.getArgument(0));
@@ -67,7 +83,7 @@ class PeliculaServiceTest {
 
         // Capturamos el argumento pasado a save para inspeccionar la entidad
         ArgumentCaptor<Pelicula> captor = ArgumentCaptor.forClass(Pelicula.class);
-        verify(repo, times(1)).save(captor.capture());
+        verify(repo, times(2)).save(captor.capture());
         Pelicula saved = captor.getValue();
         assertThat(saved).isSameAs(padre); // guardamos el padre (cascada guarda al hijo)
     }

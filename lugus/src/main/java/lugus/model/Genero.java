@@ -1,4 +1,4 @@
-package lugus;
+package lugus.model;
 
 import lombok.Getter;
 
@@ -30,5 +30,20 @@ public enum Genero {
 		this.codigo = codigo;
 		this.categoria = categoria;
 		this.orden = orden;
+	}
+	
+	/**
+	 * Obtenemos el equivalente
+	 * @param i
+	 * @return
+	 */
+	public static Genero getById(String code) {
+		for(Genero aux : values()) {
+			if(aux.getCodigo().equals(code)) {
+				return aux;
+			}
+		}
+		
+		throw new IllegalArgumentException("No existe el genero");
 	}
 }

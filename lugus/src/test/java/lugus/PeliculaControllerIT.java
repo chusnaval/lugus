@@ -1,6 +1,12 @@
 package lugus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lugus.model.Formato;
+import lugus.model.Genero;
+import lugus.model.Pelicula;
+import lugus.repository.PeliculaRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

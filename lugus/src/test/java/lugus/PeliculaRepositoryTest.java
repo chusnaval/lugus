@@ -5,6 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import lugus.model.Formato;
+import lugus.model.Genero;
+import lugus.model.Pelicula;
+import lugus.repository.PeliculaRepository;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest   // usa H2 en memoria y configura solo JPA

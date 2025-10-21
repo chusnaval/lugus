@@ -1,0 +1,80 @@
+package lugus.service;
+
+import lombok.RequiredArgsConstructor;
+import lugus.dto.PeliculaCreateDto;
+import lugus.model.Formato;
+import lugus.model.Genero;
+import lugus.model.Localizacion;
+import lugus.model.Pelicula;
+import lugus.repository.PeliculaRepository;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.validation.Valid;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class PeliculaService {
+
+	private final PeliculaRepository peliculaRepo;
+	private final LocalizacionService locService;
+
+	public List<Pelicula> findAll() {
+		return peliculaRepo.findAll();
+	}
+
+	public Optional<Pelicula> findById(Integer id) {
+		return peliculaRepo.findById(id);
+	}
+
+	@Transactional
+	public Pelicula crear(PeliculaCreateDto dto) {
+		Localizacion loc = null;
+		if (dto.getLocalizacionCodigo() != null && !dto.getLocalizacionCodigo().isBlank()) {
+			loc = locService.findById(dto.getLocalizacionCodigo())
+					.orElseThrow(() -> new IllegalArgumentException("Localización no encontrada"));
+		}
+		
+		Formato formato = Formato.getById(dto.getFormatoCodigo());
+		Genero genero = Genero.getById(dto.getGeneroCodigo());
+		
+		Pelicula p = Pelicula.builder().titulo(dto.getTitulo()).anyo(dto.getAnyo()).formato(formato)
+				.genero(genero).localizacion(loc).build();
+		p.calcularCodigo();
+		return peliculaRepo.save(p);
+	}
+
+	@Transactional
+	public void delete(Integer id) {
+		peliculaRepo.deleteById(id);
+	}
+
+	@Transactional
+	public Pelicula addChild(Integer padreId, @Valid PeliculaCreateDto dto) {
+		Pelicula padre = peliculaRepo.findById(padreId)
+				.orElseThrow(() -> new IllegalArgumentException("Padre no encontrado"));
+		Pelicula hijo = crear(dto);
+		
+		hijo.setPadre(padre);
+		padre.getPeliculasPack().add(hijo);
+		peliculaRepo.save(padre); // cascada guardará al hijo
+		return hijo;
+	}
+
+	public boolean existsById(Integer id) {
+		return peliculaRepo.existsById(id);
+	}
+
+	public List<Pelicula> findAllById(List<Integer> idsPeliculas) {
+		return peliculaRepo.findAllById(idsPeliculas);
+	}
+
+	public Pelicula save(Pelicula pelicula) {
+		return peliculaRepo.save(pelicula);
+		
+	}
+}

@@ -1,9 +1,11 @@
-package lugus;
+package lugus.model;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -15,14 +17,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lugus.converter.FormatoConverter;
+import lugus.converter.GeneroConverter;
 
 @Entity
 @Table(name = "peliculas")
@@ -30,17 +32,18 @@ import lombok.ToString;
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Pelicula {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@NotBlank(message = "El título es obligatorio")
+	@Column(nullable = false)
 	private String titulo;
 
-	@NotNull(message = "El formato es obligatorio")
-	@Enumerated(EnumType.ORDINAL)
+	@Column(nullable = false)
+	@Convert(converter = FormatoConverter.class)
 	private Formato formato;
 
 	/* ---------- 3. Many‑to‑One (Localizacion) ---------- */
@@ -48,26 +51,29 @@ public class Pelicula {
 	@JoinColumn(name = "localizacion_codigo", nullable = true) // FK → localizaciones.codigo
 	private Localizacion localizacion;
 
-	@Min(1890)
+	@Column(nullable = false)
 	private int anyo;
 
-	/* ---------- 2. Many‑to‑One (Genero) ---------- */
-	@NotNull(message = "El género es obligatorio")
-	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	@Convert(converter = GeneroConverter.class)
 	private Genero genero;
 
-	@NotBlank
+	@Column(nullable = false)
 	private String codigo;
 
+	@Column(nullable = true)
 	private String notas;
 
 	@OneToMany(mappedBy = "padre", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Pelicula> peliculasPack = new HashSet<>();
 
+	@Column
 	private boolean steelbook;
 
+	@Column
 	private boolean funda;
-	
+
+	@Column
 	private boolean comprado;
 
 	@ManyToOne

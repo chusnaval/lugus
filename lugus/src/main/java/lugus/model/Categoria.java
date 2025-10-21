@@ -1,4 +1,4 @@
-package lugus;
+package lugus.model;
 
 import lombok.Getter;
 
