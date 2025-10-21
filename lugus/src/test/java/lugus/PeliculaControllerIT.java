@@ -66,25 +66,21 @@ class PeliculaControllerIT {
 		Pelicula padre = new Pelicula();
 		padre.setId(1);
 		padre.setTitulo("Saga Star Wars");
-		padre.setAnyo(1977);
-		padre.setFormato(Formato.DVD);
+		padre.setFormato(Formato.BLURAY);
 		padre.setGenero(Genero.AVENTURA);
 		padre.calcularCodigo();
-		padre = repo.save(padre);
+		repo.save(padre);
 
 		// Payload del hijo
-		Pelicula hijo = new Pelicula();
-		hijo.setId(1);
+		PeliculaCreateDto hijo = new PeliculaCreateDto();
 		hijo.setTitulo("Una nueva esperanza");
-		hijo.setFormato(Formato.DVD);
-		hijo.setGenero(Genero.AVENTURA);
+		hijo.setFormatoCodigo(Formato.BLURAY.getId());
+		hijo.setGeneroCodigo(Genero.AVENTURA.getCodigo());
 		hijo.setAnyo(1977);
-		hijo.calcularCodigo();
 		
 		
-
 		// POST /api/peliculas/{padreId}/children
-		mvc.perform(put("/api/peliculas/{padreId}/agregar", padre.getId()).contentType(MediaType.APPLICATION_JSON)
+		mvc.perform(put("/api/peliculas/{padreId}/children", padre.getId()).contentType(MediaType.APPLICATION_JSON)
 				.content(mapper.writeValueAsString(hijo))).andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").exists()).andExpect(jsonPath("$.padre.id").value(padre.getId()));
 

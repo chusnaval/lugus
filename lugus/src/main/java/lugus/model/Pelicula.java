@@ -3,6 +3,11 @@ package lugus.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -33,6 +38,7 @@ import lugus.converter.GeneroConverter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Pelicula {
 
 	@Id
@@ -64,6 +70,7 @@ public class Pelicula {
 	@Column(nullable = true)
 	private String notas;
 
+	@JsonManagedReference
 	@OneToMany(mappedBy = "padre", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Pelicula> peliculasPack = new HashSet<>();
 

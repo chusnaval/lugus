@@ -65,12 +65,15 @@ class PeliculaServiceTest {
         Pelicula padre = new Pelicula();
         padre.setId(10);
         padre.setTitulo("Colección");
-
+        padre.setFormato(Formato.BLURAY);
+        padre.setGenero(Genero.ACCION);
+        padre.setAnyo(1970);
+        
         PeliculaCreateDto child = new PeliculaCreateDto();
         child.setTitulo("Capítulo 2");
         child.setFormatoCodigo(Formato.BLURAY.getId());
         child.setGeneroCodigo(Genero.ACCION.getCodigo());
-        child.setAnyo(1990);
+        child.setAnyo(1970);
 
         when(repo.findById(10)).thenReturn(Optional.of(padre));
         when(repo.save(any(Pelicula.class))).thenAnswer(i -> i.getArgument(0));

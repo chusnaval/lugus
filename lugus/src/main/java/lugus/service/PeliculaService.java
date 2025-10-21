@@ -58,7 +58,6 @@ public class PeliculaService {
 		Pelicula padre = peliculaRepo.findById(padreId)
 				.orElseThrow(() -> new IllegalArgumentException("Padre no encontrado"));
 		Pelicula hijo = crear(dto);
-		
 		hijo.setPadre(padre);
 		padre.getPeliculasPack().add(hijo);
 		peliculaRepo.save(padre); // cascada guardará al hijo
