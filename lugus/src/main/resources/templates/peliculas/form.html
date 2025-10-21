@@ -26,13 +26,13 @@
 
     <div class="mb-3">
         <label class="form-label">Formato</label>
-        <select class="form-select" th:field="*{formato}">
+        <select class="form-select" th:field="*{formatoCodigo}">
             <option th:each="f : ${T(lugus.model.Formato).values()}"
-                    th:value="${f}"
+                    th:value="${f.id}"
                     th:text="${f}">DVD</option>
         </select>
-        <div class="text-danger" th:if="${#fields.hasErrors('formato')}"
-             th:errors="*{formato}">Error</div>
+        <div class="text-danger" th:if="${#fields.hasErrors('formatoCodigo')}"
+             th:errors="*{formatoCodigo}">Error</div>
     </div>
 
     <div class="mb-3">
@@ -40,7 +40,7 @@
         <select class="form-select" th:field="*{generoCodigo}">
             <option th:each="g : ${T(lugus.model.Genero).values()}"
                     th:value="${g.codigo}"
-                    th:text="${g.descripcion}">Acción</option>
+                    th:text="${g}">Acción</option>
         </select>
         <div class="text-danger" th:if="${#fields.hasErrors('generoCodigo')}"
              th:errors="*{generoCodigo}">Error</div>

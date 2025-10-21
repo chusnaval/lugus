@@ -11,7 +11,7 @@
 <ul class="list-group mb-4">
     <li class="list-group-item"><strong>Año:</strong> <span th:text="${pelicula.anyo}"></span></li>
     <li class="list-group-item"><strong>Formato:</strong> <span th:text="${pelicula.formato}"></span></li>
-    <li class="list-group-item"><strong>Género:</strong> <span th:text="${pelicula.genero.descripcion}"></span></li>
+    <li class="list-group-item"><strong>Género:</strong> <span th:text="${pelicula.genero}"></span></li>
     <li class="list-group-item"><strong>Código interno:</strong> <span th:text="${pelicula.codigo}"></span></li>
 </ul>
 
@@ -46,7 +46,7 @@
             <input type="number" class="form-control" th:field="*{anyo}" placeholder="Año"/>
         </div>
         <div class="col-md-2">
-            <select class="form-select" th:field="*{formato}">
+            <select class="form-select" th:field="*{formatoCodigo}">
                 <option th:each="f : ${T(lugus.model.Formato).values()}"
                         th:value="${f}"
                         th:text="${f}">DVD</option>
@@ -56,7 +56,7 @@
             <select class="form-select" th:field="*{generoCodigo}">
                 <option th:each="g : ${T(lugus.model.Genero).values()}"
                         th:value="${g.codigo}"
-                        th:text="${g.descripcion}">Acción</option>
+                        th:text="${g}">Acción</option>
             </select>
         </div>
         <div class="col-md-2">

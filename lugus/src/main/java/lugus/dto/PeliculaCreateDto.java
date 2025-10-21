@@ -6,6 +6,8 @@ import lombok.*;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class PeliculaCreateDto {
 
+	private int id;
+	
 	@NotBlank(message = "El título es obligatorio")
     private String titulo;
 

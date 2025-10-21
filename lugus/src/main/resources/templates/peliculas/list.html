@@ -25,7 +25,7 @@
         <td th:text="${p.titulo}">Título</td>
         <td th:text="${p.anyo}">1999</td>
         <td th:text="${p.formato}">DVD</td>
-        <td th:text="${p.genero.descripcion}">Acción</td>
+        <td th:text="${p.genero}">Acción</td>
         <td>
             <a th:href="@{'/peliculas/' + ${p.id}}" class="btn btn-sm btn-outline-secondary">Ver</a>
         </td>
