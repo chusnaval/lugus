@@ -2,6 +2,7 @@ package lugus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lugus.dto.PeliculaCreateDto;
 import lugus.model.Formato;
 import lugus.model.Genero;
 import lugus.model.Pelicula;
@@ -39,13 +40,11 @@ class PeliculaControllerIT {
 	@Test
 	void create_and_fetch_pelicula() throws Exception {
 		// --- Arrange ---------------------------------------------------------
-		Pelicula dto = new Pelicula();
-		dto.setId(1);
+		PeliculaCreateDto dto = new PeliculaCreateDto();
 		dto.setTitulo("Matrix");
 		dto.setAnyo(1999);
-		dto.setGenero(Genero.CIENCIA_FICCION);
-		dto.setFormato(Formato.DVD);
-		dto.calcularCodigo();
+		dto.setGeneroCodigo(Genero.CIENCIA_FICCION.getCodigo());
+		dto.setFormatoCodigo(Formato.BLURAY.getId());
 		
 		
 		// --- Act -------------------------------------------------------------
