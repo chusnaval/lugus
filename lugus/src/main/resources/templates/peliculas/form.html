@@ -29,7 +29,7 @@
         <select class="form-select" th:field="*{formatoCodigo}">
             <option th:each="f : ${T(lugus.model.Formato).values()}"
                     th:value="${f.id}"
-                    th:text="${f}">DVD</option>
+                    th:text="${f}"></option>
         </select>
         <div class="text-danger" th:if="${#fields.hasErrors('formatoCodigo')}"
              th:errors="*{formatoCodigo}">Error</div>
@@ -40,7 +40,7 @@
         <select class="form-select" th:field="*{generoCodigo}">
             <option th:each="g : ${T(lugus.model.Genero).values()}"
                     th:value="${g.codigo}"
-                    th:text="${g}">Acción</option>
+                    th:text="${g}"></option>
         </select>
         <div class="text-danger" th:if="${#fields.hasErrors('generoCodigo')}"
              th:errors="*{generoCodigo}">Error</div>
