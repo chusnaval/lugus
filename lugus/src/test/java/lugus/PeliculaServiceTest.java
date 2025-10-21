@@ -46,6 +46,7 @@ class PeliculaServiceTest {
         child.setGenero(Genero.ACCION);
         child.setAnyo(1990);
         child.calcularCodigo();
+        padre.addHijo(child);
         
         // --- Act -------------------------------------------------------------
         Pelicula saved = service.save(child);
