@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${pelicula.id == null ? 'Crear' : 'Editar'} + ' película'">Crear película</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+</head>
+<body class="container mt-4">
+<h2 th:text="${pelicula.id == null ? 'Crear' : 'Editar'} + ' película'">Crear película</h2>
+
+<form th:action="@{/peliculas}" th:object="${pelicula}" method="post">
+    <div class="mb-3">
+        <label class="form-label">Título</label>
+        <input class="form-control" th:field="*{titulo}" placeholder="Ej.: Matrix"/>
+        <div class="text-danger" th:if="${#fields.hasErrors('titulo')}"
+             th:errors="*{titulo}">Error</div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Año</label>
+        <input type="number" class="form-control" th:field="*{anyo}" min="1888"/>
+        <div class="text-danger" th:if="${#fields.hasErrors('anyo')}"
+             th:errors="*{anyo}">Error</div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Formato</label>
+        <select class="form-select" th:field="*{formato}">
+            <option th:each="f : ${T(lugus.model.Formato).values()}"
+                    th:value="${f}"
+                    th:text="${f}">DVD</option>
+        </select>
+        <div class="text-danger" th:if="${#fields.hasErrors('formato')}"
+             th:errors="*{formato}">Error</div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Género</label>
+        <select class="form-select" th:field="*{generoCodigo}">
+            <option th:each="g : ${T(lugus.model.Genero).values()}"
+                    th:value="${g.codigo}"
+                    th:text="${g.descripcion}">Acción</option>
+        </select>
+        <div class="text-danger" th:if="${#fields.hasErrors('generoCodigo')}"
+             th:errors="*{generoCodigo}">Error</div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a th:href="@{/peliculas}" class="btn btn-link">Cancelar</a>
+</form>
+</body>
+</html>

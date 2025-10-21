@@ -76,4 +76,8 @@ public class PeliculaService {
 		return peliculaRepo.save(pelicula);
 		
 	}
+
+	public long contarTodas() {
+		return 1;
+	}
 }
