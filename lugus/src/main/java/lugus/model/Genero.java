@@ -44,6 +44,6 @@ public enum Genero {
 			}
 		}
 		
-		throw new IllegalArgumentException("No existe el genero");
+		throw new IllegalArgumentException("No existe el genero: " + code);
 	}
 }
