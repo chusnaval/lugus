@@ -1,5 +1,10 @@
 package lugus.model;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.Getter;
 
 public enum Genero {
@@ -31,19 +36,32 @@ public enum Genero {
 		this.categoria = categoria;
 		this.orden = orden;
 	}
-	
+
 	/**
 	 * Obtenemos el equivalente
+	 * 
 	 * @param i
 	 * @return
 	 */
 	public static Genero getById(String code) {
-		for(Genero aux : values()) {
-			if(aux.getCodigo().equals(code)) {
+		for (Genero aux : values()) {
+			if (aux.getCodigo().equals(code)) {
 				return aux;
 			}
 		}
-		
+
 		throw new IllegalArgumentException("No existe el genero: " + code);
 	}
+
+	public String getDisplayName() {
+		return Arrays.stream(this.name().toLowerCase().split("_"))
+				.map(s -> Character.toUpperCase(s.charAt(0)) + s.substring(1)).collect(Collectors.joining(" "));
+	}
+
+	public static List<Genero> valoresOrdenados() {
+		return Arrays.stream(Genero.values()).sorted(Comparator.comparing(Genero::getDisplayName))
+				.collect(Collectors.toList());
+
+	}
+
 }

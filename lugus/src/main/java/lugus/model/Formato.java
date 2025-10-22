@@ -1,5 +1,8 @@
 package lugus.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Getter;
 
 public enum Formato {
@@ -31,5 +34,14 @@ public enum Formato {
 		}
 		
 		throw new IllegalArgumentException("No existe el formato");
+	}
+	
+	public static List<Formato> valoresOrdenados() {
+		List<Formato> lista = new ArrayList<>();
+		lista.add(DVD);
+		lista.add(BLURAY);
+		lista.add(ULTRAHD);
+		lista.add(VHS);
+		return lista;
 	}
 }
