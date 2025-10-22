@@ -75,6 +75,9 @@ public class Pelicula {
 	private Set<Pelicula> peliculasPack = new HashSet<>();
 
 	@Column
+	private boolean pack;
+	
+	@Column
 	private boolean steelbook;
 
 	@Column

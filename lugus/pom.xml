@@ -45,7 +45,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>runtime</scope>
+           <scope>test</scope>
         </dependency>
 
 		<!-- Lombok (opcional, pero ahorra mucho código boilerplate) -->
@@ -69,6 +69,12 @@
 	        <artifactId>bootstrap</artifactId>
 	        <version>5.3.3</version>
 	    </dependency>
+
+		<!-- PostgreSQL JDBC driver -->
+	    <dependency>
+	        <groupId>org.postgresql</groupId>
+	        <artifactId>postgresql</artifactId>
+	        </dependency>
 
 		<!-- Test (JUnit 5 + Spring Test) -->
         <dependency>
@@ -95,11 +101,6 @@
                 </configuration>
             </plugin>
         </plugins>
-         <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-        </resource>
-    </resources>
     </build>
 
 </project>
