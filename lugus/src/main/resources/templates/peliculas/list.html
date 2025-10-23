@@ -16,6 +16,7 @@
         <th>Título</th>
         <th>Año</th>
         <th>Formato</th>
+        <th>Pack</th>
         <th>Género</th>
         <th>Acciones</th>
     </tr>
@@ -24,6 +25,7 @@
     <tr th:each="p : ${peliculas}">
         <td th:text="${p.titulo}">Título</td>
         <td th:text="${p.anyo}"></td>
+        <td th:text="${p.pack}"></td>
         <td th:text="${p.formato}"></td>
         <td th:text="${p.genero.displayName}"></td>
         <td>
