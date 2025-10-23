@@ -78,6 +78,6 @@ public class PeliculaService {
 	}
 
 	public long contarTodas() {
-		return peliculaRepo.count();
+		return peliculaRepo.countByPack(false);
 	}
 }
