@@ -78,6 +78,6 @@ public class PeliculaService {
 	}
 
 	public long contarTodas() {
-		return 1;
+		return peliculaRepo.count();
 	}
 }
