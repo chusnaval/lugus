@@ -3,8 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <title>Listado de películas</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet" integrity="sha384‑…" crossorigin="anonymous">
 <link rel="stylesheet"
-	th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+	integrity="sha512‑…" crossorigin="anonymous"
+	referrerpolicy="no-referrer" />
 </head>
 <body class="container mt-4">
 	<h1>Películas</h1>
@@ -49,8 +54,9 @@
 				th:classappend="${pagePeliculas.number == 1} ? 'disabled'"><a
 				th:replace="layout/paging :: paging(${pagePeliculas.number - 1}, 'Anterior', 'Página Anterior')"></a>
 			</li>
-			<li class="page-item disabled" th:if="${pagePeliculas.number - 2 > 1}"><a
-				class="page-link" href="#">...</a></li>
+			<li class="page-item disabled"
+				th:if="${pagePeliculas.number - 2 > 1}"><a class="page-link"
+				href="#">...</a></li>
 			<li class="page-item"
 				th:classappend="${page == pagePeliculas.number} ? 'active'"
 				th:each="page : ${#numbers.sequence(pagePeliculas.number > 2 ? pagePeliculas.number - 2 : 1, pagePeliculas.number + 2 < pagePeliculas.totalPages ? pagePeliculas.number + 2 : pagePeliculas.totalPages)}">
@@ -58,8 +64,8 @@
 				th:replace="layout/paging :: paging(${page}, ${page}, 'Página ' + ${page})"></a>
 			</li>
 			<li class="page-item disabled"
-				th:if="${pagePeliculas.number + 2 < pagePeliculas.totalPages}"><a class="page-link"
-				href="#">...</a></li>
+				th:if="${pagePeliculas.number + 2 < pagePeliculas.totalPages}"><a
+				class="page-link" href="#">...</a></li>
 			<li class="page-item font-weight-bold"
 				th:classappend="${pagePeliculas.number == pagePeliculas.totalPages} ? 'disabled'"><a
 				th:replace="layout/paging :: paging(${pagePeliculas.number + 1},'Siguiente', 'Página Siguiente')"></a>
