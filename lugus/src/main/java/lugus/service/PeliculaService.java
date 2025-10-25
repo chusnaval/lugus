@@ -8,8 +8,14 @@ import lugus.model.Localizacion;
 import lugus.model.Pelicula;
 import lugus.repository.PeliculaRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import jakarta.validation.Valid;
 
@@ -77,7 +83,17 @@ public class PeliculaService {
 		
 	}
 
-	public long contarTodas() {
+	public int contarTodas() {
 		return peliculaRepo.countByPack(false);
+	}
+
+	public Page<Pelicula> findAllByTitulo(String titulo, int pagina, String campo) {
+		Pageable pageable = PageRequest.of(pagina, 30, Sort.by(campo));
+		if(StringUtils.hasText(titulo)) {
+			List<Pelicula> lista = peliculaRepo.findByTitulo(titulo, pageable);
+			return new PageImpl<Pelicula>(lista, pageable, lista.size());
+		}else {
+			return  peliculaRepo.findAll(pageable);
+		}
 	}
 }

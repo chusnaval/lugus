@@ -1,38 +1,53 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Listado de películas</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+<meta charset="UTF-8" />
+<title>Listado de películas</title>
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
 </head>
 <body class="container mt-4">
-<h1>Películas</h1>
+	<h1>Películas</h1>
 
-<a class="btn btn-primary mb-3" th:href="@{/peliculas/nuevo}">Nueva película</a>
+	<a class="btn btn-primary mb-3" th:href="@{/peliculas/nuevo}">Nueva
+		película</a>
 
-<table class="table table-striped">
-    <thead>
-    <tr>
-        <th>Título</th>
-        <th>Año</th>
-        <th>Formato</th>
-        <th>Pack</th>
-        <th>Género</th>
-        <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="p : ${peliculas}">
-        <td th:text="${p.titulo}">Título</td>
-        <td th:text="${p.anyo}"></td>
-        <td th:text="${p.pack}"></td>
-        <td th:text="${p.formato}"></td>
-        <td th:text="${p.genero.displayName}"></td>
-        <td>
-            <a th:href="@{'/peliculas/' + ${p.id}}" class="btn btn-sm btn-outline-secondary">Ver</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Título</th>
+				<th>Año</th>
+				<th>Pack</th>
+				<th>Formato</th>
+				<th>Género</th>
+				<th>Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="p, iStat : ${pagePeliculas.content}"
+				th:style="${iStat.odd}? 'font-weight: bold;'"
+				th:alt-title="${iStat.even}? 'even' : 'odd'">
+				<td th:text="${p.titulo}">Título</td>
+				<td th:text="${p.anyo}"></td>
+				<td th:text="${p.pack}"></td>
+				<td th:text="${p.formato}"></td>
+				<td th:text="${p.genero.displayName}"></td>
+				<td><a th:href="@{'/peliculas/' + ${p.id}}"
+					class="btn btn-sm btn-outline-secondary">Ver</a></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<select name="paginas" onchange="irAPagina(this)">
+		<option
+			th:each="i : ${#numbers.sequence(0, pagePeliculas.totalPages)}"
+			th:value="${i}" th:text="'Página ' + (${i} + 1)"
+			></option>
+	</select>
 </body>
+<script type="text/javascript">
+	function irAPagina(variable) {
+		 window.location.href="/peliculas?pagina=" + parseInt(variable.value);
+	}
+</script>
 </html>
