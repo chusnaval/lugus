@@ -27,10 +27,20 @@ public class PeliculasController {
 	 */
 
 	@GetMapping
-	public String listPaginado(Model model, @RequestParam(required = false) String titulo,
-			@RequestParam(required = false) Optional<String> orden, @RequestParam(required = false) Optional<Integer> pagina) {
-		Page<Pelicula> resultado = service.findAllByTitulo(titulo, pagina.orElse(1), orden.orElse("titulo"));
+	public String listPaginado(Model model, @RequestParam(required = false) String keyword,
+			@RequestParam(required = false) Optional<String> orden, @RequestParam(required = false) Optional<String> direccion,
+			@RequestParam(required = false) Optional<Integer> pagina) {
+		Page<Pelicula> resultado = service.findAllByTitulo(keyword, pagina.orElse(1), orden.orElse("titulo"), direccion.orElse("ASC"));
 		model.addAttribute("pagePeliculas", resultado);
+		String campoOrden = "titulo";
+		String campoDireccion = "ASC";
+		if(resultado.getSort().get().findFirst().isPresent()) {
+			campoOrden = resultado.getSort().get().findFirst().get().getProperty();
+			campoDireccion = resultado.getSort().get().findFirst().get().getDirection().name();
+		}
+		model.addAttribute("campoOrden", campoOrden);
+		model.addAttribute("direccionOrden", campoDireccion);
+		
 		return "peliculas/list"; // → src/main/resources/templates/peliculas/list.html
 	}
 

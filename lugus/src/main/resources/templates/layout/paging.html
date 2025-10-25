@@ -1,0 +1,17 @@
+<!-- src/main/resources/templates/layout/fragments.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+<meta charset="UTF-8" />
+<title th:text="${title}">Lugus</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body>
+	<a th:fragment="paging(pageNum, label, tooltip)" class="page-link"
+		th:href="@{'/peliculas?' + ${keyword!=null && keyword!=''? 'keyword=' + keyword + '&' : ''}
+                           + 'page=' + ${pagePeliculas.number} 
+                           + ${campoOrden!=null ? '&orden=' + sortField + ',' + sortDirection : ''}}"
+		th:title="${tooltip}" rel="tooltip"> [[${label}]] </a>
+</body>
+</html>

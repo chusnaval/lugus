@@ -15,11 +15,11 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>Título</th>
-				<th>Año</th>
-				<th>Pack</th>
-				<th>Formato</th>
-				<th>Género</th>
+				<th th:replace="~{layout/sorting :: sorting('titulo','Título')}"></th>
+				<th th:replace="~{layout/sorting :: sorting('anyo','Año')}"></th>
+				<th th:replace="~{layout/sorting :: sorting('pack','Pack')}"></th>
+				<th th:replace="~{layout/sorting :: sorting('formato','Formato')}"></th>
+				<th th:replace="~{layout/sorting :: sorting('genero','Género')}"></th>
 				<th>Acciones</th>
 			</tr>
 		</thead>
