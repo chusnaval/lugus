@@ -24,6 +24,9 @@
 				<th th:replace="~{layout/sorting :: sorting('anyo','Año')}"></th>
 				<th th:replace="~{layout/sorting :: sorting('pack','Pack')}"></th>
 				<th th:replace="~{layout/sorting :: sorting('formato','Formato')}"></th>
+				<th th:replace="~{layout/sorting :: sorting('steelbook','Steelbook')}"></th>
+				<th th:replace="~{layout/sorting :: sorting('funda','Funda')}"></th>
+				<th th:replace="~{layout/sorting :: sorting('comprado','Comprado')}"></th>
 				<th th:replace="~{layout/sorting :: sorting('genero','Género')}"></th>
 				<th>Acciones</th>
 			</tr>
@@ -34,8 +37,11 @@
 				th:alt-title="${iStat.even}? 'even' : 'odd'">
 				<td th:text="${p.titulo}">Título</td>
 				<td th:text="${p.anyo}"></td>
-				<td th:class="${p.pack == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"></td>
+				<td class="text-center col-icon"> <i th:class="${p.pack == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"  aria-hidden="true"></i></td>
 				<td th:text="${p.formato}"></td>
+				<td class="text-center col-icon"> <i th:class="${p.steelbook == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"  aria-hidden="true"></i></td>
+				<td class="text-center col-icon"> <i th:class="${p.funda == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"  aria-hidden="true"></i></td>
+				<td class="text-center col-icon"> <i th:class="${p.comprado == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"  aria-hidden="true"></i></td>
 				<td th:text="${p.genero.displayName}"></td>
 				<td><a th:href="@{'/peliculas/' + ${p.id}}"
 					class="btn btn-sm btn-outline-secondary">Ver</a></td>
