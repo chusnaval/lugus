@@ -11,7 +11,7 @@
 	<a th:fragment="paging(pageNum, label, tooltip)" class="page-link"
 		th:href="@{'/peliculas?' + ${keyword!=null && keyword!=''? 'keyword=' + keyword + '&' : ''}
                 + 'pagina=' + ${pageNum}   
-                + '&orden=' + ${campoOrden} + '&direccion=' + ${direccionOrden == 'ASC'? 'DESC':'ASC'}}"
+                + '&orden=' + ${campoOrden} + '&direccion=' + ${direccionOrden}}"
 		th:title="${tooltip}" rel="tooltip"> [[${label}]] </a>
 </body>
 </html>

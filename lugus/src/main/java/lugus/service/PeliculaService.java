@@ -84,8 +84,8 @@ public class PeliculaService {
 
 	}
 
-	public int contarTodas() {
-		return peliculaRepo.countByPack(false);
+	public long contarTodas() {
+		return peliculaRepo.count();
 	}
 
 	public Page<Pelicula> findAllByTitulo(final String titulo, final int pagina, final String campo,

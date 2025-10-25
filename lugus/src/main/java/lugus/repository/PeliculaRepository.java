@@ -9,8 +9,8 @@ import lugus.model.Pelicula;
 public interface PeliculaRepository extends JpaRepository<Pelicula, Integer> {
 
 	
-	int countByPack(boolean value);
-
+	long count();
+	
 	List<Pelicula> findByTitulo(String titulo, Pageable pageable);
 
 }

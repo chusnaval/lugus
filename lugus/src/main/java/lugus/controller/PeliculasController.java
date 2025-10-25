@@ -30,7 +30,7 @@ public class PeliculasController {
 	public String listPaginado(Model model, @RequestParam(required = false) String keyword,
 			@RequestParam(required = false) Optional<String> orden, @RequestParam(required = false) Optional<String> direccion,
 			@RequestParam(required = false) Optional<Integer> pagina) {
-		Page<Pelicula> resultado = service.findAllByTitulo(keyword, pagina.orElse(1), orden.orElse("titulo"), direccion.orElse("ASC"));
+		Page<Pelicula> resultado = service.findAllByTitulo(keyword, pagina.orElse(0), orden.orElse("titulo"), direccion.orElse("ASC"));
 		model.addAttribute("pagePeliculas", resultado);
 		String campoOrden = "titulo";
 		String campoDireccion = "ASC";
