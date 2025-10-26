@@ -3,13 +3,17 @@
 <head>
 <meta charset="UTF-8" />
 <title>Listado de películas</title>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+	crossorigin="anonymous"></script>
+
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-	rel="stylesheet" integrity="sha384‑…" crossorigin="anonymous">
+	rel="stylesheet" crossorigin="anonymous">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-	integrity="sha512‑…" crossorigin="anonymous"
-	referrerpolicy="no-referrer" />
+	crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link th:href="@{/css/lugus.css}" rel="stylesheet">
 </head>
 <body class="container mt-4">
 	<h1>Películas</h1>
@@ -17,34 +21,75 @@
 	<a class="btn btn-primary mb-3" th:href="@{/peliculas/nuevo}">Nueva
 		película</a>
 
-	<table class="table table-striped">
-		<thead>
-			<tr>
-				<th th:replace="~{layout/sorting :: sorting('titulo','Título')}"></th>
-				<th th:replace="~{layout/sorting :: sorting('anyo','Año')}"></th>
-				<th th:replace="~{layout/sorting :: sorting('pack','Pack')}"></th>
-				<th th:replace="~{layout/sorting :: sorting('formato','Formato')}"></th>
-				<th th:replace="~{layout/sorting :: sorting('steelbook','Steelbook')}"></th>
-				<th th:replace="~{layout/sorting :: sorting('funda','Funda')}"></th>
-				<th th:replace="~{layout/sorting :: sorting('comprado','Comprado')}"></th>
-				<th th:replace="~{layout/sorting :: sorting('genero','Género')}"></th>
-				<th>Acciones</th>
+	<table class="table table-hover table-custom w-100">
+		<thead class="table-primary text-white">
+			<tr style="color: white !important">
+				<th></th>
+				<th class="text-center"
+					th:replace="~{layout/sorting :: sorting('titulo','Título')}"></th>
+				<th class="text-center"
+					th:replace="~{layout/sorting :: sorting('anyo','Año')}"></th>
+				<th class="text-center"
+					th:replace="~{layout/sorting :: sorting('pack','Pack')}"></th>
+				<th class="text-center"
+					th:replace="~{layout/sorting :: sorting('formato','Formato')}"></th>
+				<th class="text-center"
+					th:replace="~{layout/sorting :: sorting('steelbook','Steelbook')}"></th>
+				<th class="text-center"
+					th:replace="~{layout/sorting :: sorting('funda','Funda')}"></th>
+				<th class="text-center"
+					th:replace="~{layout/sorting :: sorting('comprado','Comprado')}"></th>
+				<th class="text-center"
+					th:replace="~{layout/sorting :: sorting('genero','Género')}"></th>
+				<th class="text-end" colspan="3">Acciones</th>
 			</tr>
 		</thead>
-		<tbody>
-			<tr th:each="p, iStat : ${pagePeliculas.content}"
-				th:style="${iStat.odd}? 'font-weight: bold;'"
-				th:alt-title="${iStat.even}? 'even' : 'odd'">
-				<td th:text="${p.titulo}">Título</td>
-				<td th:text="${p.anyo}"></td>
-				<td class="text-center col-icon"> <i th:class="${p.pack == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"  aria-hidden="true"></i></td>
-				<td th:text="${p.formato}"></td>
-				<td class="text-center col-icon"> <i th:class="${p.steelbook == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"  aria-hidden="true"></i></td>
-				<td class="text-center col-icon"> <i th:class="${p.funda == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"  aria-hidden="true"></i></td>
-				<td class="text-center col-icon"> <i th:class="${p.comprado == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"  aria-hidden="true"></i></td>
-				<td th:text="${p.genero.displayName}"></td>
-				<td><a th:href="@{'/peliculas/' + ${p.id}}"
-					class="btn btn-sm btn-outline-secondary">Ver</a></td>
+		<tbody th:each="p, iStat : ${pagePeliculas.content}"
+			id="tabla-peliculas">
+			<tr>
+				<td class="align-middle text-center"><i
+					th:if="${p.pack == true}" class="fas fa-chevron-right toggle-icon"></i>
+				</td>
+				<td class="text-left" th:text="${p.titulo}"></td>
+				<td class="text-end" th:text="${p.anyo}"></td>
+				<td class="text-center"><i
+					th:class="${p.pack == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
+					aria-hidden="true"></i></td>
+				<td class="text-left" th:text="${p.formato}"></td>
+				<td class="text-center"><i
+					th:class="${p.steelbook == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
+					aria-hidden="true"></i></td>
+				<td class="text-center"><i
+					th:class="${p.funda == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
+					aria-hidden="true"></i></td>
+				<td class="text-center"><i
+					th:class="${p.comprado == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
+					aria-hidden="true"></i></td>
+				<td class="text-left" th:text="${p.genero.displayName}"></td>
+				<td class="text-end"><a th:href="@{'/peliculas/' + ${p.id}}"
+					class="btn btn-sm btn-outline-primary">Ver</a></td>
+				<td class="text-end"><a
+					th:href="@{'/peliculas/' + ${p.id}} + '/editar'"
+					class="btn btn-sm btn-outline-secondary">Editar</a></td>
+				<td class="text-end"><a class="btn btn-sm btn-outline-danger">
+						<i
+						th:class="${p.comprado == true? 'far fa-solid fa-trash text-danger' : ''}"
+						aria-hidden="true"></i>
+				</a></td>
+
+			</tr>
+			<tr>
+				<td></td>
+				<td class="text-left" th:text="${p.codigo}"></td>
+				<td style="font-weight: bold;">Loc.:</td>
+				<td class="text-left" th:text="${p.descLocalizacion}" colspan="2"></td>
+				<td style="font-weight: bold;">Notas:</td>
+				<td class="text-left" th:text="${p.notas}" colspan="5"></td>
+			</tr>
+			<tr class="collapse" id="" th:attr="id='#details-'+${p.id}"
+				data-bs-parent="#tabla-peliculas" th:each="s : ${p.peliculasPack}">
+				<td colspan="5" class="p-3 bg-light"><span
+					th:text="${s.titulo}"></span><br></td>
 			</tr>
 		</tbody>
 	</table>

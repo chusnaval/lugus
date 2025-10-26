@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${pelicula.titulo}">Detalle</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+</head>
+<body class="container mt-4">
+<h2 th:text="${pelicula.titulo}">Título</h2>
+
+<ul class="list-group mb-4">
+    <li class="list-group-item"><strong>Año:</strong> <span th:text="${pelicula.anyo}"></span></li>
+    <li class="list-group-item"><strong>Formato:</strong> <span th:text="${pelicula.formato}"></span></li>
+    <li class="list-group-item"><strong>Género:</strong> <span th:text="${pelicula.genero.displayName}"></span></li>
+    <li class="list-group-item"><strong>Código interno:</strong> <span th:text="${pelicula.codigo}"></span></li>
+</ul>
+
+<hr/>
+
+<h4>Películas del pack</h4>
+<div th:if="${pelicula.peliculasPack.empty}">
+    <em>Este pack no contiene películas.</em>
+</div>
+<table th:unless="${pelicula.peliculasPack.empty}" class="table table-sm">
+    <thead>
+    <tr><th>Título</th><th>Año</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="h : ${pelicula.peliculasPack}">
+        <td th:text="${h.titulo}"></td>
+        <td th:text="${h.anyo}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<hr/>
+
+<h4>Añadir película al pack</h4>
+<form th:action="@{'/peliculas/' + ${pelicula.id} + '/hijo'}"
+      th:object="${nuevoHijo}" method="post">
+    <div class="row g-2">
+        <div class="col-md-4">
+            <input class="form-control" th:field="*{titulo}" placeholder="Título"/>
+        </div>
+        <div class="col-md-2">
+            <input type="number" class="form-control" th:field="*{anyo}" placeholder="Año"/>
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" th:field="*{formatoCodigo}">
+                <option th:each="f : ${T(lugus.model.Formato).valoresOrdenados()}"
+                        th:value="${f.id}"
+                        th:text="${f}"></option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" th:field="*{generoCodigo}">
+                <option th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
+                        th:value="${g.codigo}"
+                        th:text="${g.displayName}"></option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Añadir</button>
+        </div>
+    </div>
+</form>
+
+<a th:href="@{/peliculas}" class="btn btn-link mt-3">← Volver al listado</a>
+</body>
+</html>

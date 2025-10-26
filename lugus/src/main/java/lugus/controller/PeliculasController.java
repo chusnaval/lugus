@@ -83,6 +83,14 @@ public class PeliculasController {
 		return "peliculas/detail"; // → templates/peliculas/detail.html
 	}
 
+	@GetMapping("/{id}/editar")
+	public String edit(@PathVariable Integer id, Model model) {
+		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
+		model.addAttribute("pelicula", p);
+		// DTO vacío para el formulario “añadir hijo al pack”
+		model.addAttribute("nuevoHijo", new PeliculaCreateDto());
+		return "peliculas/edit"; // → templates/peliculas/detail.html
+	}
 	/*
 	 * ------------------------------------------------- AÑADIR UN HIJO AL PACK POST
 	 * /peliculas/{padreId}/hijo -------------------------------------------------

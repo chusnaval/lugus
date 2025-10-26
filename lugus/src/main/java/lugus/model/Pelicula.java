@@ -87,6 +87,13 @@ public class Pelicula {
 	@JoinColumn(name = "padre_id")
 	@ToString.Exclude
 	private Pelicula padre;
+	
+	public String getDescLocalizacion() {
+		if(localizacion==null) {
+			return "";
+		}
+		return localizacion.getDescripcion();
+	}
 
 	public void calcularCodigo() {
 		// Eliminar artículos del título

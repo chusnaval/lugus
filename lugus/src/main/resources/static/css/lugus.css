@@ -1,0 +1,17 @@
+.cursor-pointer { cursor: pointer; }
+
+.toggle-icon {
+    transition: transform .2s ease-in-out;
+}
+
+/* Rotación cuando la fila de detalle está visible */
+.collapse.show + tr .toggle-icon,
+tr[data-bs-toggle="collapse"].show .toggle-icon {
+    transform: rotate(90deg);
+}
+
+/* Opcional: colores de pares/impares (si no usas .table-custom) */
+.table-custom tbody tr:nth-child(odd) { background:#f8f9fa; }
+.table-custom tbody tr:nth-child(even){ background:#e7f1ff; }
+.table-custom tbody tr:hover { background:#d0ebff; }
+
