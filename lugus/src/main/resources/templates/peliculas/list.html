@@ -14,6 +14,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 	crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link th:href="@{/css/lugus.css}" rel="stylesheet">
+<script src="/js/actions.js"></script>
 </head>
 <body class="container mt-4">
 	<h1>Películas</h1>
@@ -24,7 +25,6 @@
 	<table class="table table-hover table-custom w-100">
 		<thead class="table-primary text-white">
 			<tr>
-				<th></th>
 				<th></th>
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('titulo','Título')}"></th>
@@ -42,10 +42,9 @@
 					th:replace="~{layout/sorting :: sorting('comprado','Comprado')}"></th>
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('genero','Género')}"></th>
-				<th class="text-end" colspan="3">Acciones</th>
+				<th class="text-end" colspan="3" rowspan="3">Acciones</th>
 			</tr>
 			<tr>
-				<th></th>
 				<th></th>
 				<th><input type="text"></th>
 				<th><input type="text"></th>
@@ -69,11 +68,12 @@
 						<option th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
 							th:value="${g.codigo}" th:text="${g.displayName}"></option>
 				</select></th>
-				<th colspan="3"></th>
 			</tr>
 			<tr>
 				<td></td>
-				<td class="text-left" style="font-weight: bold;" colspan="2">Loc:<select>
+				<td class="text-left"
+					th:replace="~{layout/sorting :: sorting('localizacion','Loc')}"></td>
+				<td><select>
 						<option th:each="l : ${localizaciones}" th:value="${l.codigo}"
 							th:text="${l.descripcion}"></option>
 				</select></td>
@@ -84,10 +84,7 @@
 		<tbody th:each="p, iStat : ${pagePeliculas.content}"
 			id="tabla-peliculas">
 			<tr>
-				<td class="align-middle text-center"><i
-					th:if="${p.pack == true}" class="fas fa-chevron-right toggle-icon"></i>
-				</td>
-				<td class="align-middle text-center"><img
+				<td class="align-middle text-center" rowspan="2"><img
 					th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
 					class="img-thumbnail" alt="Caratula" /> <img
 					th:if="${p.tieneCaratula == true}"
@@ -114,15 +111,14 @@
 				<td class="text-end"><a
 					th:href="@{'/peliculas/' + ${p.id}} + '/editar'"
 					class="btn btn-sm btn-outline-secondary">Editar</a></td>
-				<td class="text-end"><a class="btn btn-sm btn-outline-danger">
-						<i
+				<td class="text-end"><a class="btn btn-sm btn-outline-danger"
+					th:onclick="'del('+${p.id}+')'"> <i
 						th:class="${p.comprado == true? 'far fa-solid fa-trash text-danger' : ''}"
 						aria-hidden="true"></i>
 				</a></td>
 
 			</tr>
 			<tr>
-				<td></td>
 				<td class="text-left" th:text="${p.codigo}"></td>
 				<td style="font-weight: bold;">Loc.:</td>
 				<td class="text-left" th:text="${p.descLocalizacion}" colspan="2"></td>
