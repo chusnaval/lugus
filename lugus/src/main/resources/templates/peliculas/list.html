@@ -23,7 +23,7 @@
 
 	<table class="table table-hover table-custom w-100">
 		<thead class="table-primary text-white">
-			<tr style="color: white !important">
+			<tr>
 				<th></th>
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('titulo','Título')}"></th>
@@ -42,6 +42,41 @@
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('genero','Género')}"></th>
 				<th class="text-end" colspan="3">Acciones</th>
+			</tr>
+			<tr>
+				<th></th>
+				<th><input type="text"></th>
+				<th><input type="text"></th>
+				<th><select><option value="true">Sí</option>
+						<option value="false">No</option>
+				</select></th>
+				<th><select>
+						<option th:each="f : ${T(lugus.model.Formato).valoresOrdenados()}"
+							th:value="${f.id}" th:text="${f}"></option>
+				</select></th>
+				<th><select><option value="true">Sí</option>
+						<option value="false">No</option>
+				</select></th>
+				<th><select><option value="true">Sí</option>
+						<option value="false">No</option>
+				</select></th>
+				<th><select><option value="true">Sí</option>
+						<option value="false">No</option>
+				</select></th>
+				<th><select>
+						<option th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
+							th:value="${g.codigo}" th:text="${g.displayName}"></option>
+				</select></th>
+				<th colspan="3"></th>
+			</tr>
+			<tr>
+				<td></td>
+				<td class="text-left"  style="font-weight: bold;" colspan="2">Loc:<select>
+						<option th:each="l : ${localizaciones}"
+							th:value="${l.codigo}" th:text="${l.descripcion}"></option>
+				</select></td>
+				<td style="font-weight: bold;">Notas:</td>
+				<td class="text-left" colspan="8"><input type="text"></td>
 			</tr>
 		</thead>
 		<tbody th:each="p, iStat : ${pagePeliculas.content}"

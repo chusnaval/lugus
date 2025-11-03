@@ -23,4 +23,8 @@ public class LocalizacionService {
 		return locRepo.findById(id);
 	}
 
+	public List<Localizacion> findAllOrderByDescripcion() {
+		return locRepo.findAllByOrderByDescripcionAsc();
+	}
+
 }

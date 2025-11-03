@@ -3,7 +3,9 @@ package lugus.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.PeliculaCreateDto;
+import lugus.model.Localizacion;
 import lugus.model.Pelicula;
+import lugus.service.LocalizacionService;
 import lugus.service.PeliculaService;
 
 import org.springframework.data.domain.Page;
@@ -12,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -20,6 +23,8 @@ import java.util.Optional;
 public class PeliculasController {
 
 	private final PeliculaService service;
+	
+	private final LocalizacionService locService;
 
 	/*
 	 * ------------------------------------------------- LISTADO DE PELÍCULAS GET
@@ -38,6 +43,8 @@ public class PeliculasController {
 			campoOrden = resultado.getSort().get().findFirst().get().getProperty();
 			campoDireccion = resultado.getSort().get().findFirst().get().getDirection().name();
 		}
+		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
+		model.addAttribute("localizaciones", localizaciones);
 		model.addAttribute("campoOrden", campoOrden);
 		model.addAttribute("direccionOrden", campoDireccion);
 		
