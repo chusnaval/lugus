@@ -99,6 +99,10 @@ public class Pelicula {
 		return localizacion.getDescripcion();
 	}
 
+	public boolean tieneCaratula() {
+		return this.peliculaFotos!=null && !peliculaFotos.isEmpty();
+	}
+	
 	public void calcularCodigo() {
 		// Eliminar artículos del título
 		String procesado = titulo.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las)\\b\\s*", "");

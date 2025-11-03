@@ -25,6 +25,7 @@
 		<thead class="table-primary text-white">
 			<tr>
 				<th></th>
+				<th></th>
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('titulo','Título')}"></th>
 				<th class="text-center"
@@ -44,6 +45,7 @@
 				<th class="text-end" colspan="3">Acciones</th>
 			</tr>
 			<tr>
+				<th></th>
 				<th></th>
 				<th><input type="text"></th>
 				<th><input type="text"></th>
@@ -71,9 +73,9 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td class="text-left"  style="font-weight: bold;" colspan="2">Loc:<select>
-						<option th:each="l : ${localizaciones}"
-							th:value="${l.codigo}" th:text="${l.descripcion}"></option>
+				<td class="text-left" style="font-weight: bold;" colspan="2">Loc:<select>
+						<option th:each="l : ${localizaciones}" th:value="${l.codigo}"
+							th:text="${l.descripcion}"></option>
 				</select></td>
 				<td style="font-weight: bold;">Notas:</td>
 				<td class="text-left" colspan="8"><input type="text"></td>
@@ -85,6 +87,12 @@
 				<td class="align-middle text-center"><i
 					th:if="${p.pack == true}" class="fas fa-chevron-right toggle-icon"></i>
 				</td>
+				<td class="align-middle text-center"><img
+					th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
+					class="img-thumbnail" alt="Caratula" /> <img
+					th:if="${p.tieneCaratula == true}"
+					th:src="@{/peliculas/{id}/image(id=${p.id})}" class="img-thumbnail"
+					alt="Caratula" /></td>
 				<td class="text-left" th:text="${p.titulo}"></td>
 				<td class="text-end" th:text="${p.anyo}"></td>
 				<td class="text-center"><i

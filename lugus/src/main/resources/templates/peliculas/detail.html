@@ -37,8 +37,11 @@
 					interno:</strong> <span class="col-9" th:text="${pelicula.codigo}"></span></li>
 		</ul>
 		<div class="col-3">
-			<img th:if="${tieneCaratula == true}" th:src="@{/peliculas/{id}/image(id=${pelicula.id})}" class="img-thumbnail"
-				alt="Caratula" />
+			<img th:if="${pelicula.tieneCaratula == false}"
+				src="../image/placeholder.png" class="img-thumbnail" alt="Caratula" />
+			<img th:if="${pelicula.tieneCaratula == true}"
+				th:src="@{/peliculas/{id}/image(id=${pelicula.id})}"
+				class="img-thumbnail" alt="Caratula" />
 		</div>
 
 	</div>

@@ -93,7 +93,6 @@ public class PeliculasController {
 	public String detail(@PathVariable Integer id, Model model) {
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 
-		model.addAttribute("tieneCaratula", p.getPeliculaFotos()!= null && !p.getPeliculaFotos().isEmpty());
 		model.addAttribute("pelicula", p);
 		return "peliculas/detail"; // → templates/peliculas/detail.html
 	}
@@ -102,12 +101,12 @@ public class PeliculasController {
 	public ResponseEntity<byte[]> image(@PathVariable Integer id) {
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 
-		PeliculaFoto pf = p.getPeliculaFotos().iterator().next();
-
-		if (pf != null) {
+		if (p.getPeliculaFotos() != null && !p.getPeliculaFotos().isEmpty()) {
+			PeliculaFoto pf = p.getPeliculaFotos().iterator().next();
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.IMAGE_JPEG);
 			return new ResponseEntity<>(pf.getFoto(), headers, HttpStatus.OK);
+
 		} else {
 			return new ResponseEntity<>(new byte[0], HttpStatus.NOT_FOUND);
 		}
