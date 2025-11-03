@@ -36,10 +36,9 @@
 			<li class="list-group-item row"><strong class="col-3">Código
 					interno:</strong> <span class="col-9" th:text="${pelicula.codigo}"></span></li>
 		</ul>
-
 		<div class="col-3">
-			<img style="max-width:150px;"
-				src="https://www.mubis.es/media/releases/20694/346223/a-quien-ama-gilbert-grape-blu-ray-l_cover.jpg" />
+			<img th:if="${tieneCaratula == true}" th:src="@{/peliculas/{id}/image(id=${pelicula.id})}" class="img-thumbnail"
+				alt="Caratula" />
 		</div>
 
 	</div>
@@ -76,6 +75,8 @@
 			<tbody>
 				<tr th:each="h : ${pelicula.peliculasPack}">
 					<td th:text="${h.titulo}"></td>
+					<td class="text-end"><a th:href="@{'/peliculas/' + ${h.id}}"
+						class="btn btn-sm btn-outline-primary">Ver</a></td>
 					<td th:text="${h.anyo}"></td>
 				</tr>
 			</tbody>

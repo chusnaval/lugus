@@ -88,6 +88,10 @@ public class Pelicula {
 	@ToString.Exclude
 	private Pelicula padre;
 	
+	@OneToMany(mappedBy = "pelicula")
+	@ToString.Exclude
+	private Set<PeliculaFoto> peliculaFotos = new HashSet<>();
+	
 	public String getDescLocalizacion() {
 		if(localizacion==null) {
 			return "";
