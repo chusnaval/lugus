@@ -40,8 +40,13 @@ public class ImgMubisDownloader {
 		try (Connection con = DriverManager.getConnection(url, user, password)) {
 			resultado.forEach(t -> {
 				try {
-					t.setPelicula_id(localizarPeliculaId(t.getTitulo(), con));
-					imprimirEInsertar(t, con);
+					boolean existeEnBaseDatos = buscarUrlCaratula(t.getUrl(), con);
+					if (!existeEnBaseDatos) {
+						t.setPelicula_id(localizarPeliculaId(t.getTitulo(), con));
+						imprimirEInsertar(t, con);
+					} else {
+						System.out.println("La url de " + t.getTitulo() + " ya ha sido insertada ");
+					}
 				} catch (IOException | SQLException e) {
 					lgr.log(Level.SEVERE, e.getMessage(), e);
 				}
@@ -52,25 +57,37 @@ public class ImgMubisDownloader {
 
 	}
 
+	private static boolean buscarUrlCaratula(String url, Connection con) throws SQLException {
+
+		try (Statement st = con.createStatement()) {
+			String sql = "select pelicula_id FROM public.peliculas_fotos where url = '" + url + "'";
+			ResultSet rs = st.executeQuery(sql);
+
+			return rs.next();
+
+		}
+	}
+
 	private static int localizarPeliculaId(String params, Connection con) throws SQLException {
 
 		List<String> longestWords = Arrays.asList(params.split(" ")).stream()
 				.sorted((w1, w2) -> Integer.compare(w2.length(), w1.length())).limit(3) // Take top 3
 				.collect(Collectors.toList());
-
+		boolean correct = false;
 		int peliculaIdEncontrado = -1;
 		try (Statement st = con.createStatement()) {
 			String sql = " SELECT id, titulo, formato, anyo FROM public.peliculas where formato = 2 and upper(titulo) similar to upper('%("
 					+ String.join("|", longestWords)
 					+ ")%') and id not in (select pelicula_id FROM public.peliculas_fotos) ORDER BY id ASC  ";
-			
-			System.out.println("Buscamos SQL: " + sql);
-			
+
+			// System.out.println("Buscamos SQL: " + sql);
+
 			ResultSet rs = st.executeQuery(sql);
 
-			System.out.println(" Buscando pelicula: " + params);
+			System.out.println("\n\n===============================");
+			System.out.println("Buscando pelicula: " + params);
 			System.out.println("Peliculas encontradas: ");
-
+			List<Integer> encontrados = new ArrayList<Integer>();
 			while (rs.next()) {
 				int id = rs.getInt("id");
 				String titulo = rs.getString("titulo");
@@ -78,16 +95,26 @@ public class ImgMubisDownloader {
 				int anyo = rs.getInt("anyo");
 
 				System.out.println("Id: " + id + " titulo: " + titulo + " formato: " + formato + " anyo: " + anyo);
+				encontrados.add(id);
 			}
 
-			Scanner myObj = new Scanner(System.in);
-			System.out.println("Enter id: ");
-			String userId = myObj.nextLine();
+			if (encontrados.isEmpty()) {
+				System.out.println("Ninguna");
+			} else {
 
-			try {
-				peliculaIdEncontrado = Integer.parseInt(userId);
-			} catch (Exception e) {
+				encontrados.add(-1);// para poder seleccionar que no encuentra
 
+				Scanner myObj = new Scanner(System.in);
+				try {
+					while (!correct) {
+						System.out.println("Enter id localizado (-1 si no esta listado): ");
+						String userId = myObj.next();
+						peliculaIdEncontrado = Integer.parseInt(userId);
+						correct = encontrados.contains(peliculaIdEncontrado);
+					}
+				} catch (Exception e) {
+					System.out.println("Error " + e);
+				}
 			}
 		}
 		return peliculaIdEncontrado;
@@ -114,7 +141,7 @@ public class ImgMubisDownloader {
 			throws MalformedURLException, IOException, SQLException {
 
 		if (caratula.getPelicula_id() > 0) {
-			// insertar(caratula, con);
+			insertar(caratula, con);
 			System.out.println("Insertada pelicula: " + caratula.getTitulo());
 		} else {
 			System.out.println("Pelicula no encontrada: " + caratula.getTitulo());
