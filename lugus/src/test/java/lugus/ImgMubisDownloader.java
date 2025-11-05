@@ -2,38 +2,124 @@ package lugus;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class ImgMubisDownloader {
 
+	private static final int MUBIS = 6;
+	private static String url = "jdbc:postgresql://localhost:5432/lugus_dev";
+	private static String user = "lugus_usr";
+	private static String password = "lugus_pass";
+	static Logger lgr = Logger.getLogger(ImgMubisDownloader.class.getName());
+
 	public static void main(String[] args) throws IOException {
-	    // PostgreSQL connection details
-        String url = "jdbc:postgresql://localhost:5432/lugus_dev";
-        String user = "lugus_usr";
-        String password = "lugus_pass";
-        
-        try (Connection con = DriverManager.getConnection(url, user, password);
-                PreparedStatement pst = con.prepareStatement("INSERT INTO public.peliculas_fotos (id, pelicula_id, url, fuente_id, foto) VALUES (?, ?, ?, ?, ?)")) {
-    		URL imgUrl = new URL("https://www.mubis.es/media/releases/2512/5605/13-fantasmas-blu-ray-l_cover.jpg");
-    		InputStream in = imgUrl.openStream();
-    		pst.setInt(1, 1);
-    		pst.setInt(2, 5011);
-    		pst.setString(3, "https://www.mubis.es/media/releases/2512/5605/13-fantasmas-blu-ray-l_cover.jpg");
-    		pst.setInt(4, 6);
-    		pst.setBinaryStream(5, in);
-    		pst.executeUpdate();
-    		pst.close();
-    		in.close();
-        } catch (SQLException ex) {
-            Logger lgr = Logger.getLogger(ImgMubisDownloader.class.getName());
-            lgr.log(Level.SEVERE, ex.getMessage(), ex);
-        }
+		// PostgreSQL connection details
+		Path path = Paths.get("src/test/resources/tmp_caratulas.csv");
+		List<Caratula> resultado = Files.lines(path).skip(1) // saltar cabecera, si la hay
+				.map(line -> line.split(";"))
+				.map(values -> new Caratula(values[0].trim(), values[1].trim(), values[2].trim(), -1))
+				.collect(Collectors.toList());
+
+		try (Connection con = DriverManager.getConnection(url, user, password)) {
+			resultado.forEach(t -> {
+				try {
+					t.setPelicula_id(localizarPeliculaId(t.getTitulo(), con));
+					imprimirEInsertar(t, con);
+				} catch (IOException | SQLException e) {
+					lgr.log(Level.SEVERE, e.getMessage(), e);
+				}
+			});
+		} catch (SQLException ex) {
+			lgr.log(Level.SEVERE, ex.getMessage(), ex);
+		}
 
 	}
-}	
+
+	private static int localizarPeliculaId(String params, Connection con) throws SQLException {
+
+		List<String> longestWords = Arrays.asList(params.split(" ")).stream()
+				.sorted((w1, w2) -> Integer.compare(w2.length(), w1.length())).limit(3) // Take top 3
+				.collect(Collectors.toList());
+
+		int peliculaIdEncontrado = -1;
+		try (Statement st = con.createStatement()) {
+			String sql = " SELECT id, titulo, formato, anyo FROM public.peliculas where formato = 2 and upper(titulo) similar to upper('%("
+					+ String.join("|", longestWords)
+					+ ")%') and id not in (select pelicula_id FROM public.peliculas_fotos) ORDER BY id ASC  ";
+			
+			System.out.println("Buscamos SQL: " + sql);
+			
+			ResultSet rs = st.executeQuery(sql);
+
+			System.out.println(" Buscando pelicula: " + params);
+			System.out.println("Peliculas encontradas: ");
+
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String titulo = rs.getString("titulo");
+				int formato = rs.getInt("formato");
+				int anyo = rs.getInt("anyo");
+
+				System.out.println("Id: " + id + " titulo: " + titulo + " formato: " + formato + " anyo: " + anyo);
+			}
+
+			Scanner myObj = new Scanner(System.in);
+			System.out.println("Enter id: ");
+			String userId = myObj.nextLine();
+
+			try {
+				peliculaIdEncontrado = Integer.parseInt(userId);
+			} catch (Exception e) {
+
+			}
+		}
+		return peliculaIdEncontrado;
+	}
+
+	private static void insertar(Caratula caratula, Connection con)
+			throws SQLException, MalformedURLException, IOException {
+		try (PreparedStatement pst = con.prepareStatement(
+				"INSERT INTO public.peliculas_fotos ( pelicula_id, url, fuente_id, foto) VALUES ( ?, ?, ?, ?)")) {
+
+			URL imgUrl = new URL(caratula.getUrl());
+			InputStream in = imgUrl.openStream();
+			pst.setInt(1, caratula.getPelicula_id());
+			pst.setString(2, caratula.getUrl());
+			pst.setInt(3, MUBIS);
+			pst.setBinaryStream(4, in);
+			pst.executeUpdate();
+			pst.close();
+			in.close();
+		}
+	}
+
+	private static void imprimirEInsertar(Caratula caratula, Connection con)
+			throws MalformedURLException, IOException, SQLException {
+
+		if (caratula.getPelicula_id() > 0) {
+			// insertar(caratula, con);
+			System.out.println("Insertada pelicula: " + caratula.getTitulo());
+		} else {
+			System.out.println("Pelicula no encontrada: " + caratula.getTitulo());
+		}
+
+	}
+
+}
