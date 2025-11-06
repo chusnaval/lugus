@@ -40,6 +40,10 @@ public class PeliculaFoto {
 	@JoinColumn(name = "pelicula_id", nullable = true) // FK → localizaciones.codigo
 	private Pelicula pelicula;
 	
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "fuente_id", nullable = true) // FK → peliculaFotos.codigo
+	private Fuente fuente;
+	
     @Column
 	private byte[] foto;
 	

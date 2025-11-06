@@ -88,7 +88,7 @@ public class Pelicula {
 	@ToString.Exclude
 	private Pelicula padre;
 	
-	@OneToMany(mappedBy = "pelicula")
+	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
 	private Set<PeliculaFoto> peliculaFotos = new HashSet<>();
 	
@@ -126,5 +126,11 @@ public class Pelicula {
 		this.peliculasPack.add(hijo);
 		hijo.setPadre(this);
 
+	}
+
+	public void addCaratula(PeliculaFoto pf) {
+		this.peliculaFotos.add(pf);
+		pf.setPelicula(this);
+		
 	}
 }

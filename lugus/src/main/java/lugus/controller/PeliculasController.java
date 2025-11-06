@@ -3,9 +3,12 @@ package lugus.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.PeliculaCreateDto;
+import lugus.model.Fuente;
 import lugus.model.Localizacion;
 import lugus.model.Pelicula;
 import lugus.model.PeliculaFoto;
+import lugus.service.DwFotoServiceI;
+import lugus.service.FuenteService;
 import lugus.service.LocalizacionService;
 import lugus.service.PeliculaService;
 
@@ -20,6 +23,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.Image;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +35,8 @@ public class PeliculasController {
 	private final PeliculaService service;
 
 	private final LocalizacionService locService;
+	
+	private final FuenteService fuenteService;
 
 	/*
 	 * ------------------------------------------------- LISTADO DE PELÍCULAS GET
@@ -117,11 +123,38 @@ public class PeliculasController {
 	public String edit(@PathVariable Integer id, Model model) {
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 		model.addAttribute("pelicula", p);
+		
+		List<Fuente> fuentes = fuenteService.findAll();
+		model.addAttribute("fuentesList",fuentes);
+		
+		model.addAttribute("caratula", new NewCaratulaDTO());
 		// DTO vacío para el formulario “añadir hijo al pack”
 		model.addAttribute("nuevoHijo", new PeliculaCreateDto());
 		return "peliculas/edit"; // → templates/peliculas/detail.html
 	}
 
+	@PostMapping("/{id}/caratula")
+	public ResponseEntity<String> addCaratula(@PathVariable Integer id, @Valid @ModelAttribute("caratula") NewCaratulaDTO dto
+			) throws IOException {
+
+		final DwFotoServiceI dwFotoService = new DwFotoService();
+		Optional<Fuente> fuenteObj = fuenteService.findById(dto.getFuente());
+		PeliculaFoto pf = new PeliculaFoto();
+		pf.setUrl(dto.getUrl());
+		pf.setFuente(fuenteObj.get());
+		pf.setFoto(dwFotoService.descargar(dto.getFuente(), dto.getUrl()));
+
+		Optional<Pelicula> pelicula = service.findById(id);
+
+		if (pelicula.isPresent()) {
+			pelicula.get().addCaratula(pf);
+			service.save(pelicula.get());
+			return ResponseEntity.ok("Descargado");
+		}
+
+		return new ResponseEntity<String>("Id no encontrado", HttpStatus.NO_CONTENT);
+	}
+	
 	/*
 	 * ------------------------------------------------- AÑADIR UN HIJO AL PACK POST
 	 * /peliculas/{padreId}/hijo -------------------------------------------------
