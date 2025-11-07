@@ -141,6 +141,10 @@ public class PeliculasController {
 		nuevo.setFormatoCodigo(p.getFormato().getId());
 		nuevo.setGeneroCodigo(p.getGenero().getCodigo());
 		nuevo.setLocalizacionCodigo(p.getLocalizacion().getCodigo());
+		nuevo.setFunda(p.isFunda());
+		nuevo.setComprado(p.isComprado());
+		nuevo.setSteelbook(p.isSteelbook());
+		
 		model.addAttribute("nuevo", nuevo);
 
 		return "peliculas/edit"; // → templates/peliculas/detail.html
