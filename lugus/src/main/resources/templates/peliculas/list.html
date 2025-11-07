@@ -17,105 +17,131 @@
 <script src="/js/actions.js"></script>
 </head>
 <body class="container mt-4">
+	<div th:fragment="header"></div>
 	<h1>Películas</h1>
 
 	<a class="btn btn-primary mb-3" th:href="@{/peliculas/nuevo}">Nueva
 		película</a>
 
-	<table class="table table-hover table-custom w-100">
+	<table class="table table-hover table-custom w-100 peliculas">
 		<thead class="table-primary text-white">
 			<tr>
 				<th></th>
+				
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('titulo','Título')}"></th>
+					
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('anyo','Año')}"></th>
+					
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('pack','Pack')}"></th>
+					
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('formato','Formato')}"></th>
+					
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('steelbook','Steelbook')}"></th>
+					
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('funda','Funda')}"></th>
+					
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('comprado','Comprado')}"></th>
+					
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('genero','Género')}"></th>
-				<th class="text-end" colspan="3" rowspan="3">Acciones</th>
+					
+				<th class="text-end" colspan="2" rowspan="3">Acciones</th>
 			</tr>
 			<tr>
 				<th></th>
+				<th class="text-center"><input type="text"></th>
+				
 				<th><input type="text"></th>
-				<th><input type="text"></th>
+				
 				<th><select><option value="true">Sí</option>
 						<option value="false">No</option>
 				</select></th>
+				
 				<th><select>
 						<option th:each="f : ${T(lugus.model.Formato).valoresOrdenados()}"
 							th:value="${f.id}" th:text="${f}"></option>
 				</select></th>
+				
 				<th><select><option value="true">Sí</option>
 						<option value="false">No</option>
 				</select></th>
+				
 				<th><select><option value="true">Sí</option>
 						<option value="false">No</option>
 				</select></th>
+				
 				<th><select><option value="true">Sí</option>
 						<option value="false">No</option>
 				</select></th>
+				
 				<th><select>
 						<option th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
 							th:value="${g.codigo}" th:text="${g.displayName}"></option>
 				</select></th>
+				
 			</tr>
 			<tr>
 				<td></td>
 				<td class="text-left"
 					th:replace="~{layout/sorting :: sorting('localizacion','Loc')}"></td>
+					
 				<td><select>
 						<option th:each="l : ${localizaciones}" th:value="${l.codigo}"
 							th:text="${l.descripcion}"></option>
 				</select></td>
-				<td style="font-weight: bold;">Notas:</td>
-				<td class="text-left" colspan="8"><input type="text"></td>
+				
+				<td  style="font-weight: bold;">Notas:</td>
+				
+				<td class="text-left" colspan="7"><input type="text"></td>
 			</tr>
 		</thead>
 		<tbody th:each="p, iStat : ${pagePeliculas.content}"
 			id="tabla-peliculas">
 			<tr>
-				<td class="align-middle text-center" rowspan="2"><img
+				<td class="align-middle text-center cover" rowspan="2"><img
 					th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
 					class="img-thumbnail" alt="Caratula" /> <img
 					th:if="${p.tieneCaratula == true}"
 					th:src="@{/peliculas/{id}/image(id=${p.id})}" class="img-thumbnail"
 					alt="Caratula" /></td>
+					
 				<td class="text-left" th:text="${p.titulo}"></td>
+				
 				<td class="text-end" th:text="${p.anyo}"></td>
+				
 				<td class="text-center"><i
 					th:class="${p.pack == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
 					aria-hidden="true"></i></td>
-				<td class="text-left" th:text="${p.formato}"></td>
-				<td class="text-center"><i
+					
+				<td class="text-left " th:text="${p.formato}"></td>
+				
+				<td class="text-center  "><i
 					th:class="${p.steelbook == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
 					aria-hidden="true"></i></td>
+					
 				<td class="text-center"><i
 					th:class="${p.funda == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
 					aria-hidden="true"></i></td>
+					
 				<td class="text-center"><i
 					th:class="${p.comprado == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
 					aria-hidden="true"></i></td>
+					
 				<td class="text-left" th:text="${p.genero.displayName}"></td>
+				
 				<td class="text-end"><a th:href="@{'/peliculas/' + ${p.id}}"
 					class="btn btn-sm btn-outline-primary">Ver</a></td>
+					
 				<td class="text-end"><a
 					th:href="@{'/peliculas/' + ${p.id}} + '/editar'"
 					class="btn btn-sm btn-outline-secondary">Editar</a></td>
-				<td class="text-end"><a class="btn btn-sm btn-outline-danger"
-					th:onclick="'del('+${p.id}+')'"> <i
-						th:class="${p.comprado == true? 'far fa-solid fa-trash text-danger' : ''}"
-						aria-hidden="true"></i>
-				</a></td>
 
 			</tr>
 			<tr>
@@ -127,7 +153,7 @@
 			</tr>
 			<tr class="collapse" id="" th:attr="id='#details-'+${p.id}"
 				data-bs-parent="#tabla-peliculas" th:each="s : ${p.peliculasPack}">
-				<td colspan="5" class="p-3 bg-light"><span
+				<td colspan="4" class="p-3 bg-light"><span
 					th:text="${s.titulo}"></span><br></td>
 			</tr>
 		</tbody>
