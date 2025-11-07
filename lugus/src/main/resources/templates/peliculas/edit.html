@@ -16,40 +16,65 @@
 <link th:href="@{/css/lugus.css}" rel="stylesheet">
 </head>
 <body class="container mt-4">
+	<form th:action="@{'/peliculas/' + ${pelicula.id}} + '/actualizar'"
+		th:object="${nuevo}" method="post">
+		<h2 th:text="${pelicula.titulo}" >Título</h2>
+		<input type="hidden" id="idPelicula" th:value="${pelicula.id}">
 
-	<h2  th:text="${pelicula.titulo}">Título</h2>
-<input type="hidden" id="idPelicula" th:value="${pelicula.id}">
+		<div class="row">
+			<ul class="list-group mb-4 col-8">
+					<li class="list-group-item row"><strong class="col-3">Título:</strong>
+					<input type="text" th:value="${pelicula.titulo}"  th:field="*{titulo}"></li>
+					
+				<li class="list-group-item row"><strong class="col-3">Año:</strong>
+					<input type="text" th:value="${pelicula.anyo}" th:field="*{anyo}" maxlength="4"></li>
+					
+				<li class="list-group-item row"><strong class="col-3">Formato:</strong>
+					<select class="form-select" th:field="*{formatoCodigo}">
+						<option th:each="f : ${T(lugus.model.Formato).valoresOrdenados()}"
+							th:value="${f.id}" th:text="${f}"
+							th:selected="${pelicula.formato.id == f.id}"></option>
+				</select></li>
+				<li class="list-group-item row"><strong class="col-3">Género:</strong>
+					<select class="form-select" th:field="*{generoCodigo}">
+						<option th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
+							th:value="${g.codigo}" th:text="${g.displayName}"
+							th:selected="${pelicula.genero.codigo == g.codigo}"></option>
+				</select></li>
 
-	<div class="row">
-		<ul class="list-group mb-4 col-8">
-			<li class="list-group-item row"><strong class="col-3">Año:</strong>
-				<span th:text="${pelicula.anyo}"></span></li>
-			<li class="list-group-item row"><strong class="col-3">Formato:</strong>
-				<span th:text="${pelicula.formato}"></span></li>
-			<li class="list-group-item row"><strong class="col-3">Género:</strong>
-				<span th:text="${pelicula.genero.displayName}"></span></li>
-			<li class="list-group-item row"><strong class="col-3">Código
-					interno:</strong> <span th:text="${pelicula.codigo}"></span></li>
-			<li class="list-group-item row"><strong class="col-3">Steelbook:</strong><i
-				th:class="${pelicula.steelbook == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
-				aria-hidden="true"></i><strong class="col-3">Funda</strong><i
-				th:class="${pelicula.funda == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
-				aria-hidden="true"></i><strong class="col-3">Comprado:</strong><i
-				th:class="${pelicula.comprado == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
-				aria-hidden="true"></i></li>
-			<li class="list-group-item row"><strong class="col-3">Código
-					interno:</strong> <span class="col-9" th:text="${pelicula.codigo}"></span></li>
-		</ul>
-		<div class="col-3">
-			<img id="caratulaImg" th:if="${pelicula.tieneCaratula == false}"
-				src="../../image/placeholder.png" class="img-thumbnail"
-				alt="Caratula" /> <img th:if="${pelicula.tieneCaratula == true}"
-				th:src="@{/peliculas/{id}/image(id=${pelicula.id})}"
-				class="img-thumbnail" alt="Caratula" />
+				<li class="list-group-item row"><strong class="col-3">Steelbook:</strong><i
+					th:class="${pelicula.steelbook == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
+					aria-hidden="true"></i><strong class="col-3">Funda</strong><i
+					th:class="${pelicula.funda == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
+					aria-hidden="true"></i><strong class="col-3">Comprado:</strong><i
+					th:class="${pelicula.comprado == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
+					aria-hidden="true"></i></li>
+				<li class="list-group-item row"><strong class="col-3">Localización:</strong>
+					<select class="form-select" th:field="*{localizacionCodigo}">
+						<option th:each="l : ${localizaciones}" th:value="${l.codigo}"
+							th:text="${l.descripcion}"></option>
+				</select></li>
+
+				<li class="list-group-item row"><strong class="col-3">Código
+						interno:</strong> <input type="text" th:value="${pelicula.codigo}"
+					maxlength="4"></li>
+				<li class="list-group-item row"><strong class="col-3">Notas:</strong>
+					<textarea th:value="${pelicula.notas}" maxlength="400"></textarea></li>
+			</ul>
+			<div class="col-3">
+				<img id="caratulaImg" th:if="${pelicula.tieneCaratula == false}"
+					src="../../image/placeholder.png" class="img-thumbnail"
+					alt="Caratula" /> <img th:if="${pelicula.tieneCaratula == true}"
+					th:src="@{/peliculas/{id}/image(id=${pelicula.id})}"
+					class="img-thumbnail" alt="Caratula" />
+			</div>
 		</div>
-	</div>
-	<hr />
-
+		<br />
+		<div class="col-md-2">
+			<button type="submit" class="btn btn-primary w-100">Guardar</button>
+		</div>
+		<hr/>
+	</form>
 	<h4>Películas del pack</h4>
 	<div th:if="${pelicula.peliculasPack.empty}">
 		<em>Este pack no contiene películas.</em>
@@ -153,6 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Hubo un error al añadir la carátula.');
         }
     });
+    
+    
 });
 </script>
 

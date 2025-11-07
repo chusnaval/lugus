@@ -3,7 +3,9 @@ package lugus.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.PeliculaCreateDto;
+import lugus.model.Formato;
 import lugus.model.Fuente;
+import lugus.model.Genero;
 import lugus.model.Localizacion;
 import lugus.model.Pelicula;
 import lugus.model.PeliculaFoto;
@@ -22,7 +24,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.Image;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +36,7 @@ public class PeliculasController {
 	private final PeliculaService service;
 
 	private final LocalizacionService locService;
-	
+
 	private final FuenteService fuenteService;
 
 	/*
@@ -123,19 +124,64 @@ public class PeliculasController {
 	public String edit(@PathVariable Integer id, Model model) {
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 		model.addAttribute("pelicula", p);
-		
+
 		List<Fuente> fuentes = fuenteService.findAll();
-		model.addAttribute("fuentesList",fuentes);
-		
+		model.addAttribute("fuentesList", fuentes);
+
+		List<Localizacion> localizaciones = locService.findAll();
+		model.addAttribute("localizaciones", localizaciones);
+
 		model.addAttribute("caratula", new NewCaratulaDTO());
 		// DTO vacío para el formulario “añadir hijo al pack”
 		model.addAttribute("nuevoHijo", new PeliculaCreateDto());
+
+		PeliculaCreateDto nuevo = new PeliculaCreateDto();
+		nuevo.setAnyo(p.getAnyo());
+		nuevo.setTitulo(p.getTitulo());
+		nuevo.setFormatoCodigo(p.getFormato().getId());
+		nuevo.setGeneroCodigo(p.getGenero().getCodigo());
+		nuevo.setLocalizacionCodigo(p.getLocalizacion().getCodigo());
+		model.addAttribute("nuevo", nuevo);
+
 		return "peliculas/edit"; // → templates/peliculas/detail.html
 	}
 
+	@PostMapping("/{id}/actualizar")
+	public String actualizar(@PathVariable Integer id, @Valid @ModelAttribute PeliculaCreateDto nuevo) {
+		Optional<Pelicula> opt = service.findById(id);
+		
+		Pelicula existing = opt.get();
+		
+		if(existing==null) {
+			new IllegalArgumentException("Pelicula no encontrada");
+		}
+
+		Formato formato = Formato.getById(nuevo.getFormatoCodigo());
+		Genero genero = Genero.getById(nuevo.getGeneroCodigo());
+
+		Localizacion loc = null;
+		if (nuevo.getLocalizacionCodigo() != null && !nuevo.getLocalizacionCodigo().isBlank()) {
+			loc = locService.findById(nuevo.getLocalizacionCodigo())
+					.orElseThrow(() -> new IllegalArgumentException("Localización no encontrada"));
+		}
+
+		existing.setTitulo(nuevo.getTitulo());
+		existing.setFormato(formato);
+		existing.setLocalizacion(loc);
+		existing.setAnyo(nuevo.getAnyo());
+		existing.setGenero(genero);
+		existing.setNotas(nuevo.getNotas());
+		existing.setSteelbook(nuevo.isSteelbook());
+		existing.setFunda(nuevo.isFunda());
+		existing.calcularCodigo();
+		service.save(existing);
+
+		return "redirect:/peliculas";
+	}
+
 	@PostMapping("/{id}/caratula")
-	public ResponseEntity<String> addCaratula(@PathVariable Integer id, @Valid @ModelAttribute("caratula") NewCaratulaDTO dto
-			) throws IOException {
+	public ResponseEntity<String> addCaratula(@PathVariable Integer id,
+			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException {
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
 		Optional<Fuente> fuenteObj = fuenteService.findById(dto.getFuente());
@@ -154,7 +200,7 @@ public class PeliculasController {
 
 		return new ResponseEntity<String>("Id no encontrado", HttpStatus.NO_CONTENT);
 	}
-	
+
 	/*
 	 * ------------------------------------------------- AÑADIR UN HIJO AL PACK POST
 	 * /peliculas/{padreId}/hijo -------------------------------------------------
