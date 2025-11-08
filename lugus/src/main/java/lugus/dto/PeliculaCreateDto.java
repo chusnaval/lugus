@@ -25,7 +25,9 @@ public class PeliculaCreateDto {
     private String generoCodigo;        
 
     // localizacion es opcional 
-    private String localizacionCodigo;    
+    private String localizacionCodigo;
+    
+    private boolean pack;
     
 	private boolean steelbook;
 

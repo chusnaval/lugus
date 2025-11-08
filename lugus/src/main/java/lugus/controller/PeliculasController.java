@@ -144,6 +144,7 @@ public class PeliculasController {
 		nuevo.setFunda(p.isFunda());
 		nuevo.setComprado(p.isComprado());
 		nuevo.setSteelbook(p.isSteelbook());
+		nuevo.setPack(p.isPack());
 		
 		if(p.getLocalizacion()!=null) {
 			nuevo.setLocalizacionCodigo(p.getLocalizacion().getCodigo());
@@ -179,6 +180,7 @@ public class PeliculasController {
 		existing.setLocalizacion(loc);
 		existing.setAnyo(nuevo.getAnyo());
 		existing.setGenero(genero);
+		existing.setPack(nuevo.isPack());
 		existing.setNotas(nuevo.getNotas());
 		existing.setSteelbook(nuevo.isSteelbook());
 		existing.setFunda(nuevo.isFunda());
