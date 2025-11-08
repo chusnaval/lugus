@@ -20,125 +20,125 @@
 	<div th:fragment="header"></div>
 	<h1>Películas</h1>
 
-	<a class="btn btn-primary mb-3" th:href="@{/peliculas/nuevo}">Nueva
-		película</a>
 
 	<table class="table table-hover table-custom w-100 peliculas">
 		<thead class="table-primary text-white">
 			<tr>
 				<th></th>
-				
+
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('titulo','Título')}"></th>
-					
+
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('anyo','Año')}"></th>
-					
+
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('pack','Pack')}"></th>
-					
+
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('formato','Formato')}"></th>
-					
+
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('steelbook','Steelbook')}"></th>
-					
+
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('funda','Funda')}"></th>
-					
+
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('comprado','Comprado')}"></th>
-					
+
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('genero','Género')}"></th>
-					
-				<th class="text-end" colspan="2" rowspan="3">Acciones</th>
+
+				<th class="text-end" rowspan="2"><a
+					class="btn btn-primary mb-3">Buscar</a></th>
 			</tr>
 			<tr>
 				<th></th>
 				<th class="text-center"><input type="text"></th>
-				
+
 				<th><input type="text"></th>
-				
+
 				<th><select><option value="true">Sí</option>
 						<option value="false">No</option>
 				</select></th>
-				
+
 				<th><select>
 						<option th:each="f : ${T(lugus.model.Formato).valoresOrdenados()}"
 							th:value="${f.id}" th:text="${f}"></option>
 				</select></th>
-				
+
 				<th><select><option value="true">Sí</option>
 						<option value="false">No</option>
 				</select></th>
-				
+
 				<th><select><option value="true">Sí</option>
 						<option value="false">No</option>
 				</select></th>
-				
+
 				<th><select><option value="true">Sí</option>
 						<option value="false">No</option>
 				</select></th>
-				
+
 				<th><select>
 						<option th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
 							th:value="${g.codigo}" th:text="${g.displayName}"></option>
 				</select></th>
-				
+
 			</tr>
 			<tr>
 				<td></td>
 				<td class="text-left"
 					th:replace="~{layout/sorting :: sorting('localizacion','Loc')}"></td>
-					
+
 				<td><select>
 						<option th:each="l : ${localizaciones}" th:value="${l.codigo}"
 							th:text="${l.descripcion}"></option>
 				</select></td>
-				
-				<td  style="font-weight: bold;">Notas:</td>
-				
-				<td class="text-left" colspan="7"><input type="text"></td>
+
+				<td style="font-weight: bold;">Notas:</td>
+
+				<td class="text-left" colspan="5"><input type="text"></td>
+				<th class="text-end"><a class="btn btn-success mb-3"
+					th:href="@{/peliculas/nuevo}">+</a></th>
 			</tr>
 		</thead>
 		<tbody th:each="p, iStat : ${pagePeliculas.content}"
 			id="tabla-peliculas">
 			<tr>
-				<td class="align-middle text-center cover" rowspan="2"><img
-					th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
-					class="img-thumbnail" alt="Caratula" /> <img
-					th:if="${p.tieneCaratula == true}"
-					th:src="@{/peliculas/{id}/image(id=${p.id})}" class="img-thumbnail"
-					alt="Caratula" /></td>
-					
+				<td class="align-middle text-center cover" rowspan="2"><a
+					th:href="@{'/peliculas/' + ${p.id}}"
+					class="btn btn-sm btn-outline-primary"><img
+						th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
+						class="img-thumbnail" alt="Caratula" /> <img
+						th:if="${p.tieneCaratula == true}"
+						th:src="@{/peliculas/{id}/image(id=${p.id})}"
+						class="img-thumbnail" alt="Caratula" /></a></td>
+
 				<td class="text-left" th:text="${p.titulo}"></td>
-				
+
 				<td class="text-end" th:text="${p.anyo}"></td>
-				
+
 				<td class="text-center"><i
 					th:class="${p.pack == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
 					aria-hidden="true"></i></td>
-					
+
 				<td class="text-left " th:text="${p.formato}"></td>
-				
+
 				<td class="text-center  "><i
 					th:class="${p.steelbook == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
 					aria-hidden="true"></i></td>
-					
+
 				<td class="text-center"><i
 					th:class="${p.funda == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
 					aria-hidden="true"></i></td>
-					
+
 				<td class="text-center"><i
 					th:class="${p.comprado == true? 'fas fa-check-circle text-success' : 'far fa-times-circle text-danger'}"
 					aria-hidden="true"></i></td>
-					
+
 				<td class="text-left" th:text="${p.genero.displayName}"></td>
-				
-				<td class="text-end"><a th:href="@{'/peliculas/' + ${p.id}}"
-					class="btn btn-sm btn-outline-primary">Ver</a></td>
-					
+
 				<td class="text-end"><a
 					th:href="@{'/peliculas/' + ${p.id}} + '/editar'"
 					class="btn btn-sm btn-outline-secondary">Editar</a></td>
@@ -147,9 +147,11 @@
 			<tr>
 				<td class="text-left" th:text="${p.codigo}"></td>
 				<td style="font-weight: bold;">Loc.:</td>
-				<td class="text-left" th:text="${p.localizacion==null?'':p.localizacion.descripcion}" colspan="2"></td>
+				<td class="text-left"
+					th:text="${p.localizacion==null?'':p.localizacion.descripcion}"
+					colspan="2"></td>
 				<td style="font-weight: bold;">Notas:</td>
-				<td class="text-left" th:text="${p.notas}" colspan="5"></td>
+				<td class="text-left" th:text="${p.notas}" colspan="4"></td>
 			</tr>
 			<tr class="collapse" id="" th:attr="id='#details-'+${p.id}"
 				data-bs-parent="#tabla-peliculas" th:each="s : ${p.peliculasPack}">
@@ -166,37 +168,37 @@
 				th:classappend="${pagePeliculas.number == 0} ? 'disabled'"><a
 				th:replace="~{layout/paging :: paging(0, '<<', 'Primera Página')}"></a>
 			</li>
-			
+
 			<li class="page-item font-weight-bold"
 				th:classappend="${pagePeliculas.number == 0} ? 'disabled'"><a
 				th:replace="~{layout/paging :: paging(${pagePeliculas.number - 1}, 'Anterior', 'Página Anterior')}"></a>
 			</li>
-			
+
 			<li class="page-item disabled"
 				th:if="${pagePeliculas.number - 2 > 1}"><a class="page-link"
 				href="#">...</a></li>
-				
+
 			<li class="page-item"
 				th:classappend="${page == pagePeliculas.number+1} ? 'active'"
 				th:each="page : ${#numbers.sequence(pagePeliculas.number > 2 ? pagePeliculas.number - 2 : 1, pagePeliculas.number + 2 < pagePeliculas.totalPages ? pagePeliculas.number + 2 : pagePeliculas.totalPages)}">
 				<a
 				th:replace="~{layout/paging :: paging(${page}-1, ${page}, 'Página ' + ${page})}"></a>
 			</li>
-			
+
 			<li class="page-item disabled"
 				th:if="${pagePeliculas.number + 2 < pagePeliculas.totalPages}"><a
 				class="page-link" href="#">...</a></li>
-				
+
 			<li class="page-item font-weight-bold"
 				th:classappend="${pagePeliculas.number == pagePeliculas.totalPages} ? 'disabled'"><a
 				th:replace="~{layout/paging :: paging(${pagePeliculas.number+1},'Siguiente', 'Página Siguiente')}"></a>
 			</li>
-			
+
 			<li class="page-item"
 				th:classappend="${pagePeliculas.number == pagePeliculas.totalPages} ? 'disabled'"><a
 				th:replace="~{layout/paging :: paging(${pagePeliculas.totalPages}, '>>', 'Última Página')}"></a>
 			</li>
-			
+
 		</ul>
 	</nav>
 </body>
