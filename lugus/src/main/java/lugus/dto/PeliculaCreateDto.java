@@ -11,6 +11,9 @@ public class PeliculaCreateDto {
 	@NotBlank(message = "El título es obligatorio")
     private String titulo;
 
+	@NotBlank(message = "El título es obligatorio")
+    private String tituloGest;
+	
     @NotNull
     @Min(1888) @Max(2100)
     private Integer anyo;

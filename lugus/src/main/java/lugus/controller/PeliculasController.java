@@ -49,10 +49,10 @@ public class PeliculasController {
 			@RequestParam(required = false) Optional<String> orden,
 			@RequestParam(required = false) Optional<String> direccion,
 			@RequestParam(required = false) Optional<Integer> pagina) {
-		Page<Pelicula> resultado = service.findAllByTitulo(keyword, pagina.orElse(0), orden.orElse("titulo"),
+		Page<Pelicula> resultado = service.findAllByTitulo(keyword, pagina.orElse(0), orden.orElse("tituloGest"),
 				direccion.orElse("ASC"));
 		model.addAttribute("pagePeliculas", resultado);
-		String campoOrden = "titulo";
+		String campoOrden = "tituloGest";
 		String campoDireccion = "ASC";
 		if (resultado.getSort().get().findFirst().isPresent()) {
 			campoOrden = resultado.getSort().get().findFirst().get().getProperty();
@@ -138,12 +138,16 @@ public class PeliculasController {
 		PeliculaCreateDto nuevo = new PeliculaCreateDto();
 		nuevo.setAnyo(p.getAnyo());
 		nuevo.setTitulo(p.getTitulo());
+		nuevo.setTituloGest(p.getTituloGest());
 		nuevo.setFormatoCodigo(p.getFormato().getId());
 		nuevo.setGeneroCodigo(p.getGenero().getCodigo());
-		nuevo.setLocalizacionCodigo(p.getLocalizacion().getCodigo());
 		nuevo.setFunda(p.isFunda());
 		nuevo.setComprado(p.isComprado());
 		nuevo.setSteelbook(p.isSteelbook());
+		
+		if(p.getLocalizacion()!=null) {
+			nuevo.setLocalizacionCodigo(p.getLocalizacion().getCodigo());
+		}
 		
 		model.addAttribute("nuevo", nuevo);
 
@@ -170,6 +174,7 @@ public class PeliculasController {
 		}
 
 		existing.setTitulo(nuevo.getTitulo());
+		existing.setTituloGest(nuevo.getTituloGest());
 		existing.setFormato(formato);
 		existing.setLocalizacion(loc);
 		existing.setAnyo(nuevo.getAnyo());

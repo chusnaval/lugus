@@ -44,6 +44,9 @@ public class Pelicula {
 
 	@Column(nullable = false)
 	private String titulo;
+	
+	@Column(nullable = false, name="titulo_gest")
+	private String tituloGest;
 
 	@Column(nullable = false)
 	@Convert(converter = FormatoConverter.class)
