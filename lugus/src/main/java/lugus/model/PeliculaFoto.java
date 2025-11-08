@@ -46,5 +46,8 @@ public class PeliculaFoto {
 	
     @Column
 	private byte[] foto;
+    
+    @Column
+    private boolean caratula;
 	
 }

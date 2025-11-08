@@ -145,11 +145,11 @@ public class PeliculasController {
 		nuevo.setComprado(p.isComprado());
 		nuevo.setSteelbook(p.isSteelbook());
 		nuevo.setPack(p.isPack());
-		
-		if(p.getLocalizacion()!=null) {
+
+		if (p.getLocalizacion() != null) {
 			nuevo.setLocalizacionCodigo(p.getLocalizacion().getCodigo());
 		}
-		
+
 		model.addAttribute("nuevo", nuevo);
 
 		return "peliculas/edit"; // → templates/peliculas/detail.html
@@ -158,10 +158,10 @@ public class PeliculasController {
 	@PostMapping("/{id}/actualizar")
 	public String actualizar(@PathVariable Integer id, @Valid @ModelAttribute PeliculaCreateDto nuevo) {
 		Optional<Pelicula> opt = service.findById(id);
-		
+
 		Pelicula existing = opt.get();
-		
-		if(existing==null) {
+
+		if (existing == null) {
 			new IllegalArgumentException("Pelicula no encontrada");
 		}
 
@@ -187,7 +187,7 @@ public class PeliculasController {
 		existing.calcularCodigo();
 		service.save(existing);
 
-		return "redirect:/peliculas";
+		return "redirect:/peliculas/" + id + "/editar";
 	}
 
 	@PostMapping("/{id}/caratula")
@@ -200,6 +200,7 @@ public class PeliculasController {
 		pf.setUrl(dto.getUrl());
 		pf.setFuente(fuenteObj.get());
 		pf.setFoto(dwFotoService.descargar(dto.getFuente(), dto.getUrl()));
+		pf.setCaratula(true);
 
 		Optional<Pelicula> pelicula = service.findById(id);
 

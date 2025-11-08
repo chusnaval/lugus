@@ -26,9 +26,9 @@
 				<li class="list-group-item row"><strong class="col-3">Título:</strong>
 					<input type="text" th:value="${pelicula.titulo}"
 					th:field="*{titulo}"></li>
-					
-						<li class="list-group-item row"><strong class="col-3">Título para Gestión:</strong>
-					<input type="text" th:value="${pelicula.tituloGest}"
+
+				<li class="list-group-item row"><strong class="col-3">Título
+						para Gestión:</strong> <input type="text" th:value="${pelicula.tituloGest}"
 					th:field="*{tituloGest}"></li>
 
 				<li class="list-group-item row"><strong class="col-3">Año:</strong>
@@ -48,26 +48,17 @@
 							th:selected="${pelicula.genero.codigo == g.codigo}"></option>
 				</select></li>
 
-				<li class="list-group-item row">
-				
-				<strong class="col-3">Pack:</strong>
+				<li class="list-group-item row"><strong class="col-3">Pack:</strong>
 
-					<input
-					type="checkbox" th:value="${pelicula.pack}"
-					th:field="*{pack}">
-				
-				<strong class="col-3">Steelbook:</strong>
+					<input type="checkbox" th:value="${pelicula.pack}"
+					th:field="*{pack}"> <strong class="col-3">Steelbook:</strong>
 
-					<input
-					type="checkbox" th:value="${pelicula.steelbook}"
+					<input type="checkbox" th:value="${pelicula.steelbook}"
 					th:field="*{steelbook}"> <strong class="col-3">Funda:</strong>
-					<input
-					type="checkbox" th:value="${pelicula.funda}" th:field="*{funda}">
-
-					<strong class="col-3">Comprado:</strong> <input
-					type="checkbox" th:value="${pelicula.comprado}" th:field="*{comprado}">
-
-				</li>
+					<input type="checkbox" th:value="${pelicula.funda}"
+					th:field="*{funda}"> <strong class="col-3">Comprado:</strong>
+					<input type="checkbox" th:value="${pelicula.comprado}"
+					th:field="*{comprado}"></li>
 				<li class="list-group-item row"><strong class="col-3">Localización:</strong>
 					<select class="form-select" th:field="*{localizacionCodigo}">
 						<option th:each="l : ${localizaciones}" th:value="${l.codigo}"
@@ -94,27 +85,29 @@
 		</div>
 		<hr />
 	</form>
-	<h4>Películas del pack</h4>
-	<div th:if="${pelicula.peliculasPack.empty}">
-		<em>Este pack no contiene películas.</em>
-	</div>
-	<table th:unless="${pelicula.peliculasPack.empty}"
-		class="table table-sm">
-		<thead>
-			<tr>
-				<th>Título</th>
-				<th>Año</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="h : ${pelicula.peliculasPack}">
-				<td th:text="${h.titulo}"></td>
-				<td th:text="${h.anyo}"></td>
-			</tr>
-		</tbody>
-	</table>
 
-	<hr />
+	<div th:if="${pelicula.pack == true}">
+		<h4>Películas del pack</h4>
+		<div th:if="${pelicula.peliculasPack.empty}">
+			<em>Este pack no contiene películas.</em>
+		</div>
+		<table th:unless="${pelicula.peliculasPack.empty}"
+			class="table table-sm">
+			<thead>
+				<tr>
+					<th>Título</th>
+					<th>Año</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="h : ${pelicula.peliculasPack}">
+					<td th:text="${h.titulo}"></td>
+					<td th:text="${h.anyo}"></td>
+				</tr>
+			</tbody>
+		</table>
+		<hr />
+	</div>
 
 	<h4>Añadir caratula</h4>
 	<form id="formCaratula"
