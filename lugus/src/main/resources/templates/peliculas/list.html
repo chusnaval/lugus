@@ -147,7 +147,7 @@
 			<tr>
 				<td class="text-left" th:text="${p.codigo}"></td>
 				<td style="font-weight: bold;">Loc.:</td>
-				<td class="text-left" th:text="${p.descLocalizacion}" colspan="2"></td>
+				<td class="text-left" th:text="${p.localizacion==null?'':p.localizacion.descripcion}" colspan="2"></td>
 				<td style="font-weight: bold;">Notas:</td>
 				<td class="text-left" th:text="${p.notas}" colspan="5"></td>
 			</tr>
