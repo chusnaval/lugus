@@ -61,9 +61,15 @@
 	        <groupId>org.springframework.boot</groupId>
 	        <artifactId>spring-boot-starter-thymeleaf</artifactId>
 	    </dependency>
-	
-	
-	    <!-- Bootstrap CSS (opcional, vía webjars) -->
+	    
+		<!-- ... other dependency elements ... -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+
+		<!-- Bootstrap CSS (opcional, vía webjars) -->
 	    <dependency>
 	        <groupId>org.webjars</groupId>
 	        <artifactId>bootstrap</artifactId>
