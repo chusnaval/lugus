@@ -159,8 +159,7 @@
 		</div>
 	</form>
 
-	<a th:href="@{/peliculas}" class="btn btn-link mt-3">← Volver al
-		listado</a>
+<button  onclick="back()" id="floatBtn" title="Volver">Volver</button>
 
 	<script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -193,6 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     
 });
+
+function back(){
+	window.location.href = "/peliculas";
+}
 </script>
 
 </body>

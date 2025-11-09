@@ -89,7 +89,14 @@
 	<hr />
 
 
-	<a th:href="@{/peliculas}" class="btn btn-link mt-3">← Volver al
-		listado</a>
+	
+<button  onclick="back()" id="floatBtn" title="Volver">Volver</button>
+
+
+<script>		
+		function back(){
+	window.location.href = "/peliculas";
+}
+</script>
 </body>
 </html>
