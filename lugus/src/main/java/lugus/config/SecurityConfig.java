@@ -13,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+	@SuppressWarnings("unused")
 	private final UserDetailsService userDetailsService;
 
 	public SecurityConfig(UserDetailsService userDetailsService) {
@@ -24,10 +25,10 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/css/**", "/js/**", "/public/**")
 						.permitAll().anyRequest().authenticated())
-				.formLogin(form -> form.loginPage("/login") // tu vista personalizada
-						.loginProcessingUrl("/perform_login") // la URL del POST del formulario
-						.defaultSuccessUrl("/peliculas", true) // adónde ir tras login
-						.failureUrl("/login?error=true") // en caso de error
+				.formLogin(form -> form.loginPage("/login") 
+						.loginProcessingUrl("/perform_login")
+						.defaultSuccessUrl("/peliculas", true) 
+						.failureUrl("/login?error=true") 
 						.permitAll())
 				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout=true").permitAll());
 
