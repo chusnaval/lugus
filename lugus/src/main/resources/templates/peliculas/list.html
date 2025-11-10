@@ -14,18 +14,19 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 	crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link th:href="@{/css/lugus.css}" rel="stylesheet">
-<script src="/js/actions.js"></script>
+
 </head>
-<body class="container mt-4">
+<body class="container-fluid mt-4">
 	<h1>Películas</h1>
 
+	<div th:replace="~{layout/header :: header}"></div>
 
-	<div th:replace="layout/filters :: filters"></div>
+	<div th:replace="~{layout/filters :: filters}"></div>
 
 	<table class="table table-hover table-custom w-100 peliculas">
 		<thead class="table-primary text-white">
 			<tr>
-				<th><a class="btn btn-success mb-3"
+				<th><a class="btn btn-success mb-3" th:if="${admin}"
 					th:href="@{/peliculas/nuevo}">+</a></th>
 
 				<th class="text-center"
@@ -92,7 +93,7 @@
 				<td class="text-left" th:text="${p.genero.displayName}"></td>
 
 				<td class="text-end"><a
-					th:href="@{'/peliculas/' + ${p.id}} + '/editar'"
+					th:href="@{'/peliculas/' + ${p.id}} + '/editar'" th:if="${admin}"
 					class="btn btn-sm btn-outline-secondary">Editar</a></td>
 
 			</tr>
@@ -153,5 +154,8 @@
 
 		</ul>
 	</nav>
+	
+
+	<script src="/js/actions.js" defer="defer"></script>
 </body>
 </html>

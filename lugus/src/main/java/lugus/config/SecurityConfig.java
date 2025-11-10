@@ -10,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-
 @Configuration
 public class SecurityConfig {
 
@@ -28,7 +27,10 @@ public class SecurityConfig {
 						.permitAll().anyRequest().authenticated())
 				.formLogin(form -> form.loginPage("/login").loginProcessingUrl("/perform_login")
 						.defaultSuccessUrl("/peliculas", true).failureUrl("/login?error=true").permitAll())
-				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout=true").permitAll());
+				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout=true")
+						.invalidateHttpSession(true) // invalida la sesión HTTP
+						.deleteCookies("JSESSIONID") // elimina la cookie de sesión
+						.clearAuthentication(true).permitAll());
 
 		return http.build();
 	}
