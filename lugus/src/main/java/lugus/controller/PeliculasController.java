@@ -2,6 +2,7 @@ package lugus.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lugus.PermisoException;
 import lugus.dto.FiltrosDto;
 import lugus.dto.NewCaratulaDTO;
 import lugus.dto.PeliculaCreateDto;
@@ -11,10 +12,12 @@ import lugus.model.Genero;
 import lugus.model.Localizacion;
 import lugus.model.Pelicula;
 import lugus.model.PeliculaFoto;
+import lugus.model.Usuario;
 import lugus.service.DwFotoServiceI;
 import lugus.service.FuenteService;
 import lugus.service.LocalizacionService;
 import lugus.service.PeliculaService;
+import lugus.service.UsuarioService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +30,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +44,8 @@ public class PeliculasController {
 	private final LocalizacionService locService;
 
 	private final FuenteService fuenteService;
+	
+	private final UsuarioService usuarioService;
 
 	/*
 	 * ------------------------------------------------- LISTADO DE PELÍCULAS GET
@@ -47,7 +53,7 @@ public class PeliculasController {
 	 */
 
 	@GetMapping
-	public String listPaginado(Model model, @RequestParam(required = false) Optional<String> orden,
+	public String listPaginado(Model model, Principal principal,  @RequestParam(required = false) Optional<String> orden,
 			@RequestParam(required = false) Optional<String> direccion,
 			@RequestParam(required = false) Optional<Integer> pagina, @ModelAttribute FiltrosDto filtro) {
 
@@ -74,6 +80,11 @@ public class PeliculasController {
 
 		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
 		model.addAttribute("localizaciones", localizaciones);
+		
+		
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		
+		model.addAttribute("admin", usuario.isAdmin());
 
 		return "peliculas/list"; // → src/main/resources/templates/peliculas/list.html
 	}
@@ -83,7 +94,11 @@ public class PeliculasController {
 	 * /peliculas/nuevo -------------------------------------------------
 	 */
 	@GetMapping("/nuevo")
-	public String createForm(Model model) {
+	public String createForm(Principal principal, Model model) throws PermisoException {
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		if(!usuario.isAdmin()) {
+			throw new PermisoException("No tiene permisos");
+		}
 		model.addAttribute("pelicula", new PeliculaCreateDto());
 		return "peliculas/form"; // → templates/peliculas/form.html
 	}
@@ -93,7 +108,12 @@ public class PeliculasController {
 	 * /peliculas -------------------------------------------------
 	 */
 	@PostMapping
-	public String create(@Valid @ModelAttribute("pelicula") PeliculaCreateDto dto, BindingResult br, Model model) {
+	public String create(Principal principal, @Valid @ModelAttribute("pelicula") PeliculaCreateDto dto, BindingResult br, Model model) throws PermisoException {
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		if(!usuario.isAdmin()) {
+			throw new PermisoException("No tiene permisos");
+		}
+		
 		if (br.hasErrors()) {
 			// Si hay errores de validación, volvemos al mismo formulario
 			return "peliculas/form";
@@ -109,7 +129,12 @@ public class PeliculasController {
 	 * -------------------------------------------------
 	 */
 	@GetMapping("/{id}")
-	public String detail(@PathVariable Integer id, Model model) {
+	public String detail(Principal principal, @PathVariable Integer id, Model model) throws PermisoException {
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		if(!usuario.isAdmin()) {
+			throw new PermisoException("No tiene permisos");
+		}
+		
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 
 		model.addAttribute("pelicula", p);
@@ -117,7 +142,12 @@ public class PeliculasController {
 	}
 
 	@GetMapping("/{id}/image")
-	public ResponseEntity<byte[]> image(@PathVariable Integer id) {
+	public ResponseEntity<byte[]> image(Principal principal, @PathVariable Integer id) throws PermisoException {
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		if(!usuario.isAdmin()) {
+			throw new PermisoException("No tiene permisos");
+		}
+		
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 
 		if (p.getPeliculaFotos() != null && !p.getPeliculaFotos().isEmpty()) {
@@ -133,7 +163,12 @@ public class PeliculasController {
 	}
 
 	@GetMapping("/{id}/editar")
-	public String edit(@PathVariable Integer id, Model model) {
+	public String edit(Principal principal, @PathVariable Integer id, Model model) throws PermisoException {
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		if(!usuario.isAdmin()) {
+			throw new PermisoException("No tiene permisos");
+		}
+		
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 		model.addAttribute("pelicula", p);
 
@@ -168,7 +203,12 @@ public class PeliculasController {
 	}
 
 	@PostMapping("/{id}/actualizar")
-	public String actualizar(@PathVariable Integer id, @Valid @ModelAttribute PeliculaCreateDto nuevo) {
+	public String actualizar(Principal principal, @PathVariable Integer id, @Valid @ModelAttribute PeliculaCreateDto nuevo) throws PermisoException {
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		if(!usuario.isAdmin()) {
+			throw new PermisoException("No tiene permisos");
+		}
+		
 		Optional<Pelicula> opt = service.findById(id);
 
 		Pelicula existing = opt.get();
@@ -203,8 +243,13 @@ public class PeliculasController {
 	}
 
 	@PostMapping("/{id}/caratula")
-	public ResponseEntity<String> addCaratula(@PathVariable Integer id,
-			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException {
+	public ResponseEntity<String> addCaratula(Principal principal, @PathVariable Integer id,
+			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException {
+		
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		if(!usuario.isAdmin()) {
+			throw new PermisoException("No tiene permisos");
+		}
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
 		Optional<Fuente> fuenteObj = fuenteService.findById(dto.getFuente());
@@ -230,11 +275,17 @@ public class PeliculasController {
 	 * /peliculas/{padreId}/hijo -------------------------------------------------
 	 */
 	@PostMapping("/{padreId}/hijo")
-	public String addChild(@PathVariable Integer padreId, @Valid @ModelAttribute("nuevoHijo") PeliculaCreateDto dto,
-			BindingResult br, Model model) {
+	public String addChild(Principal principal, @PathVariable Integer padreId, @Valid @ModelAttribute("nuevoHijo") PeliculaCreateDto dto,
+			BindingResult br, Model model) throws PermisoException {
+		
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		if(!usuario.isAdmin()) {
+			throw new PermisoException("No tiene permisos");
+		}
+		
 		if (br.hasErrors()) {
 			// Si hay errores, volvemos al detalle mostrando los mensajes
-			return detail(padreId, model);
+			return detail(principal, padreId, model);
 		}
 		service.addChild(padreId, dto);
 		// Después de añadir el hijo, recargamos el detalle del padre
@@ -247,7 +298,12 @@ public class PeliculasController {
 	 * -------------------------------------------------
 	 */
 	@PostMapping("/{id}/eliminar") // usando POST para evitar problemas con browsers
-	public String delete(@PathVariable Integer id) {
+	public String delete(Principal principal, @PathVariable Integer id) throws PermisoException {
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		if(!usuario.isAdmin()) {
+			throw new PermisoException("No tiene permisos");
+		}
+		
 		service.delete(id);
 		return "redirect:/peliculas";
 	}

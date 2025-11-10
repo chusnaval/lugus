@@ -25,4 +25,7 @@ public class Usuario {
 	@Column
 	private String password;
 	
+	@Column
+	private boolean admin;
+	
 }
