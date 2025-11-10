@@ -8,6 +8,7 @@ import lugus.model.Genero;
 import lugus.model.Localizacion;
 import lugus.model.Pelicula;
 import lugus.repository.PeliculaRepository;
+import lugus.repository.PeliculaSpecification;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -68,7 +70,7 @@ public class PeliculaService {
 		Pelicula hijo = crear(dto);
 		hijo.setPadre(padre);
 		padre.getPeliculasPack().add(hijo);
-		peliculaRepo.save(padre); // cascada guardará al hijo
+		peliculaRepo.save(padre); 
 		return hijo;
 	}
 
@@ -93,11 +95,20 @@ public class PeliculaService {
 	public Page<Pelicula> findAllBy(FiltrosDto filtro, final int pagina, final String campo, final String direccion) {
 		
 		Pageable pageable = PageRequest.of(pagina, 30, Sort.by(Direction.fromString(direccion), campo));
-		if (StringUtils.hasText(filtro.getTitulo())) {
-			List<Pelicula> lista = peliculaRepo.findByTitulo(filtro.getTitulo(), pageable);
-			return new PageImpl<Pelicula>(lista, pageable, lista.size());
-		} else {
-			return peliculaRepo.findAll(pageable);
-		}
+		
+		 Specification<Pelicula> spec = Specification.where(null);
+		 spec = spec.and(PeliculaSpecification.porTitulo(filtro.getTitulo()));
+		 spec = spec.and(PeliculaSpecification.porFromAnyo(filtro.getFromAnyo()));
+		 spec = spec.and(PeliculaSpecification.porToAnyo(filtro.getToAnyo()));
+		 spec = spec.and(PeliculaSpecification.porPack(filtro.getPack()));
+		 spec = spec.and(PeliculaSpecification.porSteelbook(filtro.getSteelbook()));
+		 spec = spec.and(PeliculaSpecification.porFunda(filtro.getFunda()));
+		 spec = spec.and(PeliculaSpecification.porFormato(filtro.getFormato()));
+		 spec = spec.and(PeliculaSpecification.porComprado(filtro.getComprado()));
+		 spec = spec.and(PeliculaSpecification.porGenero(filtro.getGenero()));
+		 spec = spec.and(PeliculaSpecification.porLocalizacion(filtro.getLocalizacion()));
+		 spec = spec.and(PeliculaSpecification.porNotas(filtro.getNotas()));
+		 
+		  return peliculaRepo.findAll(spec, pageable);
 	}
 }

@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+
 @Configuration
 public class SecurityConfig {
 
@@ -25,11 +26,8 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/css/**", "/js/**", "/public/**")
 						.permitAll().anyRequest().authenticated())
-				.formLogin(form -> form.loginPage("/login") 
-						.loginProcessingUrl("/perform_login")
-						.defaultSuccessUrl("/peliculas", true) 
-						.failureUrl("/login?error=true") 
-						.permitAll())
+				.formLogin(form -> form.loginPage("/login").loginProcessingUrl("/perform_login")
+						.defaultSuccessUrl("/peliculas", true).failureUrl("/login?error=true").permitAll())
 				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout=true").permitAll());
 
 		return http.build();
