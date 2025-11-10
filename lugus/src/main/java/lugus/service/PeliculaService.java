@@ -1,6 +1,7 @@
 package lugus.service;
 
 import lombok.RequiredArgsConstructor;
+import lugus.dto.FiltrosDto;
 import lugus.dto.PeliculaCreateDto;
 import lugus.model.Formato;
 import lugus.model.Genero;
@@ -88,11 +89,12 @@ public class PeliculaService {
 		return peliculaRepo.count();
 	}
 
-	public Page<Pelicula> findAllByTitulo(final String titulo, final int pagina, final String campo,
-			final String direccion) {
+
+	public Page<Pelicula> findAllBy(FiltrosDto filtro, final int pagina, final String campo, final String direccion) {
+		
 		Pageable pageable = PageRequest.of(pagina, 30, Sort.by(Direction.fromString(direccion), campo));
-		if (StringUtils.hasText(titulo)) {
-			List<Pelicula> lista = peliculaRepo.findByTitulo(titulo, pageable);
+		if (StringUtils.hasText(filtro.getTitulo())) {
+			List<Pelicula> lista = peliculaRepo.findByTitulo(filtro.getTitulo(), pageable);
 			return new PageImpl<Pelicula>(lista, pageable, lista.size());
 		} else {
 			return peliculaRepo.findAll(pageable);

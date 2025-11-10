@@ -1,4 +1,4 @@
-package lugus.controller;
+package lugus.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

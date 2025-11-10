@@ -20,14 +20,16 @@
 	<div th:fragment="header"></div>
 	<h1>Películas</h1>
 
+	<div th:replace="layout/filters :: filters"></div>
 
 	<table class="table table-hover table-custom w-100 peliculas">
 		<thead class="table-primary text-white">
 			<tr>
-				<th></th>
+				<th><a class="btn btn-success mb-3"
+					th:href="@{/peliculas/nuevo}">+</a></th>
 
 				<th class="text-center"
-					th:replace="~{layout/sorting :: sorting('titulo','Título')}"></th>
+					th:replace="~{layout/sorting :: sorting('tituloGest','Título')}"></th>
 
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('anyo','Año')}"></th>
@@ -50,57 +52,7 @@
 				<th class="text-center"
 					th:replace="~{layout/sorting :: sorting('genero','Género')}"></th>
 
-				<th class="text-end" rowspan="2"><a
-					class="btn btn-primary mb-3">Buscar</a></th>
-			</tr>
-			<tr>
-				<th></th>
-				<th class="text-center"><input type="text"></th>
-
-				<th><input type="text"></th>
-
-				<th><select><option value="true">Sí</option>
-						<option value="false">No</option>
-				</select></th>
-
-				<th><select>
-						<option th:each="f : ${T(lugus.model.Formato).valoresOrdenados()}"
-							th:value="${f.id}" th:text="${f}"></option>
-				</select></th>
-
-				<th><select><option value="true">Sí</option>
-						<option value="false">No</option>
-				</select></th>
-
-				<th><select><option value="true">Sí</option>
-						<option value="false">No</option>
-				</select></th>
-
-				<th><select><option value="true">Sí</option>
-						<option value="false">No</option>
-				</select></th>
-
-				<th><select>
-						<option th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
-							th:value="${g.codigo}" th:text="${g.displayName}"></option>
-				</select></th>
-
-			</tr>
-			<tr>
-				<td></td>
-				<td class="text-left"
-					th:replace="~{layout/sorting :: sorting('localizacion','Loc')}"></td>
-
-				<td><select>
-						<option th:each="l : ${localizaciones}" th:value="${l.codigo}"
-							th:text="${l.descripcion}"></option>
-				</select></td>
-
-				<td style="font-weight: bold;">Notas:</td>
-
-				<td class="text-left" colspan="5"><input type="text"></td>
-				<th class="text-end"><a class="btn btn-success mb-3"
-					th:href="@{/peliculas/nuevo}">+</a></th>
+				<th class="text-end"></th>
 			</tr>
 		</thead>
 		<tbody th:each="p, iStat : ${pagePeliculas.content}"

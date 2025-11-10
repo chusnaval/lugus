@@ -2,6 +2,8 @@ package lugus.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lugus.dto.FiltrosDto;
+import lugus.dto.NewCaratulaDTO;
 import lugus.dto.PeliculaCreateDto;
 import lugus.model.Formato;
 import lugus.model.Fuente;
@@ -45,23 +47,33 @@ public class PeliculasController {
 	 */
 
 	@GetMapping
-	public String listPaginado(Model model, @RequestParam(required = false) String keyword,
-			@RequestParam(required = false) Optional<String> orden,
+	public String listPaginado(Model model, @RequestParam(required = false) Optional<String> orden,
 			@RequestParam(required = false) Optional<String> direccion,
-			@RequestParam(required = false) Optional<Integer> pagina) {
-		Page<Pelicula> resultado = service.findAllByTitulo(keyword, pagina.orElse(0), orden.orElse("tituloGest"),
+			@RequestParam(required = false) Optional<Integer> pagina, @ModelAttribute FiltrosDto filtro) {
+
+		Page<Pelicula> resultado = service.findAllBy(filtro, pagina.orElse(0), orden.orElse("tituloGest"),
 				direccion.orElse("ASC"));
 		model.addAttribute("pagePeliculas", resultado);
+
 		String campoOrden = "tituloGest";
+		model.addAttribute("campoOrden", campoOrden);
+
 		String campoDireccion = "ASC";
 		if (resultado.getSort().get().findFirst().isPresent()) {
 			campoOrden = resultado.getSort().get().findFirst().get().getProperty();
 			campoDireccion = resultado.getSort().get().findFirst().get().getDirection().name();
 		}
+		model.addAttribute("direccionOrden", campoDireccion);
+
+		filtro.setPagina(pagina.orElse(0));
+		filtro.setOrden(campoOrden);
+		filtro.setDireccion(campoDireccion);
+		model.addAttribute("filtro", filtro);
+		
+		model.addAttribute("numeroPagina", pagina.orElse(0));
+
 		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
 		model.addAttribute("localizaciones", localizaciones);
-		model.addAttribute("campoOrden", campoOrden);
-		model.addAttribute("direccionOrden", campoDireccion);
 
 		return "peliculas/list"; // → src/main/resources/templates/peliculas/list.html
 	}

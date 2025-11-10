@@ -1,0 +1,205 @@
+<!-- src/main/resources/templates/layout/fragments.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+<meta charset="UTF-8" />
+<title th:text="${title}">Lugus</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body>
+	<div th:fragment="filters">
+		<form th:object="${filtro}"
+			th:action="@{'/peliculas?pagina=' + ${numeroPagina}   
+                + '&orden=' + ${campoOrden} + '&direccion=' + ${direccionOrden}}"
+			method="get" name="filterForm">
+			<div class="container-fluid py-2 bg-light border-bottom">
+				<div class="row g-2 align-items-center">
+
+					<!-- Filtros rápidos (máx. 3‑4) -->
+					<div class="col-12 col-md-auto d-flex flex-wrap gap-2">
+
+						<!-- Ejemplo: filtro por estado -->
+						<div class="input-group input-group-sm">
+							<span class="input-group-text">Titulo</span> <input type="text"
+								class="form-control" th:name="titulo" th:value="*{titulo}"
+								th:field="*{titulo}">
+						</div>
+
+						<!-- Otro filtro rápido -->
+						<div class="input-group input-group-sm">
+							<span class="input-group-text">Género</span> <select
+								class="form-select" th:field="*{genero}">
+								<option value=""></option>
+								<option
+									th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
+									th:value="${g.codigo}" th:text="${g.displayName}"></option>
+							</select>
+
+
+						</div>
+
+					</div>
+
+					<!-- Botón “Más filtros” (visible en móvil y desktop) -->
+					<div class="col-12 col-md-auto ms-auto">
+						<button class="btn btn-outline-primary btn-sm" type="button"
+							data-bs-toggle="offcanvas" data-bs-target="#offcanvasFilters"
+							aria-controls="offcanvasFilters">
+							<i class="fas fa-sliders-h"></i> Más filtros
+						</button>
+						<button type="submit" class="btn btn-primary w-100">Buscar</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="offcanvas offcanvas-end" tabindex="-1"
+				id="offcanvasFilters" aria-labelledby="offcanvasFiltersLabel">
+				<div class="offcanvas-header">
+					<h5 class="offcanvas-title" id="offcanvasFiltersLabel">
+						<i class="fas fa-filter"></i> Filtros avanzados
+					</h5>
+					<button type="button" class="btn-close text-reset"
+						data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+				</div>
+				<div class="offcanvas-body">
+
+					<!-- Accordion para agrupar categorías -->
+					<div class="accordion" id="filterAccordion">
+
+						<!-- Anyo -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingDate">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapseDate"
+									aria-expanded="false" aria-controls="collapseDate">
+									<i class="fas fa-calendar-alt me-2"></i> Año de estreno
+								</button>
+							</h2>
+							<div id="collapseDate" class="accordion-collapse collapse"
+								aria-labelledby="headingDate" data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+
+									<div class="mb-3">
+										<label class="form-label small">Desde</label> <input
+											type="text" class="form-control form-control-sm"
+											th:name="fromAnyo" th:value="*{fromAnyo}"
+											th:field="*{fromAnyo}">
+									</div>
+									<div class="mb-3">
+										<label class="form-label small">Hasta</label> <input
+											type="text" class="form-control form-control-sm"
+											th:name="toAnyo" th:value="*{toAnyo}" th:field="*{toAnyo}">
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<!-- Categoría 2 -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingFormato">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapseFormato"
+									aria-expanded="false" aria-controls="collapseFormato">
+									<i class="fas fa-info-circle me-2"></i> Formato
+								</button>
+							</h2>
+							<div id="collapseFormato" class="accordion-collapse collapse"
+								aria-labelledby="headingFormato"
+								data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+
+									<div class="form-check">
+										<select class="form-select" th:field="*{formato}"
+											th:value="*{formato}">
+											<option value=""></option>
+											<option
+												th:each="f : ${T(lugus.model.Formato).valoresOrdenados()}"
+												th:value="${f.id}" th:text="${f}"></option>
+										</select>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+
+						<!-- Categoría 3 -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingComprado">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapseComprado"
+									aria-expanded="false" aria-controls="collapseComprado">
+									<i class="fas fa-info-circle me-2"></i> Comprado
+								</button>
+							</h2>
+							<div id="collapseComprado" class="accordion-collapse collapse"
+								aria-labelledby="headingComprado"
+								data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+
+									<div class="form-check">
+
+										<select class="form-select" th:field="*{comprado}"
+											th:value="*{comprado}">
+											<option value=""></option>
+											<option value="true">Sí</option>
+											<option value="false">No</option>
+										</select>
+
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<!-- Categoría 4 -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingPack">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapsePack"
+									aria-expanded="false" aria-controls="collapsePack">
+									<i class="fas fa-info-circle me-2"></i> Pack
+								</button>
+							</h2>
+							<div id="collapsePack" class="accordion-collapse collapse"
+								aria-labelledby="headingPack" data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+
+									<div class="form-check">
+
+										<select class="form-select" th:field="*{pack}"
+											th:value="*{pack}">
+											<option value=""></option>
+											<option value="true">Sí</option>
+											<option value="false">No</option>
+										</select>
+
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+
+					<!-- Botones de acción -->
+					<div class="d-grid mt-4">
+						<button class="btn btn-primary touch-target" type="submit"
+							form="filterForm">
+							<i class="fas fa-search me-1"></i> Aplicar filtros
+						</button>
+						<button class="btn btn-outline-secondary mt-2 touch-target"
+							type="reset" form="filterForm">
+							<i class="fas fa-undo me-1"></i> Limpiar
+						</button>
+					</div>
+
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

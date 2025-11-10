@@ -8,8 +8,7 @@
 
 <body>
 	<th scope="col" th:fragment="sorting(field, label)"><a
-		th:href="@{'/peliculas?' + ${keyword!=null && keyword!=''? 'keyword=' + keyword + '&' : ''}
-                + 'pagina=' + ${pagePeliculas.number}  
+		th:href="@{'/peliculas?pagina=' + ${pagePeliculas.number}  
                 + '&orden=' + ${field} + '&direccion=' + ${direccionOrden == 'ASC'? 'DESC':'ASC'}}">
 			[[${label}]] </a> <span th:if="${campoOrden == field}"
 		th:class="${direccionOrden == 'ASC' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></span>
