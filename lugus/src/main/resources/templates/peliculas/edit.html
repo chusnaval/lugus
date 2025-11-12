@@ -16,7 +16,8 @@
 <link th:href="@{/css/lugus.css}" rel="stylesheet">
 </head>
 <body class="container mt-4">
-	<form th:action="@{'/peliculas/' + ${pelicula.id}} + '/actualizar'"
+	<form
+		th:action="@{/peliculas/actualizar/{id}(id=${pelicula.id},filtroToken=${filtroToken})}"
 		th:object="${nuevo}" method="post">
 		<h2 th:text="${pelicula.titulo}">Título</h2>
 		<input type="hidden" id="idPelicula" th:value="${pelicula.id}">
@@ -158,9 +159,9 @@
 			</div>
 		</div>
 	</form>
-
-<button  onclick="back()" id="floatBtn" title="Volver">Volver</button>
-
+	<form th:action="@{/peliculas/volver(filtroToken=${filtroToken})}" method="post">
+		<button type="submit" id="floatBtn" title="Volver">Volver</button>
+	</form>
 	<script>
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('formCaratula');
@@ -193,9 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
 });
 
-function back(){
-	window.location.href = "/peliculas";
-}
 </script>
 
 </body>

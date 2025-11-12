@@ -88,15 +88,9 @@
 	</div>
 	<hr />
 
+	<form th:action="@{/peliculas/volver(filtroToken=${filtroToken})}" method="post">
+		<button type="submit" id="floatBtn" title="Volver">Volver</button>
+	</form>
 
-	
-<button  onclick="back()" id="floatBtn" title="Volver">Volver</button>
-
-
-<script>		
-		function back(){
-	window.location.href = "/peliculas";
-}
-</script>
 </body>
 </html>

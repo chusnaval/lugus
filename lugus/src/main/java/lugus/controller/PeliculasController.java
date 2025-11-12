@@ -1,5 +1,6 @@
 package lugus.controller;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.PermisoException;
@@ -28,11 +29,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/peliculas")
@@ -44,7 +47,7 @@ public class PeliculasController {
 	private final LocalizacionService locService;
 
 	private final FuenteService fuenteService;
-	
+
 	private final UsuarioService usuarioService;
 
 	/*
@@ -53,7 +56,8 @@ public class PeliculasController {
 	 */
 
 	@GetMapping
-	public String listPaginado(Model model, Principal principal,  @RequestParam(required = false) Optional<String> orden,
+	public String listPaginado(Model model, Principal principal, HttpSession session,
+			@RequestParam(required = false) Optional<String> orden,
 			@RequestParam(required = false) Optional<String> direccion,
 			@RequestParam(required = false) Optional<Integer> pagina, @ModelAttribute FiltrosDto filtro) {
 
@@ -75,16 +79,19 @@ public class PeliculasController {
 		filtro.setOrden(campoOrden);
 		filtro.setDireccion(campoDireccion);
 		model.addAttribute("filtro", filtro);
-		
+
 		model.addAttribute("numeroPagina", pagina.orElse(0));
 
 		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
 		model.addAttribute("localizaciones", localizaciones);
-		
-		
+
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		
+
 		model.addAttribute("admin", usuario.isAdmin());
+
+		String token = UUID.randomUUID().toString();
+		session.setAttribute("filtro:" + token, filtro);
+		model.addAttribute("filtroToken", token);
 
 		return "peliculas/list"; // → src/main/resources/templates/peliculas/list.html
 	}
@@ -96,7 +103,7 @@ public class PeliculasController {
 	@GetMapping("/nuevo")
 	public String createForm(Principal principal, Model model) throws PermisoException {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if(!usuario.isAdmin()) {
+		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
 		}
 		model.addAttribute("pelicula", new PeliculaCreateDto());
@@ -108,12 +115,13 @@ public class PeliculasController {
 	 * /peliculas -------------------------------------------------
 	 */
 	@PostMapping
-	public String create(Principal principal, @Valid @ModelAttribute("pelicula") PeliculaCreateDto dto, BindingResult br, Model model) throws PermisoException {
+	public String create(Principal principal, @Valid @ModelAttribute("pelicula") PeliculaCreateDto dto,
+			BindingResult br, Model model) throws PermisoException {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if(!usuario.isAdmin()) {
+		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
 		}
-		
+
 		if (br.hasErrors()) {
 			// Si hay errores de validación, volvemos al mismo formulario
 			return "peliculas/form";
@@ -129,25 +137,31 @@ public class PeliculasController {
 	 * -------------------------------------------------
 	 */
 	@GetMapping("/{id}")
-	public String detail(Principal principal, @PathVariable Integer id, Model model) throws PermisoException {
+	public String detail(Principal principal, @PathVariable Integer id, @RequestParam String filtroToken,
+			HttpSession session, Model model) throws PermisoException {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if(!usuario.isAdmin()) {
+		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
 		}
-		
+
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 
 		model.addAttribute("pelicula", p);
-		return "peliculas/detail"; // → templates/peliculas/detail.html
+
+		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro:" + filtroToken);
+		model.addAttribute("filtro", filtro);
+		model.addAttribute("filtroToken", filtroToken);
+
+		return "peliculas/detail";
 	}
 
 	@GetMapping("/{id}/image")
 	public ResponseEntity<byte[]> image(Principal principal, @PathVariable Integer id) throws PermisoException {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if(!usuario.isAdmin()) {
+		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
 		}
-		
+
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 
 		if (p.getPeliculaFotos() != null && !p.getPeliculaFotos().isEmpty()) {
@@ -162,13 +176,14 @@ public class PeliculasController {
 
 	}
 
-	@GetMapping("/{id}/editar")
-	public String edit(Principal principal, @PathVariable Integer id, Model model) throws PermisoException {
+	@GetMapping("/editar/{id}")
+	public String edit(Principal principal, @PathVariable Integer id, @RequestParam String filtroToken,
+			HttpSession session, Model model) throws PermisoException {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if(!usuario.isAdmin()) {
+		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
 		}
-		
+
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 		model.addAttribute("pelicula", p);
 
@@ -199,16 +214,21 @@ public class PeliculasController {
 
 		model.addAttribute("nuevo", nuevo);
 
+		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro:" + filtroToken);
+		model.addAttribute("filtro", filtro);
+		model.addAttribute("filtroToken", filtroToken);
 		return "peliculas/edit"; // → templates/peliculas/detail.html
 	}
 
-	@PostMapping("/{id}/actualizar")
-	public String actualizar(Principal principal, @PathVariable Integer id, @Valid @ModelAttribute PeliculaCreateDto nuevo) throws PermisoException {
+	@PostMapping("/actualizar/{id}")
+	public String actualizar(Principal principal, @RequestParam String filtroToken, HttpSession session,
+			@PathVariable Integer id, RedirectAttributes ra, @Valid @ModelAttribute PeliculaCreateDto nuevo)
+			throws PermisoException {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if(!usuario.isAdmin()) {
+		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
 		}
-		
+
 		Optional<Pelicula> opt = service.findById(id);
 
 		Pelicula existing = opt.get();
@@ -239,15 +259,36 @@ public class PeliculasController {
 		existing.calcularCodigo();
 		service.save(existing);
 
-		return "redirect:/peliculas/" + id + "/editar";
+		guardarAtributos(filtroToken, session, ra);
+
+		return "redirect:/peliculas";
+	}
+
+	@PostMapping("/volver")
+	public String volver(@RequestParam(required = false) String filtroToken, HttpSession session,
+			RedirectAttributes ra) {
+
+		if (filtroToken != null) {
+			guardarAtributos(filtroToken, session, ra);
+		}
+
+		return "redirect:/peliculas";
+	}
+
+	private void guardarAtributos(String filtroToken, HttpSession session, RedirectAttributes ra) {
+		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro:" + filtroToken);
+		ra.addAttribute("orden", filtro.getOrden());
+		ra.addAttribute("direccion", filtro.getDireccion());
+		ra.addAttribute("pagina", filtro.getPagina());
+		ra.addAllAttributes(filtro.toMap());
 	}
 
 	@PostMapping("/{id}/caratula")
 	public ResponseEntity<String> addCaratula(Principal principal, @PathVariable Integer id,
 			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException {
-		
+
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if(!usuario.isAdmin()) {
+		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
 		}
 
@@ -275,17 +316,18 @@ public class PeliculasController {
 	 * /peliculas/{padreId}/hijo -------------------------------------------------
 	 */
 	@PostMapping("/{padreId}/hijo")
-	public String addChild(Principal principal, @PathVariable Integer padreId, @Valid @ModelAttribute("nuevoHijo") PeliculaCreateDto dto,
-			BindingResult br, Model model) throws PermisoException {
-		
+	public String addChild(Principal principal, @PathVariable Integer padreId, @RequestParam String filtroToken,
+			HttpSession session, @Valid @ModelAttribute("nuevoHijo") PeliculaCreateDto dto, BindingResult br,
+			Model model) throws PermisoException {
+
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if(!usuario.isAdmin()) {
+		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
 		}
-		
+
 		if (br.hasErrors()) {
 			// Si hay errores, volvemos al detalle mostrando los mensajes
-			return detail(principal, padreId, model);
+			return detail(principal, padreId, filtroToken, session, model);
 		}
 		service.addChild(padreId, dto);
 		// Después de añadir el hijo, recargamos el detalle del padre
@@ -300,10 +342,10 @@ public class PeliculasController {
 	@PostMapping("/{id}/eliminar") // usando POST para evitar problemas con browsers
 	public String delete(Principal principal, @PathVariable Integer id) throws PermisoException {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if(!usuario.isAdmin()) {
+		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
 		}
-		
+
 		service.delete(id);
 		return "redirect:/peliculas";
 	}

@@ -60,7 +60,7 @@
 			id="tabla-peliculas">
 			<tr>
 				<td class="align-middle text-center cover" rowspan="2"><a
-					th:href="@{'/peliculas/' + ${p.id}}"
+					th:href="@{/peliculas/{id}(id=${p.id},filtroToken=${filtroToken})}"
 					class="btn btn-sm btn-outline-primary"><img
 						th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
 						class="img-thumbnail" alt="Caratula" /> <img
@@ -93,7 +93,7 @@
 				<td class="text-left" th:text="${p.genero.displayName}"></td>
 
 				<td class="text-end"><a
-					th:href="@{'/peliculas/' + ${p.id}} + '/editar'" th:if="${admin}"
+					th:href="@{/peliculas/editar/{id}(id=${p.id},filtroToken=${filtroToken})}" th:if="${admin}"
 					class="btn btn-sm btn-outline-secondary">Editar</a></td>
 
 			</tr>
