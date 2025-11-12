@@ -26,7 +26,7 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/css/**", "/js/**", "/public/**")
 						.permitAll().anyRequest().authenticated())
 				.formLogin(form -> form.loginPage("/login").loginProcessingUrl("/perform_login")
-						.defaultSuccessUrl("/peliculas", true).failureUrl("/login?error=true").permitAll())
+						.defaultSuccessUrl("/guardarUsuario", true).failureUrl("/login?error=true").permitAll())
 				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout=true")
 						.invalidateHttpSession(true) // invalida la sesión HTTP
 						.deleteCookies("JSESSIONID") // elimina la cookie de sesión

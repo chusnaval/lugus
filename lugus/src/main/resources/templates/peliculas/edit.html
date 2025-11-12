@@ -16,6 +16,8 @@
 <link th:href="@{/css/lugus.css}" rel="stylesheet">
 </head>
 <body class="container mt-4">
+	<div th:replace="~{layout/header :: header}"></div>
+
 	<form
 		th:action="@{/peliculas/actualizar/{id}(id=${pelicula.id},filtroToken=${filtroToken})}"
 		th:object="${nuevo}" method="post">

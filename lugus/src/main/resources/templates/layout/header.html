@@ -9,8 +9,18 @@
 
 <body th:fragment="header">
 
-	<form id="logoutForm" action="/logout" method="post">
-	    <button type="submit">Cerrar sesión</button>
-	</form>
+	<div class="row">
+		<div class="col-10">
+			<h1>Lugus</h1>
+		</div>
+		<div class="col-1">
+			<span th:text="${#ctx.session.usuarioConectado}"> </span>
+		</div>
+		<div class="col-1">
+			<form id="logoutForm" action="/logout" method="post">
+				<button type="submit">Cerrar sesión</button>
+			</form>
+		</div>
+	</div>
 </body>
 </html>
