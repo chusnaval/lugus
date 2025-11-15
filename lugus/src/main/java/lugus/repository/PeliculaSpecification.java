@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import lugus.model.Localizacion;
 import lugus.model.Pelicula;
+import lugus.model.PeliculaFoto;
 
 public class PeliculaSpecification {
 
@@ -59,6 +60,17 @@ public class PeliculaSpecification {
 
 			Join<Pelicula, Localizacion> generoJoin = root.join("localizacion", JoinType.INNER);
 			return cb.equal(generoJoin.get("localizacion"), localizacion);
+		};
+	}
+
+	public static Specification<Pelicula> porTieneCaratula(Boolean tieneCaratula) {
+		return (root, query, cb) -> {
+			if (tieneCaratula == null) {
+				return null;
+			}
+
+			Join<Pelicula, PeliculaFoto> fotosJoin = root.join("peliculaFotos", JoinType.LEFT);
+			return cb.isNull(fotosJoin.get("id"));
 		};
 	}
 }

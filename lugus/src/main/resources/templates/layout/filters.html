@@ -39,6 +39,12 @@
 
 						</div>
 
+						<div th:if="${admin}" class="input-group input-group-sm">
+							<span class="input-group-text">Caratula</span> <input
+								type="checkbox" th:name="tieneCaratula"
+								th:value="*{tieneCaratula}" th:field="*{tieneCaratula}">
+						</div>
+
 					</div>
 
 					<!-- Botón “Más filtros” (visible en móvil y desktop) -->

@@ -29,6 +29,8 @@ public class FiltrosDto {
 	private Boolean funda;
 
 	private Boolean comprado;
+	
+	private Boolean tieneCaratula;
 
 	private String genero;
 
@@ -72,7 +74,9 @@ public class FiltrosDto {
 			map.put("funda", funda);
 		if (comprado != null)
 			map.put("comprado", comprado);
-
+		if(tieneCaratula!=null)
+			map.put("tieneCaratula",tieneCaratula);
+		
 		if (pagina >= 0)
 			map.put("pagina", pagina);
 
