@@ -7,7 +7,7 @@ import lombok.Getter;
 
 public enum Formato {
 
-	VHS((short) 0), DVD((short) 1), BLURAY((short) 2), ULTRAHD((short) 3);
+	VHS((short) 0), DVD((short) 1), BLURAY((short) 2), ULTRAHD((short) 3), DIGITAL((short) 4);
 
 	@Getter
 	private short id;
