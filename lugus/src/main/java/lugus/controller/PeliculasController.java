@@ -139,10 +139,6 @@ public class PeliculasController {
 	@GetMapping("/{id}")
 	public String detail(Principal principal, @PathVariable Integer id, @RequestParam String filtroToken,
 			HttpSession session, Model model) throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 
@@ -157,10 +153,6 @@ public class PeliculasController {
 
 	@GetMapping("/{id}/image")
 	public ResponseEntity<byte[]> image(Principal principal, @PathVariable Integer id) throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 
