@@ -7,6 +7,8 @@ import lugus.PermisoException;
 import lugus.dto.FiltrosDto;
 import lugus.dto.NewCaratulaDTO;
 import lugus.dto.PeliculaCreateDto;
+import lugus.model.Actor;
+import lugus.model.Director;
 import lugus.model.Formato;
 import lugus.model.Fuente;
 import lugus.model.Genero;
@@ -14,6 +16,8 @@ import lugus.model.Localizacion;
 import lugus.model.Pelicula;
 import lugus.model.PeliculaFoto;
 import lugus.model.Usuario;
+import lugus.service.ActorService;
+import lugus.service.DirectorService;
 import lugus.service.DwFotoServiceI;
 import lugus.service.FuenteService;
 import lugus.service.LocalizacionService;
@@ -47,6 +51,10 @@ public class PeliculasController {
 	private final LocalizacionService locService;
 
 	private final FuenteService fuenteService;
+	
+	private final DirectorService directorService;
+	
+	private final ActorService actorService;
 
 	private final UsuarioService usuarioService;
 
@@ -148,6 +156,12 @@ public class PeliculasController {
 		model.addAttribute("filtro", filtro);
 		model.addAttribute("filtroToken", filtroToken);
 
+		List<Director> directores = directorService.findByPeliculaId(p.getId());
+		model.addAttribute("directores", directores);
+		
+		List<Actor> actores = actorService.findByPeliculaIdOrderByOrdenAsc(p.getId());
+		model.addAttribute("actores", actores);
+		
 		return "peliculas/detail";
 	}
 
@@ -206,6 +220,12 @@ public class PeliculasController {
 
 		model.addAttribute("nuevo", nuevo);
 
+		List<Director> directores = directorService.findByPeliculaId(p.getId());
+		model.addAttribute("directores", directores);
+		
+		List<Actor> actores = actorService.findByPeliculaIdOrderByOrdenAsc(p.getId());
+		model.addAttribute("actores", actores);
+		
 		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro:" + filtroToken);
 		model.addAttribute("filtro", filtro);
 		model.addAttribute("filtroToken", filtroToken);

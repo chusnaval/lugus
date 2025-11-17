@@ -19,7 +19,7 @@
 	<div th:replace="~{layout/header :: header}"></div>
 
 	<h2 th:text="${pelicula.titulo}">Título</h2>
-	
+
 	<div class="row">
 		<ul class="list-group mb-4 col-8">
 			<li class="list-group-item row"><strong class="col-3">Año:</strong>
@@ -88,9 +88,36 @@
 		</table>
 
 	</div>
+
+	<div th:if="${pelicula.pack == false}" class="row">
+		<div class="col-2">
+			<span>Director/a:</span>
+			<div th:if="${directores.empty}">No tenemos ese dato aún.</div>
+			<table th:unless="${directores.empty}" class="table table-sm">
+				<tbody>
+					<tr th:each="dir : ${directores}">
+						<td th:text="${dir.nombre}"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="col-6">
+			<span>Interpretes:</span>
+			<div th:if="${actores.empty}">No tenemos ese dato aún.</div>
+			<table th:unless="${actores.empty}" class="table table-xl">
+				<tbody>
+					<tr th:each="act : ${actores}">
+						<td th:text="${act.nombre}"></td>
+						<td th:text="${act.personaje}"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 	<hr />
 
-	<form th:action="@{/peliculas/volver(filtroToken=${filtroToken})}" method="post">
+	<form th:action="@{/peliculas/volver(filtroToken=${filtroToken})}"
+		method="post">
 		<button type="submit" id="floatBtn" title="Volver">Volver</button>
 	</form>
 
