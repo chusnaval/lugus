@@ -23,7 +23,9 @@
 						<div class="input-group input-group-sm">
 							<span class="input-group-text">Titulo</span> <input type="text"
 								class="form-control" th:name="titulo" th:value="*{titulo}"
-								th:field="*{titulo}">
+								th:field="*{titulo}"> <span class="input-group-text">Director</span>
+							<input type="text" class="form-control" th:name="director"
+								th:value="*{director}" th:field="*{director}">
 						</div>
 
 						<!-- Otro filtro rápido -->
@@ -34,8 +36,9 @@
 								<option
 									th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
 									th:value="${g.codigo}" th:text="${g.displayName}"></option>
-							</select>
-
+							</select> <span class="input-group-text">Interprete</span> <input
+								type="text" class="form-control" th:name="actor"
+								th:value="*{actor}" th:field="*{actor}">
 
 						</div>
 

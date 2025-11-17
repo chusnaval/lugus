@@ -4,6 +4,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import lugus.model.Actor;
+import lugus.model.Director;
 import lugus.model.Localizacion;
 import lugus.model.Pelicula;
 import lugus.model.PeliculaFoto;
@@ -70,7 +72,32 @@ public class PeliculaSpecification {
 			}
 
 			Join<Pelicula, PeliculaFoto> fotosJoin = root.join("peliculaFotos", JoinType.LEFT);
-			return cb.isNull(fotosJoin.get("id"));
+			if(tieneCaratula) {
+				return cb.isNull(fotosJoin.get("id"));
+			}
+			return null;
+		};
+	}
+
+	public static Specification<Pelicula> porActor(String actor) {
+		return (root, query, cb) -> {
+			if (actor == null || actor.isBlank()) {
+				return null;
+			}
+
+			Join<Pelicula, Actor> actorJoin = root.join("actores", JoinType.INNER);
+			return cb.like(actorJoin.get("nombre"), "%" + actor + "%");
+		};
+	}
+
+	public static Specification<Pelicula> porDirector(String director) {
+		return (root, query, cb) -> {
+			if (director == null || director.isBlank()) {
+				return null;
+			}
+
+			Join<Pelicula, Director> directorJoin = root.join("directores", JoinType.INNER);
+			return cb.like(cb.lower(directorJoin.get("nombre")), "%" + director.toLowerCase() + "%");
 		};
 	}
 }

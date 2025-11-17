@@ -37,12 +37,17 @@ public class FiltrosDto {
 	private String localizacion;
 
 	private String notas;
+	
+	private String director;
+	
+	private String actor;
 
 	private int pagina;
 
 	private String orden;
 
 	private String direccion;
+	
 
 	public Map<String, Object> toMap() {
 		Map<String, Object> map = new HashMap<>();
@@ -60,6 +65,13 @@ public class FiltrosDto {
 		if (direccion != null && !direccion.isBlank())
 			map.put("direccion", direccion);
 
+		if (director != null && !director.isBlank())
+			map.put("director", director);
+		
+		if (actor != null && !actor.isBlank())
+			map.put("actor", actor);
+		
+		
 		if (fromAnyo != null)
 			map.put("fromAnyo", fromAnyo);
 		if (toAnyo != null)

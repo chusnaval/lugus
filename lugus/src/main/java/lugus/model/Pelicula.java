@@ -95,6 +95,15 @@ public class Pelicula {
 	@ToString.Exclude
 	private Set<PeliculaFoto> peliculaFotos = new HashSet<>();
 	
+	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@ToString.Exclude
+	private Set<Director> directores = new HashSet<Director>();
+	
+	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@ToString.Exclude
+	private Set<Actor> actores = new HashSet<Actor>();
+	
+	
 	public String getDescLocalizacion() {
 		if(localizacion==null) {
 			return "";

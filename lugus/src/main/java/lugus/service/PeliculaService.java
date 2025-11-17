@@ -110,6 +110,9 @@ public class PeliculaService {
 		 spec = spec.and(PeliculaSpecification.porNotas(filtro.getNotas()));
 		 spec = spec.and(PeliculaSpecification.porTieneCaratula(filtro.getTieneCaratula()));
 		 
+		 spec = spec.and(PeliculaSpecification.porActor(filtro.getActor()));
+		 spec = spec.and(PeliculaSpecification.porDirector(filtro.getDirector()));
+		 
 		 
 		  return peliculaRepo.findAll(spec, pageable);
 	}
