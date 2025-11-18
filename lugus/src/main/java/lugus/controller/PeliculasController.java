@@ -67,7 +67,8 @@ public class PeliculasController {
 	public String listPaginado(Model model, Principal principal, HttpSession session,
 			@RequestParam(required = false) Optional<String> orden,
 			@RequestParam(required = false) Optional<String> direccion,
-			@RequestParam(required = false) Optional<Integer> pagina, @ModelAttribute FiltrosDto filtro) {
+			@RequestParam(required = false) Optional<Integer> pagina,
+			@ModelAttribute FiltrosDto filtro) {
 
 		Page<Pelicula> resultado = service.findAllBy(filtro, pagina.orElse(0), orden.orElse("tituloGest"),
 				direccion.orElse("ASC"));
