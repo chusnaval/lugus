@@ -1,35 +1,167 @@
-.cursor-pointer { cursor: pointer; }
+.cursor-pointer {
+	cursor: pointer;
+}
 
 .toggle-icon {
-    transition: transform .2s ease-in-out;
+	transition: transform .2s ease-in-out;
 }
 
 /* Rotación cuando la fila de detalle está visible */
-.collapse.show + tr .toggle-icon,
-tr[data-bs-toggle="collapse"].show .toggle-icon {
-    transform: rotate(90deg);
+.collapse.show+tr .toggle-icon, tr[data-bs-toggle="collapse"].show .toggle-icon
+	{
+	transform: rotate(90deg);
 }
 
 /* Opcional: colores de pares/impares (si no usas .table-custom) */
-.table-custom tbody tr:nth-child(odd) { background:#f8f9fa; }
-.table-custom tbody tr:nth-child(even){ background:#e7f1ff; }
-.table-custom tbody tr:hover { background:#d0ebff; }
+.table-custom tbody tr:nth-child(odd) {
+	background: #f8f9fa;
+}
+
+.table-custom tbody tr:nth-child(even) {
+	background: #e7f1ff;
+}
+
+.table-custom tbody tr:hover {
+	background: #d0ebff;
+}
 
 #floatBtn {
-  position: fixed; /* Fixed/sticky position */
-  bottom: 20px; /* Place the button at the bottom of the page */
-  right: 30px; /* Place the button 30px from the right */
-  z-index: 99; /* Make sure it does not overlap */
-  border: none; /* Remove borders */
-  outline: none; /* Remove outline */
-  background-color: blue; /* Set a background color */
-  color: white; /* Text color */
-  cursor: pointer; /* Add a mouse pointer on hover */
-  padding: 15px; /* Some padding */
-  border-radius: 10px; /* Rounded corners */
-  font-size: 18px; /* Increase font size */
+	position: fixed; /* Fixed/sticky position */
+	bottom: 20px; /* Place the button at the bottom of the page */
+	right: 30px; /* Place the button 30px from the right */
+	z-index: 99; /* Make sure it does not overlap */
+	border: none; /* Remove borders */
+	outline: none; /* Remove outline */
+	background-color: blue; /* Set a background color */
+	color: white; /* Text color */
+	cursor: pointer; /* Add a mouse pointer on hover */
+	padding: 15px; /* Some padding */
+	border-radius: 10px; /* Rounded corners */
+	font-size: 18px; /* Increase font size */
 }
 
 #floatBtn:hover {
-  background-color: #555; /* Add a dark-grey background on hover */
+	background-color: #555; /* Add a dark-grey background on hover */
+}
+
+/* Neon Minimalist Login Form - Complete & Self-Contained */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+		Roboto, sans-serif;
+	background: #1a2027;
+	min-height: 100vh;
+	line-height: 1.6;
+	color: white;
+}
+
+lugus_bg_color {
+	background-color: #1a2027 !important;
+	color: #fff !important;
+}
+
+/* ==== Tablas ==== */
+table, .table { /* .table es la clase típica de Bootstrap */
+	background-color: #1a2027 !important;
+	color: #fff !important;
+}
+
+/* Cabecera de tabla (thead) */
+table thead, .table thead {
+	background-color: #1a2027 !important;
+	color: #fff !important;
+}
+
+/* Celdas (td / th) */
+table td, .table td, table th, .table th {
+	background-color: #1a2027 !important;
+	color: #fff !important;
+	border-color: rgba(255, 255, 255, .2) !important;
+	/* opcional: bordes más claros */
+}
+
+/* ==== Listas (ul) ==== */
+ul, .list-group { /* si usas .list-group de Bootstrap */
+	background-color: #1a2027 !important;
+	color: #fff !important;
+	padding-left: 1rem; /* mantiene la sangría típica */
+}
+
+/* Elementos de lista */
+ul li, .list-group-item {
+	background-color: transparent; /* hereda el fondo del ul */
+	color: #fff !important;
+}
+
+/* Si usas .list-group, también ajustamos los bordes */
+.list-group-item {
+	border-color: rgba(255, 255, 255, .2) !important;
+}
+
+.card-bg {
+	max-width: 200px;
+	background-color: #2a353f !important; /* ← tono más claro */
+	color: #fff !important;
+}
+
+.card-bg:hover {
+	background-color: #3b4c58 !important; /* ← aún más claro */
+	transition: background-color 0.2s ease-in-out;
+}
+
+.card-borde {
+	border: 1px solid rgba(255, 255, 255, .1);
+}
+
+.custom-card-link {
+	outline: none; /* quita el contorno al hacer click */
+	border: none; /* por si el navegador lo agrega */
+}
+
+.custom-card-link:focus-visible {
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, .4); /* halo blanco tenue */
+}
+
+.custom-card-link:hover .card {
+	transform: translateY(-2px);
+	transition: transform .15s ease-in-out;
+}
+
+.card.fixed-height {
+	height: 100%; /* ocupa todo el alto del .col */
+	display: flex;
+	flex-direction: column;
+}
+
+.card-img-top.fixed {
+	height: 180px; /* altura fija para todas */
+	max-width: 140px;
+	object-fit: cover; /* recorta sin deformar */
+}
+
+.card-body .title {
+	min-height: 3rem; /* ~2 líneas de texto (line‑height 1.5) */
+	margin-bottom: .5rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2; /* fuerza 2 líneas */
+	-webkit-box-orient: vertical;
+}
+
+.info-line {
+    min-height: 1.4rem;               /* altura constante para ambas filas */
+    display: flex;
+    align-items: center;
+    font-size: .9rem;
+    color: #ddd;
+}
+
+.card-footer {
+    margin-top: auto;          /* empuja el footer al fondo */
 }

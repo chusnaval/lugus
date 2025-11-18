@@ -102,7 +102,7 @@ public class PeliculasController {
 		session.setAttribute("filtro:" + token, filtro);
 		model.addAttribute("filtroToken", token);
 
-		return "peliculas/list"; // → src/main/resources/templates/peliculas/list.html
+		return "peliculas/moviesList"; // → src/main/resources/templates/peliculas/list.html
 	}
 
 	/*
