@@ -1,53 +1,104 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-    <meta charset="UTF-8"/>
-    <title th:text="${pelicula.id == null ? 'Crear' : 'Editar'} + ' película'">Crear película</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+<meta charset="UTF-8" />
+<title>Añadir pelicula</title>
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
 </head>
 <body class="container mt-4">
-<h2 th:text="${pelicula.id == null ? 'Crear' : 'Editar'} + ' película'">Crear película</h2>
+	<h2>Añadir pelicula</h2>
 
-<form th:action="@{/peliculas}" th:object="${pelicula}" method="post">
-    <div class="mb-3">
-        <label class="form-label">Título</label>
-        <input class="form-control" th:field="*{titulo}" placeholder="Ej.: Matrix"/>
-        <div class="text-danger" th:if="${#fields.hasErrors('titulo')}"
-             th:errors="*{titulo}">Error</div>
-    </div>
+	<form th:action="@{/peliculas}" th:object="${pelicula}" method="post">
 
-    <div class="mb-3">
-        <label class="form-label">Año</label>
-        <input type="number" class="form-control" th:field="*{anyo}" min="1888"/>
-        <div class="text-danger" th:if="${#fields.hasErrors('anyo')}"
-             th:errors="*{anyo}">Error</div>
-    </div>
+		<div class="row">
+			<ul class="list-group mb-4 col-8">
+				<li class="list-group-item row"><strong class="col-3">Título:</strong>
+					<input class="form-control" th:field="*{titulo}"
+					placeholder="Ej.: Matrix" />
+					<div class="text-danger" th:if="${#fields.hasErrors('titulo')}"
+						th:errors="*{titulo}">Error</div></li>
 
-    <div class="mb-3">
-        <label class="form-label">Formato</label>
-        <select class="form-select" th:field="*{formatoCodigo}">
-            <option th:each="f : ${T(lugus.model.Formato).valoresOrdenados()}"
-                    th:value="${f.id}"
-                    th:text="${f}"></option>
-        </select>
-        <div class="text-danger" th:if="${#fields.hasErrors('formatoCodigo')}"
-             th:errors="*{formatoCodigo}">Error</div>
-    </div>
+				<li class="list-group-item row"><strong class="col-3">Título
+						para Gestión:</strong> <input class="form-control" th:field="*{tituloGest}"
+					placeholder="Ej.: Matrix" />
+					<div class="text-danger" th:if="${#fields.hasErrors('tituloGest')}"
+						th:errors="*{tituloGest}">Error</div></li>
 
-    <div class="mb-3">
-        <label class="form-label">Género</label>
-        <select class="form-select" th:field="*{generoCodigo}">
-            <option th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
-                    th:value="${g.codigo}"
-                    th:text="${g.displayName}"></option>
-        </select>
-        <div class="text-danger" th:if="${#fields.hasErrors('generoCodigo')}"
-             th:errors="*{generoCodigo}">Error</div>
-    </div>
+				<li class="list-group-item row"><strong class="col-3">Año:</strong>
+					<input type="number" class="form-control" th:field="*{anyo}"
+					min="1888" />
+					<div class="text-danger" th:if="${#fields.hasErrors('anyo')}"
+						th:errors="*{anyo}">Error</div></li>
 
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a th:href="@{/peliculas}" class="btn btn-link">Cancelar</a>
-</form>
+				<li class="list-group-item row"><strong class="col-3">Formato:</strong>
+					<select class="form-select" th:field="*{formatoCodigo}">
+						<option th:each="f : ${T(lugus.model.Formato).valoresOrdenados()}"
+							th:value="${f.id}" th:text="${f}"></option>
+				</select>
+					<div class="text-danger"
+						th:if="${#fields.hasErrors('formatoCodigo')}"
+						th:errors="*{formatoCodigo}">Error</div></li>
+
+
+				<li class="list-group-item row"><strong class="col-3">Género:</strong>
+					<select class="form-select" th:field="*{generoCodigo}">
+						<option th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
+							th:value="${g.codigo}" th:text="${g.displayName}"></option>
+				</select>
+					<div class="text-danger"
+						th:if="${#fields.hasErrors('generoCodigo')}"
+						th:errors="*{generoCodigo}">Error</div></li>
+
+				<li class="list-group-item row"><strong class="col-3">Pack:</strong>
+					<input type="checkbox" th:field="*{pack}">
+
+					<strong class="col-3">Steelbook:</strong> <input type="checkbox"
+					th:field="*{steelbook}"> 
+					
+					<strong class="col-3">Funda:</strong>
+					<input type="checkbox" th:field="*{funda}">
+					
+					
+					<strong class="col-3">Comprado:</strong> <input type="checkbox"
+					th:field="*{comprado}"></li>
+
+				<li class="list-group-item row"><strong class="col-3">Localización:</strong>
+					<select class="form-select" th:field="*{localizacionCodigo}">
+						<option value=""></option>
+						<option th:each="l : ${localizaciones}" th:value="${l.codigo}"
+							th:text="${l.descripcion}"></option>
+				</select></li>
+
+				<li class="list-group-item row"><strong class="col-3">Código
+						interno:</strong> <input type="text" maxlength="4" readonly="readonly"
+					disabled="disabled"></li>
+
+
+				<li class="list-group-item row"><strong class="col-3">Notas:</strong>
+					<textarea th:field="*{notas}" maxlength="400"></textarea></li>
+			</ul>
+
+
+		</div>
+
+		<h4>Caratula</h4>
+		<div class="row g-2">
+			<div class="col-md-4">
+				<input class="form-control" th:field="*{url}" placeholder="url" />
+			</div>
+			<div class="col-md-2">
+				<select class="form-select" th:field="*{fuente}">
+					<option value=""></option>
+					<option th:each="f : ${fuentesList}" th:value="${f.id}"
+						th:text="${f.descripcion}"></option>
+				</select>
+			</div>
+		</div>
+
+		<button type="submit" class="btn btn-success">Guardar</button>
+		<a th:href="@{/peliculas}" class="btn btn-link">Cancelar</a>
+	</form>
 </body>
 </html>

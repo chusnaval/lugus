@@ -10,9 +10,11 @@ import lugus.model.Formato;
 import lugus.model.Genero;
 import lugus.model.Pelicula;
 import lugus.repository.PeliculaRepository;
+import lugus.service.FuenteService;
 import lugus.service.LocalizacionService;
 import lugus.service.PeliculaService;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,12 +24,13 @@ class PeliculaServiceTest {
 
     private PeliculaRepository repo;
 	private LocalizacionService locService;
+	private FuenteService fuenteService;
     private PeliculaService service;
 
     @BeforeEach
     void setUp() {
         repo = mock(PeliculaRepository.class);
-        service = new PeliculaService(repo, locService);
+        service = new PeliculaService(repo, locService, fuenteService);
     }
 
     @Test
@@ -60,7 +63,7 @@ class PeliculaServiceTest {
     }
 
     @Test
-    void addChild_shouldPersistBothSides() {
+    void addChild_shouldPersistBothSides() throws IOException {
         // --- Arrange ---------------------------------------------------------
         Pelicula padre = new Pelicula();
         padre.setId(10);
@@ -79,7 +82,7 @@ class PeliculaServiceTest {
         when(repo.save(any(Pelicula.class))).thenAnswer(i -> i.getArgument(0));
 
         // --- Act -------------------------------------------------------------
-        Pelicula result = service.addChild(10, child);
+        Pelicula result = service.addChild(10, child, null);
 
         // --- Assert ----------------------------------------------------------
         assertThat(result.getPadre()).isSameAs(padre);

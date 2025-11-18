@@ -1,5 +1,6 @@
 package lugus.model;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -85,7 +86,14 @@ public class Pelicula {
 
 	@Column
 	private boolean comprado;
-
+	
+	@Column(name="usr_alta")
+	private String usrAlta;
+	
+	 @Column(name = "ts_alta", nullable = false,
+	            columnDefinition = "TIMESTAMP")   
+	private Instant tsAlta;   
+	 
 	@ManyToOne
 	@JoinColumn(name = "padre_id")
 	@ToString.Exclude
@@ -135,12 +143,18 @@ public class Pelicula {
 	 * @param hijo
 	 */
 	public void addHijo(Pelicula hijo) {
+		if(this.peliculasPack==null) {
+			this.peliculasPack = new HashSet<>();
+		}
 		this.peliculasPack.add(hijo);
 		hijo.setPadre(this);
 
 	}
 
 	public void addCaratula(PeliculaFoto pf) {
+		if(this.peliculaFotos==null) {
+			this.peliculaFotos = new HashSet<>();
+		}
 		this.peliculaFotos.add(pf);
 		pf.setPelicula(this);
 		

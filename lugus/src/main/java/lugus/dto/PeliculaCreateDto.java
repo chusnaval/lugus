@@ -36,4 +36,8 @@ public class PeliculaCreateDto {
 	private boolean comprado;
 	
 	private String notas;
+	
+	private String url;
+	
+	private Integer fuente;
 }

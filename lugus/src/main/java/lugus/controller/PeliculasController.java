@@ -115,6 +115,13 @@ public class PeliculasController {
 		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
 		}
+		
+		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
+		model.addAttribute("localizaciones", localizaciones);
+		
+		List<Fuente> fuentes = fuenteService.findAll();
+		model.addAttribute("fuentesList", fuentes);
+		
 		model.addAttribute("pelicula", new PeliculaCreateDto());
 		return "peliculas/form"; // → templates/peliculas/form.html
 	}
@@ -125,7 +132,7 @@ public class PeliculasController {
 	 */
 	@PostMapping
 	public String create(Principal principal, @Valid @ModelAttribute("pelicula") PeliculaCreateDto dto,
-			BindingResult br, Model model) throws PermisoException {
+			BindingResult br, Model model, HttpSession session) throws PermisoException, IOException {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
 		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
@@ -135,7 +142,7 @@ public class PeliculasController {
 			// Si hay errores de validación, volvemos al mismo formulario
 			return "peliculas/form";
 		}
-		Pelicula creada = service.crear(dto);
+		Pelicula creada = service.crear(dto, session);
 		// Redirigimos al detalle de la película recién creada
 		return "redirect:/peliculas/" + creada.getId();
 	}
@@ -146,7 +153,7 @@ public class PeliculasController {
 	 * -------------------------------------------------
 	 */
 	@GetMapping("/{id}")
-	public String detail(Principal principal, @PathVariable Integer id, @RequestParam String filtroToken,
+	public String detail(Principal principal, @PathVariable Integer id, @RequestParam(required = false) String filtroToken,
 			HttpSession session, Model model) throws PermisoException {
 
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
@@ -331,7 +338,7 @@ public class PeliculasController {
 	@PostMapping("/{padreId}/hijo")
 	public String addChild(Principal principal, @PathVariable Integer padreId, @RequestParam String filtroToken,
 			HttpSession session, @Valid @ModelAttribute("nuevoHijo") PeliculaCreateDto dto, BindingResult br,
-			Model model) throws PermisoException {
+			Model model) throws PermisoException, IOException {
 
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
 		if (!usuario.isAdmin()) {
@@ -342,7 +349,7 @@ public class PeliculasController {
 			// Si hay errores, volvemos al detalle mostrando los mensajes
 			return detail(principal, padreId, filtroToken, session, model);
 		}
-		service.addChild(padreId, dto);
+		service.addChild(padreId, dto, session);
 		// Después de añadir el hijo, recargamos el detalle del padre
 		return "redirect:/peliculas/" + padreId;
 	}

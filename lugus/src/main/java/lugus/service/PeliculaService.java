@@ -1,28 +1,33 @@
 package lugus.service;
 
 import lombok.RequiredArgsConstructor;
+import lugus.controller.DwFotoService;
 import lugus.dto.FiltrosDto;
 import lugus.dto.PeliculaCreateDto;
 import lugus.model.Formato;
+import lugus.model.Fuente;
 import lugus.model.Genero;
 import lugus.model.Localizacion;
 import lugus.model.Pelicula;
+import lugus.model.PeliculaFoto;
 import lugus.repository.PeliculaRepository;
 import lugus.repository.PeliculaSpecification;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +37,7 @@ public class PeliculaService {
 
 	private final PeliculaRepository peliculaRepo;
 	private final LocalizacionService locService;
+	private final FuenteService fuenteService;
 
 	public List<Pelicula> findAll() {
 		return peliculaRepo.findAll();
@@ -42,7 +48,7 @@ public class PeliculaService {
 	}
 
 	@Transactional
-	public Pelicula crear(PeliculaCreateDto dto) {
+	public Pelicula crear(PeliculaCreateDto dto, HttpSession session) throws IOException {
 		Localizacion loc = null;
 		if (dto.getLocalizacionCodigo() != null && !dto.getLocalizacionCodigo().isBlank()) {
 			loc = locService.findById(dto.getLocalizacionCodigo())
@@ -51,11 +57,29 @@ public class PeliculaService {
 
 		Formato formato = Formato.getById(dto.getFormatoCodigo());
 		Genero genero = Genero.getById(dto.getGeneroCodigo());
+		String user = (String) session.getAttribute("usuarioConectado");
 
-		Pelicula p = Pelicula.builder().titulo(dto.getTitulo()).anyo(dto.getAnyo()).formato(formato).genero(genero)
-				.localizacion(loc).build();
+		Pelicula p = Pelicula.builder().titulo(dto.getTitulo()).tituloGest(dto.getTituloGest()).anyo(dto.getAnyo())
+				.formato(formato).genero(genero).pack(dto.isPack()).steelbook(dto.isSteelbook()).funda(dto.isFunda())
+				.comprado(dto.isComprado()).notas(dto.getNotas()).localizacion(loc).usrAlta(user).tsAlta(Instant.now())
+				.build();
 		p.calcularCodigo();
-		return peliculaRepo.save(p);
+		Pelicula saved = peliculaRepo.save(p);
+
+		if (dto.getUrl() != null && !dto.getUrl().isEmpty()) {
+			final DwFotoServiceI dwFotoService = new DwFotoService();
+			Optional<Fuente> fuenteObj = fuenteService.findById(dto.getFuente());
+			PeliculaFoto pf = new PeliculaFoto();
+			pf.setUrl(dto.getUrl());
+			pf.setFuente(fuenteObj.get());
+			pf.setFoto(dwFotoService.descargar(dto.getFuente(), dto.getUrl()));
+			pf.setCaratula(true);
+
+			saved.addCaratula(pf);
+			saved = save(saved);
+		}
+
+		return saved;
 	}
 
 	@Transactional
@@ -64,13 +88,13 @@ public class PeliculaService {
 	}
 
 	@Transactional
-	public Pelicula addChild(Integer padreId, @Valid PeliculaCreateDto dto) {
+	public Pelicula addChild(Integer padreId, @Valid PeliculaCreateDto dto, HttpSession session) throws IOException {
 		Pelicula padre = peliculaRepo.findById(padreId)
 				.orElseThrow(() -> new IllegalArgumentException("Padre no encontrado"));
-		Pelicula hijo = crear(dto);
+		Pelicula hijo = crear(dto, session);
 		hijo.setPadre(padre);
 		padre.getPeliculasPack().add(hijo);
-		peliculaRepo.save(padre); 
+		peliculaRepo.save(padre);
 		return hijo;
 	}
 
@@ -91,29 +115,27 @@ public class PeliculaService {
 		return peliculaRepo.count();
 	}
 
-
 	public Page<Pelicula> findAllBy(FiltrosDto filtro, final int pagina, final String campo, final String direccion) {
-		
+
 		Pageable pageable = PageRequest.of(pagina, 30, Sort.by(Direction.fromString(direccion), campo));
-		
-		 Specification<Pelicula> spec = Specification.where(null);
-		 spec = spec.and(PeliculaSpecification.porTitulo(filtro.getTitulo()));
-		 spec = spec.and(PeliculaSpecification.porFromAnyo(filtro.getFromAnyo()));
-		 spec = spec.and(PeliculaSpecification.porToAnyo(filtro.getToAnyo()));
-		 spec = spec.and(PeliculaSpecification.porPack(filtro.getPack()));
-		 spec = spec.and(PeliculaSpecification.porSteelbook(filtro.getSteelbook()));
-		 spec = spec.and(PeliculaSpecification.porFunda(filtro.getFunda()));
-		 spec = spec.and(PeliculaSpecification.porFormato(filtro.getFormato()));
-		 spec = spec.and(PeliculaSpecification.porComprado(filtro.getComprado()));
-		 spec = spec.and(PeliculaSpecification.porGenero(filtro.getGenero()));
-		 spec = spec.and(PeliculaSpecification.porLocalizacion(filtro.getLocalizacion()));
-		 spec = spec.and(PeliculaSpecification.porNotas(filtro.getNotas()));
-		 spec = spec.and(PeliculaSpecification.porTieneCaratula(filtro.getTieneCaratula()));
-		 
-		 spec = spec.and(PeliculaSpecification.porActor(filtro.getActor()));
-		 spec = spec.and(PeliculaSpecification.porDirector(filtro.getDirector()));
-		 
-		 
-		  return peliculaRepo.findAll(spec, pageable);
+
+		Specification<Pelicula> spec = Specification.where(null);
+		spec = spec.and(PeliculaSpecification.porTitulo(filtro.getTitulo()));
+		spec = spec.and(PeliculaSpecification.porFromAnyo(filtro.getFromAnyo()));
+		spec = spec.and(PeliculaSpecification.porToAnyo(filtro.getToAnyo()));
+		spec = spec.and(PeliculaSpecification.porPack(filtro.getPack()));
+		spec = spec.and(PeliculaSpecification.porSteelbook(filtro.getSteelbook()));
+		spec = spec.and(PeliculaSpecification.porFunda(filtro.getFunda()));
+		spec = spec.and(PeliculaSpecification.porFormato(filtro.getFormato()));
+		spec = spec.and(PeliculaSpecification.porComprado(filtro.getComprado()));
+		spec = spec.and(PeliculaSpecification.porGenero(filtro.getGenero()));
+		spec = spec.and(PeliculaSpecification.porLocalizacion(filtro.getLocalizacion()));
+		spec = spec.and(PeliculaSpecification.porNotas(filtro.getNotas()));
+		spec = spec.and(PeliculaSpecification.porTieneCaratula(filtro.getTieneCaratula()));
+
+		spec = spec.and(PeliculaSpecification.porActor(filtro.getActor()));
+		spec = spec.and(PeliculaSpecification.porDirector(filtro.getDirector()));
+
+		return peliculaRepo.findAll(spec, pageable);
 	}
 }
