@@ -3,22 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <title>Iniciar sesión</title>
+ <link rel="stylesheet" href="/css/login.css">
 </head>
 <body>
 	<div class="login-container">
 		<h2>Iniciar sesión</h2>
 
-		<form th:action="@{/perform_login}" method="post">
-			<div>
-				<label>Usuario</label> <input type="text" name="username" required />
+		<form th:action="@{/perform_login}" method="post" class="login-form" id="loginForm">
+			<div class="form-group">
+				<div class="input-wrapper">
+					<label>Usuario</label> <input type="text" name="username" required />
+					<span class="input-line"></span>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-wrapper password-wrapper">
+					<label>Contraseña</label> <input type="password" name="password"
+						required /> <span class="input-line"></span>
+				</div>
 			</div>
 			<div>
-				<label>Contraseña</label> <input type="password" name="password"
-					required />
-			</div>
-
-			<div>
-				<button type="submit">Entrar</button>
+				<button type="submit" class="login-btn btn">
+					Entrar <span class="btn-loader"></span> <span class="btn-glow"></span>
+				</button>
 			</div>
 
 			<div th:if="${param.error}">
@@ -28,6 +35,17 @@
 				<p style="color: green;">Has cerrado sesión correctamente.</p>
 			</div>
 		</form>
+		<div class="success-message" id="successMessage">
+			<div class="success-icon">✓</div>
+			<h3>Encantado de volver a verte!</h3>
+			<p>Espera un segundo por favor...</p>
+		</div>
+		<div class="background-effects">
+			<div class="glow-orb glow-orb-1"></div>
+			<div class="glow-orb glow-orb-2"></div>
+			<div class="glow-orb glow-orb-3"></div>
+		</div>
 	</div>
+	 <script src="/js/login.js"></script>
 </body>
 </html>
