@@ -1,0 +1,32 @@
+/* Clase reutilizable para cualquier elemento <button>, <a> o <input type="button"> */
+.btn-lumo {
+    --lumo-primary: #6c5ce7;            /* color oficial de Lumo */
+    background-color: var(--lumo-primary);
+    color: #fff;                           /* texto blanco */
+    border: none;
+    border-radius: .4rem;                  /* radio similar al de Lumo */
+    padding: .45rem 1rem;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: center;
+   cursor: pointer;
+    transition: background-color .15s ease-in-out,
+                box-shadow .15s ease-in-out;
+}
+
+/* Hover / foco – un tono ligeramente más claro */
+.btn-lumo:hover,
+.btn-lumo:focus-visible {
+    background-color: #8259ff;   /* 10 % más claro */
+    box-shadow: 0 0 0 3px rgba(108,92,231,.25);
+    outline: none;
+}
+
+/* Estado deshabilitado */
+.btn-lumo:disabled,
+.btn-lumo.disabled {
+    background-color: #a1a1a1;
+    cursor: not-allowed;
+    opacity: .65;
+}

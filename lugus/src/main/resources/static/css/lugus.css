@@ -60,7 +60,7 @@ body {
 	color: white;
 }
 
-lugus_bg_color {
+.lugus_bg_color {
 	background-color: #1a2027 !important;
 	color: #fff !important;
 }

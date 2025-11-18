@@ -13,12 +13,14 @@
 		<div class="col-10">
 			<h1>Lugus</h1>
 		</div>
-		<div class="col-1">
-			<span th:text="${#ctx.session.usuarioConectado}"> </span>
+		<div class="col-1 ">
+			<span th:text="${#ctx.session.usuarioConectado}"> </span> <a
+				class="btn btn-lumo mb-3" th:if="${admin}"
+				th:href="@{/peliculas/nuevo}">+</a>
 		</div>
 		<div class="col-1">
 			<form id="logoutForm" action="/logout" method="post">
-				<button type="submit" class="btn btn-danger" >Cerrar sesión</button>
+				<button type="submit" class="btn btn-lumo">Cerrar sesión</button>
 			</form>
 		</div>
 	</div>

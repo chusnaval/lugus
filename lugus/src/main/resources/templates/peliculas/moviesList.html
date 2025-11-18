@@ -14,6 +14,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 	crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link th:href="@{/css/lugus.css}" rel="stylesheet">
+<link th:href="@{/css/botones.css}" rel="stylesheet">
 
 </head>
 <body class="p-4">
@@ -21,7 +22,7 @@
 	<div th:replace="~{layout/header :: header}"></div>
 
 	<div th:replace="~{layout/filters :: filters}"></div>
-
+	
 	<div class="container-fluid">
 		<div class="row justify-content-center g-4">
 			<div th:each="p, iStat : ${pagePeliculas.content}"
@@ -56,7 +57,7 @@
 				<div class="card-footer bg-transparent border-0 p-2">
 					<a
 						th:href="@{/peliculas/editar/{id}(id=${p.id},filtroToken=${filtroToken})}"
-						th:if="${admin}" class="btn btn-sm btn-outline-secondary">Editar</a>
+						th:if="${admin}" class="btn btn-sm btn-lumo">Editar</a>
 				</div>
 			</div>
 		</div>
