@@ -165,3 +165,31 @@ ul li, .list-group-item {
 .card-footer {
     margin-top: auto;          /* empuja el footer al fondo */
 }
+
+.image-wrapper {
+    position: relative;            /* necesario para el absolute del overlay */
+    display: inline-block;         /* se adapta al ancho de la img */
+}
+
+.overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;   /* cubre toda la imagen */
+    background: rgba(0, 0, 0, 0.55);        /* negro con 55 % opacidad */
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  opacity: 0;            /* oculto por defecto */
+    transition: opacity 0.2s ease-in-out;
+}
+
+.overlay.unavailable {
+  opacity: 1;                  /* visible cuando lleva la clase */
+}
+
+.image-wrapper:hover .overlay {
+   opacity: 0.8;                /* ligera aparición al hover */
+}
