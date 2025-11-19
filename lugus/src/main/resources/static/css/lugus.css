@@ -107,6 +107,11 @@ ul li, .list-group-item {
 	max-width: 200px;
 	background-color: #2a353f !important; /* ← tono más claro */
 	color: #fff !important;
+	
+}
+
+.card-body{
+	height: 314px;
 }
 
 .card-bg:hover {
@@ -169,6 +174,30 @@ ul li, .list-group-item {
 .image-wrapper {
     position: relative;            /* necesario para el absolute del overlay */
     display: inline-block;         /* se adapta al ancho de la img */
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    src: url('https://fonts.gstatic.com/s/inter/v13/UcCO3Fwr7vZcUe5GQ3eK.woff2') format('woff2');
+}
+
+h5 {
+    font-family: 'Inter',            /* fuente premium */
+               -apple-system,         /* Safari/macOS */
+                 BlinkMacSystemFont,    /* Chrome en macOS */
+                 'Segoe UI',            /* Windows */
+             Roboto,                /* Android/Chrome */
+                 Helvetica, Arial,      /* fallback clásico */
+                 sans-serif;            /* última opción */
+    font-weight: 600;      /* Semi‑bold, como en Lumo */
+    font-size: 0.775rem;    /* 14 px (equivalente a 0.875 rem) */
+    letter-spacing: 0.02em;
+    text-transform: uppercase;   /* Lumo muestra los encabezados en mayúsculas */
+    color: #e0e0e0;          /* gris claro sobre fondos oscuros */
+    background-color: transparent;/* el fondo lo controla la tabla */
+    padding: .75rem  .55rem;          /* espaciado interno similar a Bootstrap */
 }
 
 .overlay {
