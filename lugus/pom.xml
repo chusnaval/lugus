@@ -97,6 +97,7 @@
     </dependencies>
 
     <build>
+     	<finalName>lugus</finalName>
         <plugins>
 			<!-- Plugin de Spring Boot para crear el ejecutable JAR -->
             <plugin>
