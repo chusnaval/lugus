@@ -17,7 +17,10 @@
 			method="get" name="filterForm">
 			<div class="container-fluid row py-2 lugus_bg_color border-bottom">
 				<div class="col-2">
-					<h1>Lugus</h1>
+					<a
+						th:href="@{'/peliculas?pagina=0&orden=tituloGest&direccion=ASC'}">
+						<img th:src="@{/image/logo.png}" class="lugus_logo" />
+					</a>
 				</div>
 				<div class="col-9 g-2 align-items-center">
 					<div class="row">
@@ -236,7 +239,8 @@
 
 									<div class="mb-3">
 										<label class="form-label small">Sentido</label> <select
-											class="form-select" th:field="*{direccion}" th:value="*{direccion}">
+											class="form-select" th:field="*{direccion}"
+											th:value="*{direccion}">
 											<option value="ASC">Ascendente</option>
 											<option value="DESC">Descendente</option>
 										</select>
