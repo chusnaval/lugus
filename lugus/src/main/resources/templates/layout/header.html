@@ -8,21 +8,30 @@
 </head>
 
 <body th:fragment="header">
+	<script src="js/actions.js" defer="defer"></script>
 
-	<div class="row">
-		<div class="col-10">
-			<h1>Lugus</h1>
-		</div>
-		<div class="col-1 ">
-			<span th:text="${#ctx.session.usuarioConectado}"> </span> <a
-				class="btn btn-lumo mb-3" th:if="${admin}"
-				th:href="@{/peliculas/nuevo}">+</a>
-		</div>
-		<div class="col-1">
-			<form id="logoutForm" action="/logout" method="post">
-				<button type="submit" class="btn btn-lumo">Cerrar sesión</button>
-			</form>
-		</div>
+	<!-- ==== DROPDOWN FIXED ==== -->
+	<div class="fixed-dropdown dropdown">
+		<!-- Botón que abre el menú -->
+		<button class="btn btn-user dropdown-toggle" type="button"
+			id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false"
+			data-bs-popper="static" aria-label="Menú de usuario">☰</button>
+
+		<!-- Menú -->
+		<ul
+			class="dropdown-menu dropdown-menu-end dropdown-menu-dark custom-dark"
+			aria-labelledby="userMenuBtn">
+			<li th:if="${admin}"><a class="btn btn-lumo mb-3 dropdown-item"
+				th:if="${admin}" th:href="@{/peliculas/nuevo}">+</a></li>
+
+			<li>
+				<form id="logoutForm" action="logout" method="post">
+					<button type="submit" class="btn btn-lumo dropdown-item">Cerrar
+						sesión</button>
+				</form>
+			</li>
+		</ul>
 	</div>
+
 </body>
 </html>

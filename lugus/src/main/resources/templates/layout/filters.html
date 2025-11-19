@@ -15,57 +15,41 @@
 			th:action="@{'/peliculas?pagina=' + ${numeroPagina}   
                 + '&orden=' + ${campoOrden} + '&direccion=' + ${direccionOrden}}"
 			method="get" name="filterForm">
-			<div class="container-fluid py-2 lugus_bg_color border-bottom">
-				<div class="row g-2 align-items-center">
+			<div class="container-fluid row py-2 lugus_bg_color border-bottom">
+				<div class="col-2">
+					<h1>Lugus</h1>
+				</div>
+				<div class="col-9 g-2 align-items-center">
+					<div class="row">
+						<div class="col-8">
 
-					<!-- Filtros rápidos (máx. 3‑4) -->
-					<div class="col-12 col-md-auto d-flex flex-wrap gap-2">
+							<!-- Ejemplo: filtro por estado -->
+							<div class="input-group input-group-sm">
+								<input type="text" class="form-control" th:name="texto"
+									th:value="*{texto}" th:field="*{texto}">
+							</div>
 
-						<!-- Ejemplo: filtro por estado -->
-						<div class="input-group input-group-sm">
-							<span class="input-group-text">Titulo</span> <input type="text"
-								class="form-control" th:name="titulo" th:value="*{titulo}"
-								th:field="*{titulo}"> <span class="input-group-text">Director</span>
-							<input type="text" class="form-control" th:name="director"
-								th:value="*{director}" th:field="*{director}">
-						</div>
-
-						<!-- Otro filtro rápido -->
-						<div class="input-group input-group-sm">
-							<span class="input-group-text">Género</span> <select
-								class="form-select" th:field="*{genero}">
-								<option value=""></option>
-								<option
-									th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
-									th:value="${g.codigo}" th:text="${g.displayName}"></option>
-							</select> <span class="input-group-text">Interprete</span> <input
-								type="text" class="form-control" th:name="actor"
-								th:value="*{actor}" th:field="*{actor}">
 
 						</div>
 
-						<div th:if="${admin}" class="input-group input-group-sm">
-							<span class="input-group-text">Caratula</span> <input
-								type="checkbox" th:name="tieneCaratula"
-								th:value="*{tieneCaratula}" th:field="*{tieneCaratula}">
-						</div>
-
-					</div>
-
-					<!-- Botón “Más filtros” (visible en móvil y desktop) -->
-					<div class="row col-md-auto ms-auto">
-						<div class="col-6 g-4">
-							<button class="btn btn-lumo btn-sm" type="button"
-								data-bs-toggle="offcanvas" data-bs-target="#offcanvasFilters"
-								aria-controls="offcanvasFilters">
-								<i class="fas fa-sliders-h"></i> Más filtros
-							</button>
-						</div>
-						<div class="col-6 g-4">
-							<button type="submit" class="btn btn-lumo w-100">Buscar</button>
+						<!-- Botón “Más filtros” (visible en móvil y desktop) -->
+						<div class="col-4">
+							<div class="row">
+								<div class="col-8">
+									<button class="btn btn-lumo btn-sm" type="button"
+										data-bs-toggle="offcanvas" data-bs-target="#offcanvasFilters"
+										aria-controls="offcanvasFilters">
+										<i class="fas fa-sliders-h"></i> Más filtros
+									</button>
+								</div>
+								<div class="col-4">
+									<button type="submit" class="btn btn-lumo w-100">Buscar</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
+
 			</div>
 
 			<div class="offcanvas offcanvas-end lugus_bg_color" tabindex="-1"
@@ -139,6 +123,32 @@
 							</div>
 						</div>
 
+						<!-- Categoría 2 -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingGenero">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapseGenero"
+									aria-expanded="false" aria-controls="collapseGenero">
+									<i class="fas fa-info-circle me-2"></i> Genero
+								</button>
+							</h2>
+							<div id="collapseGenero" class="accordion-collapse collapse"
+								aria-labelledby="headingGenero"
+								data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+
+									<div class="form-check">
+										<select class="form-select" th:field="*{genero}">
+											<option value=""></option>
+											<option
+												th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
+												th:value="${g.codigo}" th:text="${g.displayName}"></option>
+										</select>
+									</div>
+
+								</div>
+							</div>
+						</div>
 
 						<!-- Categoría 3 -->
 						<div class="accordion-item">
@@ -197,6 +207,30 @@
 							</div>
 						</div>
 
+						<!-- Categoría 4 -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingCaratula">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapseCaratula"
+									aria-expanded="false" aria-controls="collapseCaratula">
+									<i class="fas fa-info-circle me-2"></i> Caratula
+								</button>
+							</h2>
+							<div id="collapseCaratula" class="accordion-collapse collapse"
+								aria-labelledby="headingCaratula"
+								data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+
+									<div class="form-check">
+
+										<input type="checkbox" th:name="tieneCaratula"
+											th:value="*{tieneCaratula}" th:field="*{tieneCaratula}">
+
+									</div>
+
+								</div>
+							</div>
+						</div>
 
 					</div>
 

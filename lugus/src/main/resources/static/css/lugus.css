@@ -107,10 +107,9 @@ ul li, .list-group-item {
 	max-width: 200px;
 	background-color: #2a353f !important; /* ← tono más claro */
 	color: #fff !important;
-	
 }
 
-.card-body{
+.card-body {
 	height: 314px;
 }
 
@@ -160,65 +159,109 @@ ul li, .list-group-item {
 }
 
 .info-line {
-    min-height: 1.4rem;               /* altura constante para ambas filas */
-    display: flex;
-    align-items: center;
-    font-size: .9rem;
-    color: #ddd;
+	min-height: 1.4rem; /* altura constante para ambas filas */
+	display: flex;
+	align-items: center;
+	font-size: .9rem;
+	color: #ddd;
 }
 
 .card-footer {
-    margin-top: auto;          /* empuja el footer al fondo */
+	margin-top: auto; /* empuja el footer al fondo */
 }
 
 .image-wrapper {
-    position: relative;            /* necesario para el absolute del overlay */
-    display: inline-block;         /* se adapta al ancho de la img */
-}
-
-@font-face {
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 400;
-    src: url('https://fonts.gstatic.com/s/inter/v13/UcCO3Fwr7vZcUe5GQ3eK.woff2') format('woff2');
+	position: relative; /* necesario para el absolute del overlay */
+	display: inline-block; /* se adapta al ancho de la img */
 }
 
 h5 {
-    font-family: 'Inter',            /* fuente premium */
-               -apple-system,         /* Safari/macOS */
-                 BlinkMacSystemFont,    /* Chrome en macOS */
-                 'Segoe UI',            /* Windows */
-             Roboto,                /* Android/Chrome */
-                 Helvetica, Arial,      /* fallback clásico */
-                 sans-serif;            /* última opción */
-    font-weight: 600;      /* Semi‑bold, como en Lumo */
-    font-size: 0.775rem;    /* 14 px (equivalente a 0.875 rem) */
-    letter-spacing: 0.02em;
-    text-transform: uppercase;   /* Lumo muestra los encabezados en mayúsculas */
-    color: #e0e0e0;          /* gris claro sobre fondos oscuros */
-    background-color: transparent;/* el fondo lo controla la tabla */
-    padding: .75rem  .55rem;          /* espaciado interno similar a Bootstrap */
+	font-family: 'Inter', /* fuente premium */      
+               -apple-system, /* Safari/macOS */      
+                 BlinkMacSystemFont, /* Chrome en macOS */      
+                 'Segoe UI', /* Windows */      
+             Roboto, /* Android/Chrome */      
+                 Helvetica, Arial, /* fallback clásico */      
+                 sans-serif; /* última opción */
+	font-weight: 600; /* Semi‑bold, como en Lumo */
+	font-size: 0.775rem; /* 14 px (equivalente a 0.875 rem) */
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	/* Lumo muestra los encabezados en mayúsculas */
+	color: #e0e0e0; /* gris claro sobre fondos oscuros */
+	background-color: transparent; /* el fondo lo controla la tabla */
+	padding: .75rem .55rem; /* espaciado interno similar a Bootstrap */
 }
 
 .overlay {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;   /* cubre toda la imagen */
-    background: rgba(0, 0, 0, 0.55);        /* negro con 55 % opacidad */
-    color: #fff;
-    font-size: 0.9rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  opacity: 0;            /* oculto por defecto */
-    transition: opacity 0.2s ease-in-out;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0; /* cubre toda la imagen */
+	background: rgba(0, 0, 0, 0.55); /* negro con 55 % opacidad */
+	color: #fff;
+	font-size: 0.9rem;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	opacity: 0; /* oculto por defecto */
+	transition: opacity 0.2s ease-in-out;
 }
 
 .overlay.unavailable {
-  opacity: 1;                  /* visible cuando lleva la clase */
+	opacity: 1; /* visible cuando lleva la clase */
 }
 
 .image-wrapper:hover .overlay {
-   opacity: 0.8;                /* ligera aparición al hover */
+	opacity: 0.8; /* ligera aparición al hover */
+}
+
+/* -------------------------------------------
+   Posicionamiento del dropdown
+   ------------------------------------------------- */
+/* Posicionamos el wrapper en la esquina superior‑derecha */
+.fixed-dropdown {
+	position: fixed;
+	top: 1rem;
+	right: 1rem; /* 1 rem del borde derecho del viewport */
+	z-index: 1080; /* > 1050 de Bootstrap */
+}
+
+/* -----------------------------------------
+     2️⃣ Botón oscuro (opcional)
+       -------------------------------------------- */
+.btn-user {
+	background: #333;
+	color: #fff;
+	border: none;
+}
+
+.btn-user:hover, .btn-user:focus {
+	background: #444;
+}
+
+/* ---------------------------------------
+      3️⃣ Menú oscuro (sobreescribimos variables)
+       -------------------------------------------- */
+.dropdown-menu-dark.custom-dark {
+	--bs-dropdown-bg: #222;
+	--bs-dropdown-link-color: #fff;
+	--bs-dropdown-link-hover-bg: #333;
+	--bs-dropdown-link-active-bg: #444;
+}
+
+/* -------------------------------------------------
+       4️⃣ FORZAR posición: alineado a la derecha del viewport
+          (sin interferencia de Popper)
+       --------------------------------------- */
+.fixed-dropdown .dropdown-menu {
+	/* Deshacemos lo que Popper haya puesto en línea */
+	left: auto !important;
+	right: 0 !important; /* ancla al borde derecho del contenedor */
+	transform: none !important; /* elimina translate3d(...) */
+	/* Evitamos que el menú sea más ancho que la pantalla */
+	max-width: calc(100vw - 2rem); /* 2 rem de margen de seguridad */
 }

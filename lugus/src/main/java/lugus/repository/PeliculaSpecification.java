@@ -4,6 +4,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import lugus.model.Actor;
 import lugus.model.Director;
 import lugus.model.Localizacion;
@@ -72,7 +75,7 @@ public class PeliculaSpecification {
 			}
 
 			Join<Pelicula, PeliculaFoto> fotosJoin = root.join("peliculaFotos", JoinType.LEFT);
-			if(tieneCaratula) {
+			if (tieneCaratula) {
 				return cb.isNull(fotosJoin.get("id"));
 			}
 			return null;
@@ -84,9 +87,17 @@ public class PeliculaSpecification {
 			if (actor == null || actor.isBlank()) {
 				return null;
 			}
-
-			Join<Pelicula, Actor> actorJoin = root.join("actores", JoinType.INNER);
-			return cb.like(actorJoin.get("nombre"), "%" + actor + "%");
+			query.distinct(true);
+			String patron = "%" + actor.toLowerCase() + "%";
+			
+			Subquery<Integer> subDir = query.subquery(Integer.class);
+			Root<Actor> dirRoot = subDir.from(Actor.class);
+			subDir.select(dirRoot.get("pelicula").get("id"));
+			Predicate dirNombre = cb.like(cb.lower(dirRoot.get("nombre")), patron);
+			subDir.where(dirNombre);
+			
+			Predicate enActores = root.get("id").in(subDir);
+			 return cb.or(enActores);
 		};
 	}
 
@@ -96,8 +107,17 @@ public class PeliculaSpecification {
 				return null;
 			}
 
-			Join<Pelicula, Director> directorJoin = root.join("directores", JoinType.INNER);
-			return cb.like(cb.lower(directorJoin.get("nombre")), "%" + director.toLowerCase() + "%");
+			query.distinct(true);
+			String patron = "%" + director.toLowerCase() + "%";
+
+			Subquery<Integer> subDir = query.subquery(Integer.class);
+			Root<Director> dirRoot = subDir.from(Director.class);
+			subDir.select(dirRoot.get("pelicula").get("id"));
+			Predicate dirNombre = cb.like(cb.lower(dirRoot.get("nombre")), patron);
+			subDir.where(dirNombre);
+			
+			Predicate enDirectores = root.get("id").in(subDir);
+			 return cb.or(enDirectores);
 		};
 	}
 }

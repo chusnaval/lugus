@@ -14,6 +14,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FiltrosDto {
 
+	private String texto;
+	
 	private String titulo;
 
 	private Integer fromAnyo;
@@ -52,6 +54,9 @@ public class FiltrosDto {
 	public Map<String, Object> toMap() {
 		Map<String, Object> map = new HashMap<>();
 
+		if (titulo != null && !texto.isBlank())
+			map.put("texto", texto);
+		
 		if (titulo != null && !titulo.isBlank())
 			map.put("titulo", titulo);
 		if (genero != null && !genero.isBlank())

@@ -120,7 +120,6 @@ public class PeliculaService {
 		Pageable pageable = PageRequest.of(pagina, 30, Sort.by(Direction.fromString(direccion), campo));
 
 		Specification<Pelicula> spec = Specification.where(null);
-		spec = spec.and(PeliculaSpecification.porTitulo(filtro.getTitulo()));
 		spec = spec.and(PeliculaSpecification.porFromAnyo(filtro.getFromAnyo()));
 		spec = spec.and(PeliculaSpecification.porToAnyo(filtro.getToAnyo()));
 		spec = spec.and(PeliculaSpecification.porPack(filtro.getPack()));
@@ -132,9 +131,11 @@ public class PeliculaService {
 		spec = spec.and(PeliculaSpecification.porLocalizacion(filtro.getLocalizacion()));
 		spec = spec.and(PeliculaSpecification.porNotas(filtro.getNotas()));
 		spec = spec.and(PeliculaSpecification.porTieneCaratula(filtro.getTieneCaratula()));
-
-		spec = spec.and(PeliculaSpecification.porActor(filtro.getActor()));
-		spec = spec.and(PeliculaSpecification.porDirector(filtro.getDirector()));
+		
+		spec = spec.or(PeliculaSpecification.porActor(filtro.getTexto()));
+		spec = spec.or(PeliculaSpecification.porDirector(filtro.getTexto()));
+		spec = spec.or(PeliculaSpecification.porTitulo(filtro.getTexto()));
+		
 
 		return peliculaRepo.findAll(spec, pageable);
 	}

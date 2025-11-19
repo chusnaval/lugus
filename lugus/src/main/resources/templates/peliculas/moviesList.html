@@ -15,13 +15,10 @@
 	crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link th:href="@{/css/lugus.css}" rel="stylesheet">
 <link th:href="@{/css/botones.css}" rel="stylesheet">
-<link href="https://fonts.googleapis.com/cs2?family=Inter:wght@400;600&display=swap"
-      rel="stylesheet">
 </head>
 <body class="p-4">
 
 	<div th:replace="~{layout/header :: header}"></div>
-
 	<div th:replace="~{layout/filters :: filters}"></div>
 	
 	<div class="container-fluid">
@@ -40,9 +37,9 @@
 								class="card-img-top fixed" th:alt="${p.notas}" /> <img
 								th:if="${p.tieneCaratula == true}"
 								th:src="@{/peliculas/{id}/image(id=${p.id})}"
-								class="card-img-top fixed" th:alt="${p.notas}" />
-								</span>
-								<div th:class="${p.comprado ? 'overlay' : 'overlay unavailable'}">No Disponible</div>
+								class="card-img-top fixed" th:alt="${p.notas}" /> </span>
+							<div th:class="${p.comprado ? 'overlay' : 'overlay unavailable'}">No
+								Disponible</div>
 							<h5 class="title fw-bold mb-2" th:text="${p.titulo}"></h5>
 							<div class="row info-line">
 								<div class="col-5 text-left" th:text="${p.anyo}"></div>
@@ -65,9 +62,9 @@
 			</div>
 		</div>
 	</div>
-	
-	<hr/>
-	
+
+	<hr />
+
 	<nav aria-label="Pagination" th:if="${pagePeliculas.totalPages > 0}">
 		<ul class="pagination justify-content-center">
 			<li class="page-item"
@@ -108,6 +105,5 @@
 		</ul>
 	</nav>
 
-	<script src="js/actions.js" defer="defer"></script>
 </body>
 </html>
