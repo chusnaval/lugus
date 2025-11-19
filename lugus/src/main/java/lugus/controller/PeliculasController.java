@@ -328,6 +328,8 @@ public class PeliculasController {
 		Optional<Pelicula> pelicula = service.findById(id);
 
 		if (pelicula.isPresent()) {
+			pelicula.get().getPeliculaFotos().clear();
+			service.save(pelicula.get());
 			pelicula.get().addCaratula(pf);
 			service.save(pelicula.get());
 			return ResponseEntity.ok("Descargado");

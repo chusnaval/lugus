@@ -78,7 +78,7 @@
 			<div class="col-3">
 				<img id="caratulaImg" th:if="${pelicula.tieneCaratula == false}"
 					src="../../image/placeholder.png" class="img-thumbnail"
-					alt="Caratula" /> <img th:if="${pelicula.tieneCaratula == true}"
+					alt="Caratula" /> <img id="caratulaImg" th:if="${pelicula.tieneCaratula == true}"
 					th:src="@{/peliculas/{id}/image(id=${pelicula.id})}"
 					class="img-thumbnail" alt="Caratula" />
 			</div>
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Error al enviar la carátula');
             const idPelicula = document.getElementById('idPelicula');
             // Refrescar la imagen, evitando la caché del navegador
-            const nuevaSrc = '/peliculas/' + idPelicula.value + '/image';
+            const nuevaSrc = '/lugus/peliculas/' + idPelicula.value + '/image';
             caratulaImg.src = nuevaSrc;
 
         } catch (err) {

@@ -99,7 +99,7 @@ public class Pelicula {
 	@ToString.Exclude
 	private Pelicula padre;
 	
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private Set<PeliculaFoto> peliculaFotos = new HashSet<>();
 	
