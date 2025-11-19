@@ -68,8 +68,13 @@ public class PeliculasController {
 			@RequestParam(required = false) Optional<String> orden,
 			@RequestParam(required = false) Optional<String> direccion,
 			@RequestParam(required = false) Optional<Integer> pagina,
+			@RequestParam(required = false) String filtroToken,
 			@ModelAttribute FiltrosDto filtro) {
 
+		if(filtroToken!=null) {
+			filtro = (FiltrosDto) session.getAttribute("filtro:" + filtroToken);
+		}
+		
 		Page<Pelicula> resultado = service.findAllBy(filtro, pagina.orElse(0), orden.orElse("tituloGest"),
 				direccion.orElse("ASC"));
 		model.addAttribute("pagePeliculas", resultado);
