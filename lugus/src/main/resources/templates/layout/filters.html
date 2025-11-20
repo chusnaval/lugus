@@ -52,7 +52,7 @@
 						</div>
 					</div>
 				</div>
-
+				<span th:text="${numResultado}"></span>
 			</div>
 
 			<div class="offcanvas offcanvas-end lugus_bg_color" tabindex="-1"
@@ -250,7 +250,7 @@
 						</div>
 
 						<!-- Caratula -->
-						<div class="accordion-item">
+						<div class="accordion-item" th:if="${admin}">
 							<h2 class="accordion-header" id="headingCaratula">
 								<button class="accordion-button collapsed" type="button"
 									data-bs-toggle="collapse" data-bs-target="#collapseCaratula"
