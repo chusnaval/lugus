@@ -23,6 +23,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Order;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -116,8 +117,19 @@ public class PeliculaService {
 	}
 
 	public Page<Pelicula> findAllBy(FiltrosDto filtro, final int pagina, final String campo, final String direccion) {
+		Sort sort;
+		if ("compra".equals(campo)) {
+			if ("DESC".equalsIgnoreCase(direccion)) {
+				sort = Sort.by(Sort.Order.desc("tsModif").with(Sort.NullHandling.NULLS_LAST), Sort.Order.desc("tsAlta"));
+			} else {
+				// Orden ascendente (NULLs al principio)
+				sort = Sort.by(Sort.Order.asc("tsModif").with(Sort.NullHandling.NULLS_FIRST), Sort.Order.asc("tsAlta"));
+			}
+		} else {
+			sort = Sort.by(Direction.fromString(direccion), campo);
+		}
 
-		Pageable pageable = PageRequest.of(pagina, 30, Sort.by(Direction.fromString(direccion), campo));
+		Pageable pageable = PageRequest.of(pagina, 30, sort);
 
 		Specification<Pelicula> spec = Specification.where(null);
 		spec = spec.and(PeliculaSpecification.porFromAnyo(filtro.getFromAnyo()));
@@ -131,11 +143,10 @@ public class PeliculaService {
 		spec = spec.and(PeliculaSpecification.porLocalizacion(filtro.getLocalizacion()));
 		spec = spec.and(PeliculaSpecification.porNotas(filtro.getNotas()));
 		spec = spec.and(PeliculaSpecification.porTieneCaratula(filtro.getTieneCaratula()));
-		
+
 		spec = spec.or(PeliculaSpecification.porActor(filtro.getTexto()));
 		spec = spec.or(PeliculaSpecification.porDirector(filtro.getTexto()));
 		spec = spec.or(PeliculaSpecification.porTitulo(filtro.getTexto()));
-		
 
 		return peliculaRepo.findAll(spec, pageable);
 	}

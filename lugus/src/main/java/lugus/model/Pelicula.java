@@ -96,6 +96,16 @@ public class Pelicula {
 
 	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
 	private Instant tsAlta;
+	
+	@Column(name = "usr_modif")
+	private String usrModif;
+	
+	@Column(name = "ts_modif", columnDefinition = "TIMESTAMP")
+	private Instant tsModif;
+	
+	@Column(name = "ts_baja",  columnDefinition = "TIMESTAMP")
+	private Instant tsBaja;
+	
 
 	@ManyToOne
 	@JoinColumn(name = "padre_id")
