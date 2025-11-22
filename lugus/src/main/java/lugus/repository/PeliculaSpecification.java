@@ -17,7 +17,7 @@ public class PeliculaSpecification {
 
 	public static Specification<Pelicula> porTitulo(String titulo) {
 		return (root, query, cb) -> (titulo == null || titulo.isBlank()) ? null
-				: cb.like(cb.lower(root.get("titulo")), "%" + titulo.toLowerCase() + "%");
+				: cb.like(cb.lower(root.get("titulo")), "%" + titulo.trim().toLowerCase() + "%");
 	}
 
 	public static Specification<Pelicula> porFromAnyo(Integer fromAnyo) {
@@ -88,16 +88,16 @@ public class PeliculaSpecification {
 				return null;
 			}
 			query.distinct(true);
-			String patron = "%" + actor.toLowerCase() + "%";
-			
+			String patron = "%" + actor.trim().toLowerCase() + "%";
+
 			Subquery<Integer> subDir = query.subquery(Integer.class);
 			Root<Actor> dirRoot = subDir.from(Actor.class);
 			subDir.select(dirRoot.get("pelicula").get("id"));
 			Predicate dirNombre = cb.like(cb.lower(dirRoot.get("nombre")), patron);
 			subDir.where(dirNombre);
-			
+
 			Predicate enActores = root.get("id").in(subDir);
-			 return cb.or(enActores);
+			return cb.or(enActores);
 		};
 	}
 
@@ -108,16 +108,16 @@ public class PeliculaSpecification {
 			}
 
 			query.distinct(true);
-			String patron = "%" + director.toLowerCase() + "%";
+			String patron = "%" + director.trim().toLowerCase() + "%";
 
 			Subquery<Integer> subDir = query.subquery(Integer.class);
 			Root<Director> dirRoot = subDir.from(Director.class);
 			subDir.select(dirRoot.get("pelicula").get("id"));
 			Predicate dirNombre = cb.like(cb.lower(dirRoot.get("nombre")), patron);
 			subDir.where(dirNombre);
-			
+
 			Predicate enDirectores = root.get("id").in(subDir);
-			 return cb.or(enDirectores);
+			return cb.or(enDirectores);
 		};
 	}
 }
