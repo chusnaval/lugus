@@ -12,7 +12,6 @@ import lugus.repository.DirectorRepository;
 @RequiredArgsConstructor
 public class DirectorService {
 
-	@SuppressWarnings("unused")
 	private final  DirectorRepository directorRepository;
 
 	public List<Director> findByPeliculaId(int id) {

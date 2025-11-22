@@ -271,3 +271,7 @@ h5 {
     max-width: 120px;
     object-fit: cover;
 }
+
+.tachado {
+    text-decoration: line-through;
+}

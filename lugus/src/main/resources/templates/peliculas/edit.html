@@ -15,6 +15,8 @@
 	crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link th:href="@{/css/lugus.css}" rel="stylesheet">
 <link th:href="@{/css/botones.css}" rel="stylesheet">
+
+
 </head>
 <body class="container mt-4">
 	<div th:replace="~{layout/header :: header}"></div>
@@ -28,7 +30,7 @@
 		<div class="row">
 			<ul class="list-group mb-4 col-8">
 				<li class="list-group-item row"><strong class="col-3">Título:</strong>
-					<input type="text" th:value="${pelicula.titulo}"
+					<input type="text" id="campoTitulo" th:value="${pelicula.titulo}"
 					th:field="*{titulo}"></li>
 
 				<li class="list-group-item row"><strong class="col-3">Título
@@ -68,17 +70,62 @@
 						<option th:each="l : ${localizaciones}" th:value="${l.codigo}"
 							th:text="${l.descripcion}"></option>
 				</select></li>
+				<li class="list-group-item row"></li>
+				<li class="list-group-item row">
+					<div class="col-5">
+						<i class="fa-solid fa-plus btn btn-sm btn-success"
+							id="openModalBtnDir" data-bs-toggle="modal"
+							data-bs-target="#personModal"></i><strong>Director/a:</strong>
+					</div>
+
+					<table id="tablaDirectores">
+						<tr th:each="d, iStat : ${directores}">
+
+							<td><input type="hidden" id="'key_"
+								th:value="${d.persona}" /> <input type="hidden"
+								id="nuevo_" th:value="false" /> <input
+								type="hidden" id="borrado_" th:value="false" /> <span
+								id="nombre_" th:text="${d.nombre}"></span></td>
+							<td><i id="del_"
+								class="fa-solid fa-delete-left btn btn-sm btn-danger"></i></td>
+						</tr>
+					</table>
+				</li>
+
+				<li class="list-group-item row">
+					<div class="col-5">
+						<i class="fa-solid fa-plus btn btn-sm btn-success"
+							data-bs-toggle="modal" data-bs-target="#personModal"></i><strong>Interpretes:</strong>
+					</div>
+
+					<table id="tablaInterpretes">
+						<tr th:each="d, iStat : ${actores}">
+
+							<td><input type="hidden" id="key_${d.persona}"
+								th:value="${d.persona}" /> <input type="hidden"
+								id="nuevo_${d.persona}" th:value="false" /> <input
+								type="hidden" id="borrado_${d.persona}" th:value="false" /> <span
+								id="nombre_${d.persona}" th:text="${d.nombre}"></span></td>
+							<td><i id="del_${d.persona}"
+								class="fa-solid fa-delete-left btn btn-sm btn-danger"></i></td>
+						</tr>
+					</table>
+				</li>
 
 				<li class="list-group-item row"><strong class="col-3">Código
 						interno:</strong> <input type="text" th:value="${pelicula.codigo}"
-					maxlength="4" readonly="readonly" disabled="disabled" ></li>
+					maxlength="4" readonly="readonly" disabled="disabled"></li>
 				<li class="list-group-item row"><strong class="col-3">Notas:</strong>
 					<textarea th:value="${pelicula.notas}" maxlength="400"></textarea></li>
 			</ul>
+
+
+
 			<div class="col-3">
 				<img id="caratulaImg" th:if="${pelicula.tieneCaratula == false}"
 					src="../../image/placeholder.png" class="img-thumbnail"
-					alt="Caratula" /> <img id="caratulaImg" th:if="${pelicula.tieneCaratula == true}"
+					alt="Caratula" /> <img id="caratulaImg"
+					th:if="${pelicula.tieneCaratula == true}"
 					th:src="@{/peliculas/{id}/image(id=${pelicula.id})}"
 					class="img-thumbnail" alt="Caratula" />
 			</div>
@@ -162,42 +209,46 @@
 			</div>
 		</div>
 	</form>
-	<form th:action="@{/peliculas/volver(filtroToken=${filtroToken})}" method="post">
+	<form th:action="@{/peliculas/volver(filtroToken=${filtroToken})}"
+		method="post">
 		<button type="submit" id="floatBtn" title="Volver">Volver</button>
 	</form>
-	<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('formCaratula');
-    const caratulaImg = document.getElementById('caratulaImg');
-	
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Evita recarga
 
-        const actionUrl = form.getAttribute('action');
-        const formData = new FormData(form);
 
-        try {
-            const response = await fetch(actionUrl, {
-                method: 'POST',
-                body: formData
-            });
 
-            if (!response.ok) throw new Error('Error al enviar la carátula');
-            const idPelicula = document.getElementById('idPelicula');
-            // Refrescar la imagen, evitando la caché del navegador
-            const nuevaSrc = '/lugus/peliculas/' + idPelicula.value + '/image';
-            caratulaImg.src = nuevaSrc;
+	<div class="modal fade" id="personModal" tabindex="-1"
+		aria-labelledby="personModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-scrollable">
+			<div class="modal-content">
 
-        } catch (err) {
-            console.error(err);
-            alert('Hubo un error al añadir la carátula.');
-        }
-    });
-    
-    
-});
+				<div class="modal-header bg-dark text-white">
+					<h5 class="modal-title" id="personModalLabel">Personas</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="Cerrar"></button>
+				</div>
 
-</script>
+				<div class="modal-body p-0">
+					<!-- Aquí insertaremos el contenido vía AJAX -->
+					<div id="modalContent">
+						<!-- Mientras carga podemos poner un spinner -->
+						<div class="d-flex justify-content-center align-items-center py-5">
+							<div class="spinner-border text-primary" role="status">
+								<span class="visually-hidden">Cargando...</span>
+							</div>
+						</div>
+					</div>
+				</div>
 
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">Cerrar</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<!-- Fin del modal -->
+
+	<script src="/lugus/js/edit.js" defer="defer"></script>
 </body>
 </html>

@@ -75,6 +75,11 @@ public class Pelicula {
 	@OneToMany(mappedBy = "padre", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Pelicula> peliculasPack = new HashSet<>();
 
+	
+	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
+	@ToString.Exclude
+	private Set<PeliculasPersonal> peliculasPersonal = new HashSet<>();
+	
 	@Column
 	private boolean pack;
 	
