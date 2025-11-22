@@ -45,8 +45,8 @@ public class Pelicula {
 
 	@Column(nullable = false)
 	private String titulo;
-	
-	@Column(nullable = false, name="titulo_gest")
+
+	@Column(nullable = false, name = "titulo_gest")
 	private String tituloGest;
 
 	@Column(nullable = false)
@@ -75,14 +75,13 @@ public class Pelicula {
 	@OneToMany(mappedBy = "padre", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Pelicula> peliculasPack = new HashSet<>();
 
-	
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private Set<PeliculasPersonal> peliculasPersonal = new HashSet<>();
-	
+
 	@Column
 	private boolean pack;
-	
+
 	@Column
 	private boolean steelbook;
 
@@ -91,43 +90,41 @@ public class Pelicula {
 
 	@Column
 	private boolean comprado;
-	
-	@Column(name="usr_alta")
+
+	@Column(name = "usr_alta")
 	private String usrAlta;
-	
-	 @Column(name = "ts_alta", nullable = false,
-	            columnDefinition = "TIMESTAMP")   
-	private Instant tsAlta;   
-	 
+
+	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
+	private Instant tsAlta;
+
 	@ManyToOne
 	@JoinColumn(name = "padre_id")
 	@ToString.Exclude
 	private Pelicula padre;
-	
+
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private Set<PeliculaFoto> peliculaFotos = new HashSet<>();
-	
+
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
 	private Set<Director> directores = new HashSet<Director>();
-	
+
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
 	private Set<Actor> actores = new HashSet<Actor>();
-	
-	
+
 	public String getDescLocalizacion() {
-		if(localizacion==null) {
+		if (localizacion == null) {
 			return "";
 		}
 		return localizacion.getDescripcion();
 	}
 
 	public boolean tieneCaratula() {
-		return this.peliculaFotos!=null && !peliculaFotos.isEmpty();
+		return this.peliculaFotos != null && !peliculaFotos.isEmpty();
 	}
-	
+
 	public void calcularCodigo() {
 		// Eliminar artículos del título
 		String procesado = tituloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
@@ -138,7 +135,7 @@ public class Pelicula {
 		// Obtener la etiqueta del género
 		String parteCodigo = genero.getCodigo();
 
-		codigo = prefijo + "-" + parteCodigo + "-" + anyo;
+		codigo = parteCodigo + "-" + prefijo + "-" + anyo;
 
 	}
 
@@ -148,7 +145,7 @@ public class Pelicula {
 	 * @param hijo
 	 */
 	public void addHijo(Pelicula hijo) {
-		if(this.peliculasPack==null) {
+		if (this.peliculasPack == null) {
 			this.peliculasPack = new HashSet<>();
 		}
 		this.peliculasPack.add(hijo);
@@ -157,11 +154,11 @@ public class Pelicula {
 	}
 
 	public void addCaratula(PeliculaFoto pf) {
-		if(this.peliculaFotos==null) {
+		if (this.peliculaFotos == null) {
 			this.peliculaFotos = new HashSet<>();
 		}
 		this.peliculaFotos.add(pf);
 		pf.setPelicula(this);
-		
+
 	}
 }
