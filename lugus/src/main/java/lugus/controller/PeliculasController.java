@@ -77,7 +77,7 @@ public class PeliculasController {
 		Page<Pelicula> resultado = service.findAllBy(filtro, pagina.orElse(0), orden.orElse("tituloGest"),
 				direccion.orElse("ASC"));
 		model.addAttribute("pagePeliculas", resultado);
-		model.addAttribute("numResultado", "Resultados encontrados: " + resultado.getSize());
+		model.addAttribute("numResultado", "Resultados encontrados: " + resultado.getTotalElements());
 
 		String campoOrden = "tituloGest";
 		model.addAttribute("campoOrden", campoOrden);
