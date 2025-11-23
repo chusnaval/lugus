@@ -119,7 +119,7 @@ public class PeliculaService {
 	public Page<Pelicula> findAllBy(FiltrosDto filtro, final int pagina, final String campo, final String direccion) {
 		Sort sort;
 		if ("compra".equals(campo)) {
-			if ("DESC".equalsIgnoreCase(direccion)) {
+			if ("ASC".equalsIgnoreCase(direccion)) {
 				sort = Sort.by(Sort.Order.desc("tsModif").with(Sort.NullHandling.NULLS_LAST), Sort.Order.desc("tsAlta"));
 			} else {
 				// Orden ascendente (NULLs al principio)

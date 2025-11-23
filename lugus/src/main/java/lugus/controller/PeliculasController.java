@@ -346,7 +346,7 @@ public class PeliculasController {
 	 * /peliculas/{padreId}/hijo -------------------------------------------------
 	 */
 	@PostMapping("/{padreId}/hijo")
-	public String addChild(Principal principal, @PathVariable Integer padreId, @RequestParam String filtroToken,
+	public String addChild(Principal principal, @PathVariable Integer padreId, @RequestParam(required = false) String filtroToken,
 			HttpSession session, @Valid @ModelAttribute("nuevoHijo") PeliculaCreateDto dto, BindingResult br,
 			Model model) throws PermisoException, IOException {
 
