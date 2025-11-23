@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import lugus.dto.PeliculaChildDto;
 import lugus.dto.PeliculaCreateDto;
 import lugus.model.Formato;
 import lugus.model.Genero;
@@ -72,7 +73,7 @@ class PeliculaServiceTest {
         padre.setGenero(Genero.ACCION);
         padre.setAnyo(1970);
         
-        PeliculaCreateDto child = new PeliculaCreateDto();
+        PeliculaChildDto child = new PeliculaChildDto();
         child.setTitulo("Capítulo 2");
         child.setFormatoCodigo(Formato.BLURAY.getId());
         child.setGeneroCodigo(Genero.ACCION.getCodigo());

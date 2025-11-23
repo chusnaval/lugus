@@ -3,6 +3,7 @@ package lugus.service;
 import lombok.RequiredArgsConstructor;
 import lugus.controller.DwFotoService;
 import lugus.dto.FiltrosDto;
+import lugus.dto.PeliculaChildDto;
 import lugus.dto.PeliculaCreateDto;
 import lugus.model.Formato;
 import lugus.model.Fuente;
@@ -89,14 +90,30 @@ public class PeliculaService {
 	}
 
 	@Transactional
-	public Pelicula addChild(Integer padreId, @Valid PeliculaCreateDto dto, HttpSession session) throws IOException {
+	public Pelicula addChild(Integer padreId, @Valid PeliculaChildDto dto, HttpSession session) throws IOException {
 		Pelicula padre = peliculaRepo.findById(padreId)
 				.orElseThrow(() -> new IllegalArgumentException("Padre no encontrado"));
-		Pelicula hijo = crear(dto, session);
+		Pelicula hijo = add(padre, dto, session);
 		hijo.setPadre(padre);
 		padre.getPeliculasPack().add(hijo);
 		peliculaRepo.save(padre);
 		return hijo;
+	}
+
+	private Pelicula add(Pelicula padre, PeliculaChildDto dto, HttpSession session) {
+
+		Formato formato = Formato.getById(dto.getFormatoCodigo());
+		Genero genero = Genero.getById(dto.getGeneroCodigo());
+		String user = (String) session.getAttribute("usuarioConectado");
+
+		Pelicula p = Pelicula.builder().titulo(dto.getTitulo()).tituloGest(dto.getTitulo()).anyo(dto.getAnyo())
+				.formato(formato).genero(genero).pack(false).steelbook(padre.isSteelbook()).funda(padre.isFunda())
+				.comprado(padre.isComprado()).notas(padre.getNotas()).localizacion(padre.getLocalizacion()).usrAlta(user).tsAlta(Instant.now())
+				.build();
+		p.calcularCodigo();
+		Pelicula saved = peliculaRepo.save(p);
+
+		return saved;
 	}
 
 	public boolean existsById(Integer id) {
@@ -120,7 +137,8 @@ public class PeliculaService {
 		Sort sort;
 		if ("compra".equals(campo)) {
 			if ("ASC".equalsIgnoreCase(direccion)) {
-				sort = Sort.by(Sort.Order.desc("tsModif").with(Sort.NullHandling.NULLS_LAST), Sort.Order.desc("tsAlta"));
+				sort = Sort.by(Sort.Order.desc("tsModif").with(Sort.NullHandling.NULLS_LAST),
+						Sort.Order.desc("tsAlta"));
 			} else {
 				// Orden ascendente (NULLs al principio)
 				sort = Sort.by(Sort.Order.asc("tsModif").with(Sort.NullHandling.NULLS_FIRST), Sort.Order.asc("tsAlta"));

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lugus.PermisoException;
 import lugus.dto.FiltrosDto;
 import lugus.dto.NewCaratulaDTO;
+import lugus.dto.PeliculaChildDto;
 import lugus.dto.PeliculaCreateDto;
 import lugus.model.Actor;
 import lugus.model.Director;
@@ -215,7 +216,7 @@ public class PeliculasController {
 
 		model.addAttribute("caratula", new NewCaratulaDTO());
 		// DTO vacío para el formulario “añadir hijo al pack”
-		model.addAttribute("nuevoHijo", new PeliculaCreateDto());
+		model.addAttribute("nuevoHijo", new PeliculaChildDto());
 
 		PeliculaCreateDto nuevo = new PeliculaCreateDto();
 		nuevo.setAnyo(p.getAnyo());
@@ -347,7 +348,7 @@ public class PeliculasController {
 	 */
 	@PostMapping("/{padreId}/hijo")
 	public String addChild(Principal principal, @PathVariable Integer padreId, @RequestParam(required = false) String filtroToken,
-			HttpSession session, @Valid @ModelAttribute("nuevoHijo") PeliculaCreateDto dto, BindingResult br,
+			HttpSession session, @Valid @ModelAttribute("nuevoHijo") PeliculaChildDto dto, BindingResult br,
 			Model model) throws PermisoException, IOException {
 
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
