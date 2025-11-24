@@ -19,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -73,6 +74,7 @@ public class Pelicula {
 
 	@JsonManagedReference
 	@OneToMany(mappedBy = "padre", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OrderBy("anyo ASC")
 	private Set<Pelicula> peliculasPack = new HashSet<>();
 
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -96,16 +98,15 @@ public class Pelicula {
 
 	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
 	private Instant tsAlta;
-	
+
 	@Column(name = "usr_modif")
 	private String usrModif;
-	
+
 	@Column(name = "ts_modif", columnDefinition = "TIMESTAMP")
 	private Instant tsModif;
-	
-	@Column(name = "ts_baja",  columnDefinition = "TIMESTAMP")
+
+	@Column(name = "ts_baja", columnDefinition = "TIMESTAMP")
 	private Instant tsBaja;
-	
 
 	@ManyToOne
 	@JoinColumn(name = "padre_id")
