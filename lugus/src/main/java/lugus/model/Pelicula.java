@@ -75,11 +75,11 @@ public class Pelicula {
 	@JsonManagedReference
 	@OneToMany(mappedBy = "padre", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("anyo ASC")
-	private Set<Pelicula> peliculasPack = new HashSet<>();
+	private final Set<Pelicula> peliculasPack = new HashSet<>();
 
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private Set<PeliculasPersonal> peliculasPersonal = new HashSet<>();
+	private final Set<PeliculasPersonal> peliculasPersonal = new HashSet<>();
 
 	@Column
 	private boolean pack;
@@ -115,15 +115,15 @@ public class Pelicula {
 
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private Set<PeliculaFoto> peliculaFotos = new HashSet<>();
+	private final Set<PeliculaFoto> peliculaFotos = new HashSet<>();
 
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
-	private Set<Director> directores = new HashSet<Director>();
+	private final Set<Director> directores = new HashSet<Director>();
 
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
-	private Set<Actor> actores = new HashSet<Actor>();
+	private final Set<Actor> actores = new HashSet<Actor>();
 
 	public String getDescLocalizacion() {
 		if (localizacion == null) {
@@ -156,18 +156,12 @@ public class Pelicula {
 	 * @param hijo
 	 */
 	public void addHijo(Pelicula hijo) {
-		if (this.peliculasPack == null) {
-			this.peliculasPack = new HashSet<>();
-		}
 		this.peliculasPack.add(hijo);
 		hijo.setPadre(this);
 
 	}
 
 	public void addCaratula(PeliculaFoto pf) {
-		if (this.peliculaFotos == null) {
-			this.peliculaFotos = new HashSet<>();
-		}
 		this.peliculaFotos.add(pf);
 		pf.setPelicula(this);
 

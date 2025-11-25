@@ -8,9 +8,9 @@
 </head>
 
 <body>
-	<a th:fragment="paging(pageNum, label, tooltip)" class="page-link"
-		th:href="@{'/peliculas?pagina=' + ${pageNum}   
-                + '&orden=' + ${campoOrden} + '&direccion=' + ${direccionOrden}+ '&filtroToken=' + ${filtroToken}}"
+	<a th:fragment="paging(pagina, label, tooltip)" class="page-link"
+		th:href="@{'/peliculas?pagina=' + *{pagina}   
+                + '&orden=' + *{orden} + '&direccion=' + *{direccion}}"
 		th:title="${tooltip}" rel="tooltip"> [[${label}]] </a>
 </body>
 </html>

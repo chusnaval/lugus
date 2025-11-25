@@ -12,14 +12,13 @@
 <body>
 	<div th:fragment="filters">
 		<form th:object="${filtro}"
-			th:action="@{'/peliculas?pagina=' + ${numeroPagina}   
-                + '&orden=' + ${campoOrden} + '&direccion=' + ${direccionOrden}}"
-			method="get" name="filterForm">
-			
+			th:action="@{'/peliculas?pagina=' + *{pagina}   
+                + '&orden=' + *{orden} + '&direccion=' + *{direccion}+'&resetFilter=true'}"
+			method="get" name="filterForm" id="filterForm">
 			<div class="container-fluid row py-2 lugus_bg_color border-bottom">
 				<div class="col-2">
 					<a
-						th:href="@{'/peliculas?pagina=0&orden=tituloGest&direccion=ASC&init=S'}">
+						th:href="@{'/peliculas?pagina=0&orden=tituloGest&direccion=ASC&resetFilter=true'}" id="logo_link">
 						<img th:src="@{/image/logo.png}" class="lugus_logo" />
 					</a>
 				</div>
@@ -227,7 +226,6 @@
 
 										<select class="form-select" th:field="*{orden}"
 											th:value="*{orden}">
-											<option value=""></option>
 											<option value="tituloGest">Título</option>
 											<option value="anyo">Año</option>
 											<option value="formato">Formato</option>
@@ -280,7 +278,7 @@
 
 					<!-- Botones de acción -->
 					<div class="d-grid mt-4">
-						<button class="btn btn-lumo touch-target" type="submit">
+						<button class="btn btn-lumo touch-target" type="submit" id="apl_btn" onclick="applyFilters()">
 							<i class="fas fa-search me-1"></i> Aplicar filtros
 						</button>
 						<button class="btn btn-lumo mt-2 touch-target" type="reset">
@@ -292,5 +290,6 @@
 			</div>
 		</form>
 	</div>
+
 </body>
 </html>

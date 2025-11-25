@@ -18,8 +18,9 @@ public class LoginController {
 
 	@GetMapping("/guardarUsuario")
 	public String guardarUsuario(Principal principal, HttpSession session) {
+		session.removeAttribute("filtro");
 		session.setAttribute("usuarioConectado", principal.getName());
-		return "redirect:/peliculas";
+		return "redirect:/peliculas?resetFilter=true";
 	}
 
 }

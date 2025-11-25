@@ -22,7 +22,7 @@
 	<div th:replace="~{layout/header :: header}"></div>
 
 	<form
-		th:action="@{/peliculas/actualizar/{id}(id=${pelicula.id},filtroToken=${filtroToken})}"
+		th:action="@{/peliculas/actualizar/{id}(id=${pelicula.id})}"
 		th:object="${nuevo}" method="post">
 		<h2 th:text="${pelicula.titulo}">Título</h2>
 		<input type="hidden" id="idPelicula" th:value="${pelicula.id}">
@@ -210,7 +210,7 @@
 			</div>
 		</div>
 	</form>
-	<form th:action="@{/peliculas/volver(filtroToken=${filtroToken})}"
+	<form th:action="@{/peliculas/volver}"
 		method="post">
 		<button type="submit" id="floatBtn" title="Volver">Volver</button>
 	</form>

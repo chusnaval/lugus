@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/peliculas")
@@ -66,53 +65,41 @@ public class PeliculasController {
 
 	@GetMapping
 	public String listPaginado(Model model, Principal principal, HttpSession session,
-			@RequestParam(required = false) Optional<String> orden,
-			@RequestParam(required = false) Optional<String> direccion,
-			@RequestParam(required = false) Optional<Integer> pagina,
-			@RequestParam(required = false) Optional<String> filtroToken,
-			@RequestParam(required = false) Optional<String> init, @ModelAttribute FiltrosDto filtro) {
-		if (filtroToken.isPresent() && (init.isEmpty() || !"S".equals(init.get()))) {
-			filtro = (FiltrosDto) session.getAttribute("filtro:" + filtroToken);
-		}
+			@RequestParam(required = false) Boolean resetFilter,
+			@RequestParam(required = false) Boolean recuperar,
+			@ModelAttribute FiltrosDto filtro) {
 
-		if (init.isPresent() && "S".equals(init.get())) {
+		// si hay filtro anterior y no queremos reiniciarlo
+		if ((resetFilter != null && resetFilter)) {
 			filtro = new FiltrosDto();
-			filtro.setInitFilter(true);
+			filtro.setOrden(Optional.of("tituloGest"));
+			filtro.setPack(false);
+			filtro.setComprado(true);
+			session.removeAttribute("filtro");
+			
+		} else if ((recuperar != null && recuperar)) {
+
+			if (session.getAttribute("filtro") != null) {
+				filtro = (FiltrosDto) session.getAttribute("filtro");
+			}
 		}
 
-		Page<Pelicula> resultado = service.findAllBy(filtro, pagina.orElse(0), orden.orElse("tituloGest"),
-				direccion.orElse("ASC"));
-		model.addAttribute("pagePeliculas", resultado);
+		// set filter to view
+		model.addAttribute("filtro", filtro);
+		session.setAttribute("filtro", filtro);
 
+		// obtain the film by the filter
+		Page<Pelicula> resultado = service.findAllBy(filtro);
+		model.addAttribute("pagePeliculas", service.findAllBy(filtro));
 		model.addAttribute("numResultado", "Resultados encontrados: " + resultado.getTotalElements());
 
-		String campoOrden = "tituloGest";
-		model.addAttribute("campoOrden", campoOrden);
-
-		String campoDireccion = "ASC";
-		if (resultado.getSort().get().findFirst().isPresent()) {
-			campoOrden = resultado.getSort().get().findFirst().get().getProperty();
-			campoDireccion = resultado.getSort().get().findFirst().get().getDirection().name();
-		}
-		model.addAttribute("direccionOrden", campoDireccion);
-
-		filtro.setPagina(pagina.orElse(0));
-		filtro.setOrden(campoOrden);
-		filtro.setDireccion(campoDireccion);
-		model.addAttribute("filtro", filtro);
-
-		model.addAttribute("numeroPagina", pagina.orElse(0));
-
+		// select for filter
 		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
 		model.addAttribute("localizaciones", localizaciones);
 
+		// admin rigth
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-
 		model.addAttribute("admin", usuario.isAdmin());
-
-		String token = UUID.randomUUID().toString();
-		session.setAttribute("filtro:" + token, filtro);
-		model.addAttribute("filtroToken", token);
 
 		return "peliculas/moviesList"; // → src/main/resources/templates/peliculas/list.html
 	}
@@ -165,17 +152,15 @@ public class PeliculasController {
 	 * -------------------------------------------------
 	 */
 	@GetMapping("/{id}")
-	public String detail(Principal principal, @PathVariable Integer id,
-			@RequestParam(required = false) String filtroToken, HttpSession session, Model model)
+	public String detail(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
 			throws PermisoException {
 
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 
 		model.addAttribute("pelicula", p);
 
-		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro:" + filtroToken);
+		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro");
 		model.addAttribute("filtro", filtro);
-		model.addAttribute("filtroToken", filtroToken);
 
 		List<Director> directores = directorService.findByPeliculaId(p.getId());
 		model.addAttribute("directores", directores);
@@ -204,8 +189,8 @@ public class PeliculasController {
 	}
 
 	@GetMapping("/editar/{id}")
-	public String edit(Principal principal, @PathVariable Integer id, @RequestParam String filtroToken,
-			HttpSession session, Model model) throws PermisoException {
+	public String edit(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
+			throws PermisoException {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
 		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
@@ -247,16 +232,14 @@ public class PeliculasController {
 		List<Actor> actores = actorService.findByPeliculaIdOrderByOrdenAsc(p.getId());
 		model.addAttribute("actores", actores);
 
-		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro:" + filtroToken);
+		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro");
 		model.addAttribute("filtro", filtro);
-		model.addAttribute("filtroToken", filtroToken);
 		return "peliculas/edit"; // → templates/peliculas/detail.html
 	}
 
 	@PostMapping("/actualizar/{id}")
-	public String actualizar(Principal principal, @RequestParam String filtroToken, HttpSession session,
-			@PathVariable Integer id, RedirectAttributes ra, @Valid @ModelAttribute PeliculaCreateDto nuevo)
-			throws PermisoException {
+	public String actualizar(Principal principal, HttpSession session, @PathVariable Integer id, RedirectAttributes ra,
+			@Valid @ModelAttribute PeliculaCreateDto nuevo) throws PermisoException {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
 		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tiene permisos");
@@ -292,31 +275,16 @@ public class PeliculasController {
 		existing.calcularCodigo();
 		service.save(existing);
 
-		guardarAtributos(filtroToken, session, ra);
-
-		return "redirect:/peliculas";
+		return "redirect:/peliculas?recuperar=true";
 	}
 
 	@PostMapping("/volver")
-	public String volver(@RequestParam(required = false) String filtroToken, HttpSession session,
-			RedirectAttributes ra) {
+	public String volver(HttpSession session, RedirectAttributes ra) {
 
-		if (filtroToken != null && !filtroToken.isBlank()) {
-			guardarAtributos(filtroToken, session, ra);
-		}
 
-		return "redirect:/peliculas";
+		return "redirect:/peliculas?recuperar=true";
 	}
 
-	private void guardarAtributos(String filtroToken, HttpSession session, RedirectAttributes ra) {
-		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro:" + filtroToken);
-		if (filtro != null) {
-			ra.addAttribute("orden", filtro.getOrden());
-			ra.addAttribute("direccion", filtro.getDireccion());
-			ra.addAttribute("pagina", filtro.getPagina());
-			ra.addAllAttributes(filtro.toMap());
-		}
-	}
 
 	@PostMapping("/{id}/caratula")
 	public ResponseEntity<String> addCaratula(Principal principal, @PathVariable Integer id,
@@ -353,8 +321,7 @@ public class PeliculasController {
 	 * /peliculas/{padreId}/hijo -------------------------------------------------
 	 */
 	@PostMapping("/{padreId}/hijo")
-	public String addChild(Principal principal, @PathVariable Integer padreId,
-			@RequestParam(required = false) String filtroToken, HttpSession session,
+	public String addChild(Principal principal, @PathVariable Integer padreId, HttpSession session,
 			@Valid @ModelAttribute("nuevoHijo") PeliculaChildDto dto, BindingResult br, Model model)
 			throws PermisoException, IOException {
 
@@ -365,7 +332,7 @@ public class PeliculasController {
 
 		if (br.hasErrors()) {
 			// Si hay errores, volvemos al detalle mostrando los mensajes
-			return detail(principal, padreId, filtroToken, session, model);
+			return detail(principal, padreId, session, model);
 		}
 		service.addChild(padreId, dto, session);
 		// Después de añadir el hijo, recargamos el detalle del padre

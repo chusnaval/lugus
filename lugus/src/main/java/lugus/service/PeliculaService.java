@@ -153,22 +153,15 @@ public class PeliculaService {
 	 * @param direction
 	 * @return
 	 */
-	public Page<Pelicula> findAllBy(FiltrosDto filter, final int page, final String field, final String direction) {
-		Sort sort = buildSort(field, direction);
+	public Page<Pelicula> findAllBy(FiltrosDto filter) {
+		Sort sort = buildSort(filter.getOrden(), filter.getDireccion());
 
-		Pageable pageable = PageRequest.of(page, NUM_ELEMENTS_PER_PAGE, sort);
+		Pageable pageable = PageRequest.of(filter.getPagina().get(), NUM_ELEMENTS_PER_PAGE, sort);
 
 		Specification<Pelicula> spec = Specification.where(null);
 
-		// by default we want the purchased and separated films
-		if (filter.isInitFilter()) {
-			spec = spec.and(PeliculaSpecification.porPack(false));
-			spec = spec.and(PeliculaSpecification.porComprado(true));
-		} else {
-			spec = spec.and(PeliculaSpecification.porPack(filter.getPack()));
-			spec = spec.and(PeliculaSpecification.porComprado(filter.getComprado()));
-		}
-
+		spec = spec.and(PeliculaSpecification.porPack(filter.getPack()));
+		spec = spec.and(PeliculaSpecification.porComprado(filter.getComprado()));
 		spec = spec.and(PeliculaSpecification.porFromAnyo(filter.getFromAnyo()));
 		spec = spec.and(PeliculaSpecification.porToAnyo(filter.getToAnyo()));
 		spec = spec.and(PeliculaSpecification.porSteelbook(filter.getSteelbook()));
@@ -195,10 +188,10 @@ public class PeliculaService {
 	 * @param direction
 	 * @return
 	 */
-	protected static Sort buildSort(final String field, final String direction) {
+	protected static Sort buildSort(final Optional<String> field, final Optional<String> direction) {
 		Sort sort;
-		if ("compra".equals(field)) {
-			if ("ASC".equalsIgnoreCase(direction)) {
+		if (field.isPresent() && "compra".equals(field.get())) {
+			if (direction.isPresent() && "ASC".equalsIgnoreCase(direction.get())) {
 				sort = Sort.by(Sort.Order.desc("tsModif").with(Sort.NullHandling.NULLS_LAST),
 						Sort.Order.desc("tsAlta"));
 			} else {
@@ -206,7 +199,7 @@ public class PeliculaService {
 				sort = Sort.by(Sort.Order.asc("tsModif").with(Sort.NullHandling.NULLS_FIRST), Sort.Order.asc("tsAlta"));
 			}
 		} else {
-			sort = Sort.by(Direction.fromString(direction), field);
+			sort = Sort.by(Direction.fromString(direction.orElse("ASC")), field.orElse("tituloGest"));
 		}
 		return sort;
 	}

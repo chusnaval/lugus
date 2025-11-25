@@ -37,5 +37,5 @@ public class Fuente {
     
 	@OneToMany(mappedBy = "fuente")
 	@ToString.Exclude
-	private Set<PeliculaFoto> peliculaFotos = new HashSet<>();
+	private final Set<PeliculaFoto> peliculaFotos = new HashSet<>();
 }
