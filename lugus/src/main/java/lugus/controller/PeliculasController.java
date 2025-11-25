@@ -69,15 +69,21 @@ public class PeliculasController {
 			@RequestParam(required = false) Optional<String> orden,
 			@RequestParam(required = false) Optional<String> direccion,
 			@RequestParam(required = false) Optional<Integer> pagina,
-			@RequestParam(required = false) String filtroToken, @ModelAttribute FiltrosDto filtro) {
-
-		if (filtroToken != null) {
+			@RequestParam(required = false) Optional<String> filtroToken,
+			@RequestParam(required = false) Optional<String> init, @ModelAttribute FiltrosDto filtro) {
+		if (filtroToken.isPresent() && (init.isEmpty() || !"S".equals(init.get()))) {
 			filtro = (FiltrosDto) session.getAttribute("filtro:" + filtroToken);
+		}
+
+		if (init.isPresent() && "S".equals(init.get())) {
+			filtro = new FiltrosDto();
+			filtro.setInitFilter(true);
 		}
 
 		Page<Pelicula> resultado = service.findAllBy(filtro, pagina.orElse(0), orden.orElse("tituloGest"),
 				direccion.orElse("ASC"));
 		model.addAttribute("pagePeliculas", resultado);
+
 		model.addAttribute("numResultado", "Resultados encontrados: " + resultado.getTotalElements());
 
 		String campoOrden = "tituloGest";
@@ -347,9 +353,10 @@ public class PeliculasController {
 	 * /peliculas/{padreId}/hijo -------------------------------------------------
 	 */
 	@PostMapping("/{padreId}/hijo")
-	public String addChild(Principal principal, @PathVariable Integer padreId, @RequestParam(required = false) String filtroToken,
-			HttpSession session, @Valid @ModelAttribute("nuevoHijo") PeliculaChildDto dto, BindingResult br,
-			Model model) throws PermisoException, IOException {
+	public String addChild(Principal principal, @PathVariable Integer padreId,
+			@RequestParam(required = false) String filtroToken, HttpSession session,
+			@Valid @ModelAttribute("nuevoHijo") PeliculaChildDto dto, BindingResult br, Model model)
+			throws PermisoException, IOException {
 
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
 		if (!usuario.isAdmin()) {

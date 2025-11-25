@@ -15,10 +15,11 @@
 			th:action="@{'/peliculas?pagina=' + ${numeroPagina}   
                 + '&orden=' + ${campoOrden} + '&direccion=' + ${direccionOrden}}"
 			method="get" name="filterForm">
+			
 			<div class="container-fluid row py-2 lugus_bg_color border-bottom">
 				<div class="col-2">
 					<a
-						th:href="@{'/peliculas?pagina=0&orden=tituloGest&direccion=ASC'}">
+						th:href="@{'/peliculas?pagina=0&orden=tituloGest&direccion=ASC&init=S'}">
 						<img th:src="@{/image/logo.png}" class="lugus_logo" />
 					</a>
 				</div>
