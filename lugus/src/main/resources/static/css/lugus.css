@@ -225,8 +225,6 @@ h5 {
 /* Posicionamos el wrapper en la esquina superior‑derecha */
 .fixed-dropdown {
 	position: fixed;
-	top: 1rem;
-	right: 1rem; /* 1 rem del borde derecho del viewport */
 	z-index: 1080; /* > 1050 de Bootstrap */
 }
 
@@ -253,17 +251,30 @@ h5 {
 	--bs-dropdown-link-active-bg: #444;
 }
 
-/* -------------------------------------------------
-       4️⃣ FORZAR posición: alineado a la derecha del viewport
-          (sin interferencia de Popper)
-       --------------------------------------- */
+
 .fixed-dropdown .dropdown-menu {
 	/* Deshacemos lo que Popper haya puesto en línea */
 	left: auto !important;
-	right: 0 !important; /* ancla al borde derecho del contenedor */
 	transform: none !important; /* elimina translate3d(...) */
 	/* Evitamos que el menú sea más ancho que la pantalla */
 	max-width: calc(100vw - 2rem); /* 2 rem de margen de seguridad */
+}
+
+.menu-lumo {
+   --lumo-primary: #6c5ce7 !important;            /* color oficial de Lumo */
+    background-color: var(--lumo-primary) !important;
+    color: #fff !important;                           /* texto blanco */
+    border: none !important;
+    border-radius: .4rem !important;                  /* radio similar al de Lumo */
+    padding: .45rem 3rem !important;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color .15s ease-in-out,
+                box-shadow .15s ease-in-out;
+    margin-bottom: 2rem !important;
 }
 
 .lugus_logo {

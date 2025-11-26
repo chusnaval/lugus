@@ -1,0 +1,33 @@
+/* Estilo extra para el contenedor del menú */
+.menu-card {
+	/* 1️⃣  Fondo y sombra */
+	background-color: #ffffff;
+	/* blanco puro (cambia si quieres otro color) */
+	box-shadow: 0 4px 12px rgba(0, 0, 0, .1); /* sombra ligera */
+	/* 2️⃣  Bordes redondeados */
+	border-radius: .75rem; /* 12 px ≈ .75rem */
+	/* 3️⃣  Padding interno */
+	padding: 1rem; /* 16 px */
+	/* 4️⃣  Ancho fijo (ajustable) */
+	width: 260px; /* puedes usar % o vw si prefieres */
+}
+
+/* Opcional: hover en los enlaces */
+.menu-card .nav-link {
+	color: #212529; /* color base (gris oscuro) */
+	border-radius: .4rem; /* redondeado leve al pasar el mouse */
+	transition: background-color .2s, color .2s;
+}
+
+.menu-card .nav-link:hover {
+	background-color: #f8f9fa; /* gris muy claro */
+	color: #0d6efd; /* azul Bootstrap */
+}
+
+/* Si quieres que el menú quede “pegado” a la izquierda del viewport */
+.menu-wrapper {
+	position: fixed;
+	top: 1rem; /* distancia del borde superior */
+	left: 1rem; /* distancia del borde izquierdo */
+	z-index: 1050; /* por encima de la mayoría de contenidos */
+}
