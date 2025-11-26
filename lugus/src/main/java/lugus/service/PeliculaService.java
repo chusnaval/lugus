@@ -22,12 +22,14 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -167,15 +169,24 @@ public class PeliculaService {
 		spec = spec.and(PeliculaSpecification.porSteelbook(filter.getSteelbook()));
 		spec = spec.and(PeliculaSpecification.porFunda(filter.getFunda()));
 		spec = spec.and(PeliculaSpecification.porFormato(filter.getFormato()));
-		
+
 		spec = spec.and(PeliculaSpecification.porGenero(filter.getGenero()));
 		spec = spec.and(PeliculaSpecification.porLocalizacion(filter.getLocalizacion()));
 		spec = spec.and(PeliculaSpecification.porNotas(filter.getNotas()));
 		spec = spec.and(PeliculaSpecification.porTieneCaratula(filter.getTieneCaratula()));
 
-		spec = spec.or(PeliculaSpecification.porActor(filter.getTexto()));
-		spec = spec.or(PeliculaSpecification.porDirector(filter.getTexto()));
-		spec = spec.or(PeliculaSpecification.porTitulo(filter.getTexto()));
+		Specification<Pelicula> textoGroup = null;
+		if (StringUtils.hasText(filter.getTexto())) {
+			Specification<Pelicula> actorSpec = PeliculaSpecification.porActor(filter.getTexto());
+			Specification<Pelicula> directorSpec = PeliculaSpecification.porDirector(filter.getTexto());
+			Specification<Pelicula> tituloSpec = PeliculaSpecification.porTitulo(filter.getTexto());
+
+			textoGroup = Specification.where(actorSpec).or(directorSpec).or(tituloSpec);
+		}
+		
+		if (textoGroup != null) {
+			spec = spec.and(textoGroup); // <-- AND con el resto
+		}
 
 		return peliculaRepo.findAll(spec, pageable);
 	}
@@ -202,5 +213,13 @@ public class PeliculaService {
 			sort = Sort.by(Direction.fromString(direction.orElse("ASC")), field.orElse("tituloGest"));
 		}
 		return sort;
+	}
+
+	public List<Pelicula> findByTitlesInYear(String title, String titleGest, int year) {
+		List<Pelicula> result = new ArrayList<Pelicula>();
+		result.addAll(peliculaRepo.findByTituloAndAnyo(title, year));
+		result.addAll(peliculaRepo.findByTituloGestAndAnyo(title, year));
+		
+		return result;
 	}
 }

@@ -6,8 +6,10 @@
 <title>Añadir pelicula</title>
 <link rel="stylesheet"
 	th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
-	<link th:href="@{/css/lugus.css}" rel="stylesheet">
-	<link th:href="@{/css/botones.css}" rel="stylesheet">
+<link th:href="@{/css/lugus.css}" rel="stylesheet">
+<link th:href="@{/css/botones.css}" rel="stylesheet">
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script defer="defer" type="text/javascript" th:src="@{/js/newFilm.js}"></script>
 </head>
 <body class="container mt-4">
 	<h2>Añadir pelicula</h2>
@@ -54,16 +56,11 @@
 						th:errors="*{generoCodigo}">Error</div></li>
 
 				<li class="list-group-item row"><strong class="col-3">Pack:</strong>
-					<input type="checkbox" th:field="*{pack}">
-
-					<strong class="col-3">Steelbook:</strong> <input type="checkbox"
-					th:field="*{steelbook}"> 
-					
-					<strong class="col-3">Funda:</strong>
-					<input type="checkbox" th:field="*{funda}">
-					
-					
-					<strong class="col-3">Comprado:</strong> <input type="checkbox"
+					<input type="checkbox" th:field="*{pack}"> <strong
+					class="col-3">Steelbook:</strong> <input type="checkbox"
+					th:field="*{steelbook}"> <strong class="col-3">Funda:</strong>
+					<input type="checkbox" th:field="*{funda}"> <strong
+					class="col-3">Comprado:</strong> <input type="checkbox"
 					th:field="*{comprado}"></li>
 
 				<li class="list-group-item row"><strong class="col-3">Localización:</strong>
@@ -99,8 +96,30 @@
 			</div>
 		</div>
 
-		<button type="submit" class="btn btn-success">Guardar</button>
+		<button type="submit" class="btn btn-success" id="guardar">Guardar</button>
 		<a th:href="@{/peliculas}" class="btn btn-link">Cancelar</a>
 	</form>
+
+	<div class="modal fade" id="confirmModal" tabindex="-1"
+		aria-labelledby="confirmModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content bg-dark text-white">
+				<div class="modal-header bg-dark text-white">
+					<h5 class="modal-title" id="confirmModalLabel">Confirmación
+						requerida</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+						aria-label="Cerrar"></button>
+				</div>
+				<div class="modal-body">Ya existe una película con el mismo titulo en el mismo año. ¿Desea
+					continuar con el alta?</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal" id="cancelBtn">Cancelar</button>
+					<button type="button" class="btn btn-success" id="acceptBtn">
+						Aceptar</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

@@ -65,8 +65,7 @@ public class PeliculasController {
 
 	@GetMapping
 	public String listPaginado(Model model, Principal principal, HttpSession session,
-			@RequestParam(required = false) Boolean resetFilter,
-			@RequestParam(required = false) Boolean recuperar,
+			@RequestParam(required = false) Boolean resetFilter, @RequestParam(required = false) Boolean recuperar,
 			@ModelAttribute FiltrosDto filtro) {
 
 		// si hay filtro anterior y no queremos reiniciarlo
@@ -75,8 +74,7 @@ public class PeliculasController {
 			filtro.setOrden(Optional.of("tituloGest"));
 			filtro.setPack(false);
 			filtro.setComprado(true);
-			session.removeAttribute("filtro");
-			
+
 		} else if ((recuperar != null && recuperar)) {
 
 			if (session.getAttribute("filtro") != null) {
@@ -90,7 +88,7 @@ public class PeliculasController {
 
 		// obtain the film by the filter
 		Page<Pelicula> resultado = service.findAllBy(filtro);
-		model.addAttribute("pagePeliculas", service.findAllBy(filtro));
+		model.addAttribute("pagePeliculas", resultado);
 		model.addAttribute("numResultado", "Resultados encontrados: " + resultado.getTotalElements());
 
 		// select for filter
@@ -281,10 +279,8 @@ public class PeliculasController {
 	@PostMapping("/volver")
 	public String volver(HttpSession session, RedirectAttributes ra) {
 
-
 		return "redirect:/peliculas?recuperar=true";
 	}
-
 
 	@PostMapping("/{id}/caratula")
 	public ResponseEntity<String> addCaratula(Principal principal, @PathVariable Integer id,
@@ -354,4 +350,6 @@ public class PeliculasController {
 		service.delete(id);
 		return "redirect:/peliculas";
 	}
+
+	
 }

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -54,6 +55,7 @@ public class Pelicula {
 	@Convert(converter = FormatoConverter.class)
 	private Formato formato;
 
+	@JsonIgnore
 	/* ---------- 3. Many‑to‑One (Localizacion) ---------- */
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "localizacion_codigo", nullable = true) // FK → localizaciones.codigo
@@ -72,11 +74,12 @@ public class Pelicula {
 	@Column(nullable = true)
 	private String notas;
 
-	@JsonManagedReference
+	@JsonIgnore
 	@OneToMany(mappedBy = "padre", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("anyo ASC")
 	private final Set<Pelicula> peliculasPack = new HashSet<>();
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private final Set<PeliculasPersonal> peliculasPersonal = new HashSet<>();
@@ -113,14 +116,17 @@ public class Pelicula {
 	@ToString.Exclude
 	private Pelicula padre;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private final Set<PeliculaFoto> peliculaFotos = new HashSet<>();
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
 	private final Set<Director> directores = new HashSet<Director>();
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
 	private final Set<Actor> actores = new HashSet<Actor>();

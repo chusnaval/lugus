@@ -7,11 +7,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import lugus.model.Pelicula;
+
 public interface PeliculaRepository extends JpaRepository<Pelicula, Integer>, JpaSpecificationExecutor<Pelicula> {
 
-	
 	long count();
-	
+
 	List<Pelicula> findByTitulo(String titulo, Pageable pageable);
+
+	List<Pelicula> findByTituloAndAnyo(final String titulo, final int anyo);
+
+	List<Pelicula> findByTituloGestAndAnyo(final String titulo, final int anyo);
 
 }
