@@ -28,6 +28,7 @@ public class Localizacion {
 	
 	@NotBlank  
 	private String descripcion;
+
 	
 	@OneToMany(mappedBy = "localizacion")
 	@ToString.Exclude

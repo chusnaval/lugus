@@ -14,12 +14,16 @@ import lugus.repository.FuenteRepository;
 public class FuenteService {
 
 	private final FuenteRepository fuenteRepository;
-	
+
 	public Optional<Fuente> findById(Integer id) {
 		return fuenteRepository.findById(id);
 	}
 
 	public List<Fuente> findAll() {
 		return fuenteRepository.findAll();
+	}
+
+	public List<Fuente> findBySuggestIsNotNull() {
+		return fuenteRepository.findBySuggestIsNotNull();
 	}
 }

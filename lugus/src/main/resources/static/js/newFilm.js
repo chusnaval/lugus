@@ -2,14 +2,14 @@ const btnSave = document.getElementById('guardar');
 const btnAceptar = document.getElementById('acceptBtn');
 const btnCancelar = document.getElementById('cancelBtn');
 
-const modal =  new bootstrap.Modal(document.getElementById('confirmModal'));
+const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
 
 btnSave.addEventListener('click', async (e) => {
 	try {
 		e.preventDefault();
 		const result = await validateTitleAndYear();
 
-		if (result.titulo==null) {
+		if (result.titulo == null) {
 			formulario.submit();
 		} else {
 
@@ -53,3 +53,36 @@ const validateTitleAndYear = async function() {
 	});
 
 }
+
+const lfuentes = async function() {
+	const res = await fetch('/lugus/fuentes', {
+		method: 'GET',
+		credentials: 'same-origin'
+	});
+	if (!res.ok) {
+		throw new Error(`Error ${res.status}: ${res.statusText}`);
+	}
+	return res.json();
+}
+
+var valFuentes;
+const ejecutarFuentes = async function() {
+	valFuentes = await lfuentes();
+}();
+
+const fuenteSelect = document.getElementById("fuente");
+
+function calculateFuente(event) {
+	const valor = event.target.value;
+
+	const coincidencia = valFuentes.find(fuente =>
+		// Si el suggest está contenido en el texto del input
+		valor.includes(fuente.suggest.toLowerCase())
+	);
+
+	if (coincidencia) {
+		fuenteSelect.value = coincidencia.id;
+	}
+}
+const urlInput = document.getElementById('url');
+urlInput.addEventListener('input', calculateFuente);

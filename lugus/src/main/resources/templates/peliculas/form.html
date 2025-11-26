@@ -68,8 +68,10 @@
 						<option value=""></option>
 						<option th:each="l : ${localizaciones}" th:value="${l.codigo}"
 							th:text="${l.descripcion}"></option>
-				</select></li>
-
+				</select>
+				
+			
+				</li>
 				<li class="list-group-item row"><strong class="col-3">Código
 						interno:</strong> <input type="text" maxlength="4" readonly="readonly"
 					disabled="disabled"></li>
@@ -81,7 +83,6 @@
 
 
 		</div>
-
 		<h4>Caratula</h4>
 		<div class="row g-2">
 			<div class="col-md-4">
