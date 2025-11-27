@@ -20,7 +20,7 @@ public class LoginController {
 	public String guardarUsuario(Principal principal, HttpSession session) {
 		session.removeAttribute("filtro");
 		session.setAttribute("usuarioConectado", principal.getName());
-		return "redirect:/peliculas?resetFilter=true";
+		return "redirect:/home";
 	}
 
 }

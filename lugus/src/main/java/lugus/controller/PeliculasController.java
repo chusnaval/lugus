@@ -19,6 +19,7 @@ import lugus.model.PeliculaFoto;
 import lugus.model.Usuario;
 import lugus.service.ActorService;
 import lugus.service.DirectorService;
+import lugus.service.DwFotoService;
 import lugus.service.DwFotoServiceI;
 import lugus.service.FuenteService;
 import lugus.service.LocalizacionService;

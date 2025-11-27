@@ -1,7 +1,6 @@
 package lugus.service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.controller.DwFotoService;
 import lugus.dto.FiltrosDto;
 import lugus.dto.PeliculaChildDto;
 import lugus.dto.PeliculaCreateDto;
@@ -37,6 +36,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PeliculaService {
 
+	private static final int NUM_ELEMENTS_PER_HOME = 5;
 	private static final int NUM_ELEMENTS_PER_PAGE = 30;
 	private final PeliculaRepository peliculaRepo;
 	private final LocalizacionService locService;
@@ -187,6 +187,18 @@ public class PeliculaService {
 		if (textoGroup != null) {
 			spec = spec.and(textoGroup); // <-- AND con el resto
 		}
+
+		return peliculaRepo.findAll(spec, pageable);
+	}
+	
+	public Page<Pelicula> findForHome() {
+		Sort sort = buildSort(Optional.of("compra"), Optional.of("ASC"));
+
+		Pageable pageable = PageRequest.of(0, NUM_ELEMENTS_PER_HOME, sort);
+
+		Specification<Pelicula> spec = Specification.where(null);
+
+		spec = spec.and(PeliculaSpecification.porComprado(true));
 
 		return peliculaRepo.findAll(spec, pageable);
 	}

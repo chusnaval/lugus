@@ -1,11 +1,9 @@
-package lugus.controller;
+package lugus.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-
-import lugus.service.DwFotoServiceI;
 
 public class DwFotoService implements DwFotoServiceI {
 
