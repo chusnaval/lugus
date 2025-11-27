@@ -122,7 +122,7 @@ public class SerieService {
 
 		Serie p = Serie.builder().titulo(dto.getTitulo()).tituloGest(dto.getTituloGest())
 				.anyoInicio(dto.getAnyoInicio()).anyoFin(dto.getAnyoFin()).formato(formato).genero(genero)
-				.comprado(dto.isComprado()).notas(dto.getNotas()).localizacion(loc).usrAlta(user).tsAlta(Instant.now())
+				.comprado(dto.isComprado()).completa(dto.isCompleta()).notas(dto.getNotas()).localizacion(loc).usrAlta(user).tsAlta(Instant.now())
 				.build();
 		p.calcularCodigo();
 		Serie saved = serieRepo.save(p);
