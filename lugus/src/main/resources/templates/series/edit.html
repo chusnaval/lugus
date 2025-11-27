@@ -113,7 +113,7 @@
 						interno:</strong> <input type="text" th:value="${serie.codigo}"
 					maxlength="4" readonly="readonly" disabled="disabled"></li>
 				<li class="list-group-item row"><strong class="col-3">Notas:</strong>
-					<textarea th:value="${serie.notas}" maxlength="400"></textarea></li>
+					<textarea th:value="${serie.notas}" th:field="${serie.notas}" maxlength="400"></textarea></li>
 			</ul>
 
 

@@ -1,0 +1,238 @@
+<!-- src/main/resources/templates/layout/fragments.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+<meta charset="UTF-8" />
+<title th:text="${title}">Lugus</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{/css/lugus.css}">
+
+</head>
+
+<body>
+	<div th:fragment="filters">
+		<form th:object="${filtro}"
+			th:action="@{'/series?pagina=' + *{pagina}   
+                + '&orden=' + *{orden} + '&direccion=' + *{direccion}+'&resetFilter=true'}"
+			method="get" name="filterForm" id="filterForm">
+			<div class="container-fluid row py-2 lugus_bg_color border-bottom">
+			
+				<div class="col-9 g-2 align-items-center">
+					<div class="row">
+						<div class="col-8">
+
+							<!-- Ejemplo: filtro por estado -->
+							<div class="input-group input-group-sm">
+								<input type="text" class="form-control" th:name="texto"
+									th:value="*{texto}" th:field="*{texto}">
+							</div>
+
+
+						</div>
+
+						<!-- Botón “Más filtros” (visible en móvil y desktop) -->
+						<div class="col-4">
+							<div class="row">
+								<div class="col-8">
+									<button class="btn btn-lumo btn-sm" type="button"
+										data-bs-toggle="offcanvas" data-bs-target="#offcanvasFilters"
+										aria-controls="offcanvasFilters">
+										<i class="fas fa-sliders-h"></i> Más filtros
+									</button>
+								</div>
+								<div class="col-4">
+									<button type="submit" class="btn btn-lumo w-100">Buscar</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<span th:text="${numResultado}"></span>
+			</div>
+
+			<div class="offcanvas offcanvas-end lugus_bg_color" tabindex="-1"
+				id="offcanvasFilters" aria-labelledby="offcanvasFiltersLabel">
+				<div class="offcanvas-header">
+					<h5 class="offcanvas-title" id="offcanvasFiltersLabel">
+						<i class="fas fa-filter"></i> Filtros avanzados
+					</h5>
+					<button type="button" class="btn-close text-reset"
+						data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+				</div>
+				<div class="offcanvas-body">
+
+					<!-- Accordion para agrupar categorías -->
+					<div class="accordion" id="filterAccordion">
+
+						<!-- Anyo -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingDate">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapseDate"
+									aria-expanded="false" aria-controls="collapseDate">
+									<i class="fas fa-calendar-alt me-2"></i> Año de estreno
+								</button>
+							</h2>
+							<div id="collapseDate" class="accordion-collapse collapse"
+								aria-labelledby="headingDate" data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+
+									<div class="mb-3">
+										<label class="form-label small">Desde</label> <input
+											type="text" class="form-control form-control-sm"
+											th:name="fromAnyo" th:value="*{fromAnyo}"
+											th:field="*{fromAnyo}">
+									</div>
+									<div class="mb-3">
+										<label class="form-label small">Hasta</label> <input
+											type="text" class="form-control form-control-sm"
+											th:name="toAnyo" th:value="*{toAnyo}" th:field="*{toAnyo}">
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<!-- Categoría 2 -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingFormato">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapseFormato"
+									aria-expanded="false" aria-controls="collapseFormato">
+									<i class="fas fa-info-circle me-2"></i> Formato
+								</button>
+							</h2>
+							<div id="collapseFormato" class="accordion-collapse collapse"
+								aria-labelledby="headingFormato"
+								data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+
+									<div class="form-check">
+										<select class="form-select" th:field="*{formato}"
+											th:value="*{formato}">
+											<option value=""></option>
+											<option
+												th:each="f : ${T(lugus.model.Formato).valoresOrdenados()}"
+												th:value="${f.id}" th:text="${f}"></option>
+										</select>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<!-- Categoría 2 -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingGenero">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapseGenero"
+									aria-expanded="false" aria-controls="collapseGenero">
+									<i class="fas fa-info-circle me-2"></i> Genero
+								</button>
+							</h2>
+							<div id="collapseGenero" class="accordion-collapse collapse"
+								aria-labelledby="headingGenero"
+								data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+
+									<div class="form-check">
+										<select class="form-select" th:field="*{genero}">
+											<option value=""></option>
+											<option
+												th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
+												th:value="${g.codigo}" th:text="${g.displayName}"></option>
+										</select>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<!-- Categoría 3 -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingComprado">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapseComprado"
+									aria-expanded="false" aria-controls="collapseComprado">
+									<i class="fas fa-info-circle me-2"></i> Comprado
+								</button>
+							</h2>
+							<div id="collapseComprado" class="accordion-collapse collapse"
+								aria-labelledby="headingComprado"
+								data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+
+									<div class="form-check">
+
+										<select class="form-select" th:field="*{comprado}"
+											th:value="*{comprado}">
+											<option value=""></option>
+											<option value="true">Sí</option>
+											<option value="false">No</option>
+										</select>
+
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<!-- Ordenacion -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingOrden">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapseOrden"
+									aria-expanded="false" aria-controls="collapseOrden">
+									<i class="fas fa-info-circle me-2"></i> Ordenar por
+								</button>
+							</h2>
+							<div id="collapseOrden" class="accordion-collapse collapse"
+								aria-labelledby="headingOrden" data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+									<div class="mb-3">
+
+										<select class="form-select" th:field="*{orden}"
+											th:value="*{orden}">
+											<option value="tituloGest">Título</option>
+											<option value="anyo">Año</option>
+											<option value="formato">Formato</option>
+											<option value="genero">Genero</option>
+											<option value="comprado">Disponible</option>
+											<option value="compra">Novedad</option>
+											<option value="pack">Pack</option>
+										</select>
+
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label small">Sentido</label> <select
+											class="form-select" th:field="*{direccion}"
+											th:value="*{direccion}">
+											<option value="ASC">Ascendente</option>
+											<option value="DESC">Descendente</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+
+					<!-- Botones de acción -->
+					<div class="d-grid mt-4">
+						<button class="btn btn-lumo touch-target" type="submit" id="apl_btn" onclick="applyFilters()">
+							<i class="fas fa-search me-1"></i> Aplicar filtros
+						</button>
+						<button class="btn btn-lumo mt-2 touch-target" type="reset">
+							<i class="fas fa-undo me-1"></i> Limpiar
+						</button>
+					</div>
+
+				</div>
+			</div>
+		</form>
+	</div>
+
+</body>
+</html>
