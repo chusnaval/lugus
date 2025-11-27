@@ -11,7 +11,6 @@ import lugus.model.Actor;
 import lugus.model.Director;
 import lugus.model.Localizacion;
 import lugus.model.Pelicula;
-import lugus.model.PeliculaFoto;
 
 public class PeliculaSpecification {
 
@@ -68,19 +67,6 @@ public class PeliculaSpecification {
 		};
 	}
 
-	public static Specification<Pelicula> porTieneCaratula(Boolean tieneCaratula) {
-		return (root, query, cb) -> {
-			if (tieneCaratula == null) {
-				return null;
-			}
-
-			Join<Pelicula, PeliculaFoto> fotosJoin = root.join("peliculaFotos", JoinType.LEFT);
-			if (tieneCaratula) {
-				return cb.isNull(fotosJoin.get("id"));
-			}
-			return null;
-		};
-	}
 
 	public static Specification<Pelicula> porActor(String actor) {
 		return (root, query, cb) -> {

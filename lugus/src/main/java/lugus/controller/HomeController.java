@@ -1,14 +1,12 @@
 package lugus.controller;
 
 import lombok.RequiredArgsConstructor;
-import lugus.dto.FiltrosDto;
 import lugus.model.Pelicula;
 import lugus.model.Usuario;
 import lugus.service.PeliculaService;
 import lugus.service.UsuarioService;
 
 import java.security.Principal;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
