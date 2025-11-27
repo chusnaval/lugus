@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<title>Listado de series</title>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+	crossorigin="anonymous"></script>
+
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet" crossorigin="anonymous">
+	
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+	crossorigin="anonymous" referrerpolicy="no-referrer" />
+	
+<link th:href="@{/css/lugus.css}" rel="stylesheet">
+<link th:href="@{/css/botones.css}" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/menu.css}">
+</head>
+<body class="p-4">
+
+	<div th:replace="~{layout/header :: header}"></div>
+	<div th:replace="~{layout/filters :: filters}"></div>
+	
+	<div class="container-fluid">
+		<div class="row justify-content-center g-4">
+			<div th:each="p, iStat : ${pageSeries.content}"
+				id="tabla-series"
+				class="film col-12 col-sm-6 col-md-3 col-lg-2 card-bg card-borde ms-1">
+				<a
+					th:href="@{/series/{id}(id=${p.id})}"
+					class="text-decoration-none d-block custom-card-link fixed-height">
+					<div class="card fixed-height border-0 card-bg">
+						<div class="card-body card-bg">
+
+							<span class="cover image-wrapper ms-2"><img
+								th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
+								class="card-img-top fixed" th:alt="${p.notas}" /> <img
+								th:if="${p.tieneCaratula == true}"
+								th:src="@{/series/{id}/image(id=${p.id})}"
+								class="card-img-top fixed" th:alt="${p.notas}" /> </span>
+							<div th:class="${p.comprado ? 'overlay' : 'overlay unavailable'}">No
+								Disponible</div>
+							<h5 class="title fw-bold mb-2" th:text="${p.titulo}"></h5>
+							<div class="row info-line">
+								<div class="col-5 text-left" th:text="${p.anyoInicio}"></div>
+								<div class="col-7 text-left" th:text="${p.formato}"></div>
+							</div>
+							<div class="row info-line">
+
+								<span class="text-left"
+									th:text="${p.localizacion==null?'':p.localizacion.descripcion}"></span>
+
+							</div>
+						</div>
+					</div>
+				</a>
+				<div class="card-footer bg-transparent border-0 p-2">
+					<a
+						th:href="@{/series/editar/{id}(id=${p.id})}"
+						th:if="${admin}" class="btn btn-sm btn-lumo">Editar</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<hr />
+
+	<nav aria-label="Pagination" th:if="${pageSeries.totalPages > 0}">
+		<ul class="pagination justify-content-center">
+			<li class="page-item"
+				th:classappend="${pageSeries.number == 0} ? 'disabled'"><a
+				th:replace="~{layout/paging :: paging(0, '<<', 'Primera Página')}"></a>
+			</li>
+
+			<li class="page-item font-weight-bold"
+				th:classappend="${pageSeries.number == 0} ? 'disabled'"><a
+				th:replace="~{layout/paging :: paging(${pageSeries.number - 1}, 'Anterior', 'Página Anterior')}"></a>
+			</li>
+
+			<li class="page-item disabled"
+				th:if="${pageSeries.number - 2 > 1}"><a class="page-link"
+				href="#">...</a></li>
+
+			<li class="page-item"
+				th:classappend="${page == pageSeries.number+1} ? 'active'"
+				th:each="page : ${#numbers.sequence(pageSeries.number > 2 ? pageSeries.number - 2 : 1, pageSeries.number + 2 < pageSeries.totalPages ? pageSeries.number + 2 : pageSeries.totalPages)}">
+				<a
+				th:replace="~{layout/paging :: paging(${page}-1, ${page}, 'Página ' + ${page})}"></a>
+			</li>
+
+			<li class="page-item disabled"
+				th:if="${pageSeries.number + 2 < pageSeries.totalPages}"><a
+				class="page-link" href="#">...</a></li>
+
+			<li class="page-item font-weight-bold"
+				th:classappend="${pageSeries.number == pageSeries.totalPages} ? 'disabled'"><a
+				th:replace="~{layout/paging :: paging(${pageSeries.number+1},'Siguiente', 'Página Siguiente')}"></a>
+			</li>
+
+			<li class="page-item"
+				th:classappend="${pageSeries.number == pageSeries.totalPages} ? 'disabled'"><a
+				th:replace="~{layout/paging :: paging(${pageSeries.totalPages}, '>>', 'Última Página')}"></a>
+			</li>
+
+		</ul>
+	</nav>
+
+</body>
+</html>

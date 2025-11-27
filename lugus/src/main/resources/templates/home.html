@@ -57,7 +57,40 @@
 			</div>
 		</div>
 	</div>
+	<hr/>
+	<h4>Series</h4>
+	<div class="container-fluid">
+		<div class="row justify-content-center g-4">
+			<div th:each="p, iStat : ${pageSeries.content}" id="tabla-series"
+				class="film col-12 col-sm-6 col-md-3 col-lg-2 card-bg card-borde ms-1">
+				<a th:href="@{/series/{id}(id=${p.id})}"
+					class="text-decoration-none d-block custom-card-link fixed-height">
+					<div class="card fixed-height border-0 card-bg">
+						<div class="card-body card-bg">
 
+							<span class="cover image-wrapper ms-2"><img
+								th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
+								class="card-img-top fixed" th:alt="${p.notas}" /> <img
+								th:if="${p.tieneCaratula == true}"
+								th:src="@{/peliculas/{id}/image(id=${p.id})}"
+								class="card-img-top fixed" th:alt="${p.notas}" /> </span>
+							<h5 class="title fw-bold mb-2" th:text="${p.titulo}"></h5>
+							<div class="row info-line">
+								<div class="col-5 text-left" th:text="${p.anyoInicio}"></div>
+								<div class="col-7 text-left" th:text="${p.formato}"></div>
+							</div>
+							<div class="row info-line">
+
+								<span class="text-left"
+									th:text="${p.localizacion==null?'':p.localizacion.descripcion}"></span>
+
+							</div>
+						</div>
+					</div>
+				</a>
+			</div>
+		</div>
+	</div>
 
 </body>
 </html>

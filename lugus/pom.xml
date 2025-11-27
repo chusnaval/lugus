@@ -11,16 +11,14 @@
     <name>Lugus</name>
     <description>Guardar mi filmoteca.</description>
 
-	<!-- Versión de Spring Boot (puedes actualizarla cuando lo necesites) -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.2</version> <!-- verifica la última versión disponible -->
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>3.2.12</version> 
+        <relativePath/> 
     </parent>
 
     <properties>
-		<!-- Compatibilidad con Java 17 (ajusta si usas otra versión) -->
         <java.version>17</java.version>
     </properties>
 
@@ -41,14 +39,12 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-		<!-- Base de datos en memoria (ideal para pruebas rápidas) -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
            <scope>test</scope>
         </dependency>
 
-		<!-- Lombok (opcional, pero ahorra mucho código boilerplate) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -68,7 +64,6 @@
 		</dependency>
 
 
-		<!-- Bootstrap CSS (opcional, vía webjars) -->
 	    <dependency>
 	        <groupId>org.webjars</groupId>
 	        <artifactId>bootstrap</artifactId>
@@ -98,12 +93,10 @@
     <build>
      	<finalName>lugus</finalName>
         <plugins>
-			<!-- Plugin de Spring Boot para crear el ejecutable JAR -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-					<!-- Opcional: repackage para generar un jar “fat” -->
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>

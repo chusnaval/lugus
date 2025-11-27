@@ -19,7 +19,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,14 +30,14 @@ import lugus.converter.FormatoConverter;
 import lugus.converter.GeneroConverter;
 
 @Entity
-@Table(name = "peliculas")
+@Table(name = "series")
 @Data
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Pelicula {
+public class Serie {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,8 +58,11 @@ public class Pelicula {
 	@JoinColumn(name = "localizacion_codigo", nullable = true) // FK → localizaciones.codigo
 	private Localizacion localizacion;
 
-	@Column(nullable = false)
-	private int anyo;
+	@Column(nullable = false, name="anyo_inicio")
+	private int anyoInicio;
+	
+	@Column(nullable = false, name="anyo_fin")
+	private int anyoFin;
 
 	@Column(nullable = false)
 	@Convert(converter = GeneroConverter.class)
@@ -71,29 +73,10 @@ public class Pelicula {
 
 	@Column(nullable = true)
 	private String notas;
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "padre", cascade = CascadeType.ALL, orphanRemoval = true)
-	@OrderBy("anyo ASC")
-	private final Set<Pelicula> peliculasPack = new HashSet<>();
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
-	@ToString.Exclude
-	private final Set<PeliculasPersonal> peliculasPersonal = new HashSet<>();
-
-	@Column
-	private boolean pack;
-
-	@Column
-	private boolean steelbook;
-
-	@Column
-	private boolean funda;
-
+	
 	@Column
 	private boolean comprado;
-
+	
 	@Column(name = "usr_alta")
 	private String usrAlta;
 
@@ -108,27 +91,13 @@ public class Pelicula {
 
 	@Column(name = "ts_baja", columnDefinition = "TIMESTAMP")
 	private Instant tsBaja;
-
-	@ManyToOne
-	@JoinColumn(name = "padre_id")
-	@ToString.Exclude
-	private Pelicula padre;
-
+	
 	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private final Set<PeliculaFoto> peliculaFotos = new HashSet<>();
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
-	@ToString.Exclude
-	private final Set<Director> directores = new HashSet<Director>();
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
-	@ToString.Exclude
-	private final Set<Actor> actores = new HashSet<Actor>();
-
+	private final Set<SerieFoto> serieFotos = new HashSet<>();
+	
+	
 	public String getDescLocalizacion() {
 		if (localizacion == null) {
 			return "";
@@ -137,9 +106,10 @@ public class Pelicula {
 	}
 
 	public boolean tieneCaratula() {
-		return this.peliculaFotos != null && !peliculaFotos.isEmpty();
+		return this.serieFotos != null && !serieFotos.isEmpty();
 	}
 
+	
 	public void calcularCodigo() {
 		// Eliminar artículos del título
 		String procesado = tituloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
@@ -150,24 +120,13 @@ public class Pelicula {
 		// Obtener la etiqueta del género
 		String parteCodigo = genero.getCodigo();
 
-		codigo = parteCodigo + "-" + prefijo + "-" + anyo;
+		codigo = parteCodigo + "-" + prefijo + "-" + anyoInicio;
 
 	}
-
-	/**
-	 * Vincula las peliculas
-	 * 
-	 * @param hijo
-	 */
-	public void addHijo(Pelicula hijo) {
-		this.peliculasPack.add(hijo);
-		hijo.setPadre(this);
-
-	}
-
-	public void addCaratula(PeliculaFoto pf) {
-		this.peliculaFotos.add(pf);
-		pf.setPelicula(this);
+	
+	public void addCaratula(SerieFoto pf) {
+		this.serieFotos.add(pf);
+		pf.setSerie(this);
 
 	}
 }

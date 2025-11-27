@@ -364,7 +364,41 @@ GRANT ALL ON SEQUENCE lugus.tipo_oper_id_seq TO lugus_admin;
 
 GRANT ALL ON SEQUENCE lugus.tipo_oper_id_seq TO lugus_role;
 
+-- SEQUENCE: lugus.series_id_seq
 
+-- DROP SEQUENCE IF EXISTS lugus.series_id_seq;
+
+CREATE SEQUENCE IF NOT EXISTS lugus.series_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE lugus.series_id_seq
+    OWNER TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus.series_id_seq TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus.series_id_seq TO lugus_role;
+
+-- SEQUENCE: lugus.fotoser_id_seq
+
+-- DROP SEQUENCE IF EXISTS lugus.fotoser_id_seq;
+
+CREATE SEQUENCE IF NOT EXISTS lugus.fotoser_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE lugus.fotoser_id_seq
+    OWNER TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus.fotoser_id_seq TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus.fotoser_id_seq TO lugus_role;
 -- tables
 -- Table: lugus.fuentes
 
@@ -918,6 +952,99 @@ CREATE INDEX IF NOT EXISTS fki_personal_fk2
     (persona_id ASC NULLS LAST)
     WITH (fillfactor=100, deduplicate_items=True)
     TABLESPACE tb_lugus_index;
+
+-- Table: lugus.series
+
+-- DROP TABLE IF EXISTS lugus.series;
+
+CREATE TABLE IF NOT EXISTS lugus.series
+(
+    id integer NOT NULL DEFAULT nextval('lugus.series_id_seq'::regclass),
+    titulo character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    titulo_gest character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    anyo_inicio integer NOT NULL,
+    anyo_fin integer NOT NULL,
+    formato smallint NOT NULL,
+    genero character varying(3) COLLATE pg_catalog."default" NOT NULL,
+    localizacion_codigo character varying(12) COLLATE pg_catalog."default",
+    codigo character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    notas text COLLATE pg_catalog."default",
+    comprado boolean DEFAULT false,
+    usr_alta character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    usr_modif character varying(10) COLLATE pg_catalog."default",
+    ts_alta timestamp without time zone NOT NULL,
+    ts_modif timestamp without time zone,
+    ts_baja timestamp without time zone,
+    CONSTRAINT series_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_local_series FOREIGN KEY (localizacion_codigo)
+        REFERENCES lugus.localizaciones (codigo) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_usr_alta_s FOREIGN KEY (usr_alta)
+        REFERENCES lugus.usuarios (login) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_usr_modif_s FOREIGN KEY (usr_modif)
+        REFERENCES lugus.usuarios (login) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE tb_lugus;
+
+ALTER TABLE IF EXISTS lugus.series
+    OWNER to lugus_admin;
+
+REVOKE ALL ON TABLE lugus.series FROM lugus_readonly;
+REVOKE ALL ON TABLE lugus.series FROM lugus_role;
+
+GRANT ALL ON TABLE lugus.series TO lugus_admin;
+
+GRANT SELECT ON TABLE lugus.series TO lugus_readonly;
+
+GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.series TO lugus_role;
+
+
+-- Table: lugus.series_fotos
+
+-- DROP TABLE IF EXISTS lugus.series_fotos;
+
+CREATE TABLE IF NOT EXISTS lugus.series_fotos
+(
+    id integer NOT NULL DEFAULT nextval('lugus.fotoser_id_seq'::regclass),
+    serie_id integer NOT NULL,
+    url character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    fuente_id integer NOT NULL,
+    foto bytea NOT NULL,
+    caratula boolean NOT NULL DEFAULT false,
+    CONSTRAINT series_foto_pkey PRIMARY KEY (id),
+    CONSTRAINT series_foto_fk1 FOREIGN KEY (serie_id)
+        REFERENCES lugus.series (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT series_foto_fk2 FOREIGN KEY (fuente_id)
+        REFERENCES lugus.fuentes (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE tb_lugus;
+
+ALTER TABLE IF EXISTS lugus.series_fotos
+    OWNER to lugus_admin;
+
+REVOKE ALL ON TABLE lugus.series_fotos FROM lugus_readonly;
+REVOKE ALL ON TABLE lugus.series_fotos FROM lugus_role;
+
+GRANT ALL ON TABLE lugus.series_fotos TO lugus_admin;
+
+GRANT SELECT ON TABLE lugus.series_fotos TO lugus_readonly;
+
+GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.series_fotos TO lugus_role;
 	
 -- views
 -- View: lugus.actores

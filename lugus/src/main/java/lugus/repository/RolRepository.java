@@ -1,4 +1,4 @@
-package lugus.service;
+package lugus.repository;
 
 
 import java.util.Optional;

@@ -11,11 +11,8 @@
 	<script th:src="@{/js/actions.js}" defer="defer"></script>
 	<div class="row">
 		<div class="col-2">
-			<a
-				th:href="@{'/home'}" 
-				id="logo_link"> <img th:src="@{/image/logo.png}"
-				class="lugus_logo" />
-				<!-- th:href="@{'/peliculas?pagina=0&orden=tituloGest&direccion=ASC&resetFilter=true'}" -->
+			<a th:href="@{'/home'}" id="logo_link"> <img
+				th:src="@{/image/logo.png}" class="lugus_logo" />
 			</a>
 		</div>
 		<div class="col-8">
@@ -46,15 +43,22 @@
 							aria-labelledby="navbarDropdown">
 							<a class="dropdown-item" th:if="${admin}"
 								th:href="@{/peliculas/nuevo}">Nueva</a> <a class="dropdown-item"
-								th:href="@{/peliculas?pagina=0&orden=tituloGest&direccion=ASC&resetFilter=true}">Buscar</a> <a class="dropdown-item"
-								th:href="@{/peliculas/request}">Petición</a>
+								th:href="@{/peliculas?pagina=0&orden=tituloGest&direccion=ASC&resetFilter=true}">Buscar</a>
+							<a class="dropdown-item" th:href="@{/peliculas/request}">Petición</a>
 
 						</div></li>
 
-					<li class="nav-item inactive"><span
-						class="custom-dark nav-link disabled" id="seriesBtn"
+					<li class="nav-item dropdown"><span
+						class="custom-dark nav-link dropdown-toggle" id="seriesBtn"
 						data-bs-toggle="dropdown" aria-expanded="false"
-						data-bs-popper="static" aria-label="Menú de usuario">Series</span></li>
+						data-bs-popper="static" aria-label="Series">Series</span>
+						<div class="dropdown-divider"></div>
+						<div class="dropdown-menu dropdown-menu-dark custom-dark"
+							aria-labelledby="navbarDropdown">
+							<a class="dropdown-item"
+								th:href="@{/series?pagina=0&orden=tituloGest&direccion=ASC&resetFilter=true}">Buscar</a>
+
+						</div></li>
 
 					<li class="nav-item inactive"><span
 						class="custom-dark nav-link disabled" id="musicBtn"
