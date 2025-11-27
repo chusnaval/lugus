@@ -176,6 +176,35 @@
 								</div>
 							</div>
 						</div>
+						
+							<!-- Categoría 4 -->
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="headingCompleta">
+								<button class="accordion-button collapsed" type="button"
+									data-bs-toggle="collapse" data-bs-target="#collapseCompleta"
+									aria-expanded="false" aria-controls="collapseCompleta">
+									<i class="fas fa-info-circle me-2"></i> Completa
+								</button>
+							</h2>
+							<div id="collapseCompleta" class="accordion-collapse collapse"
+								aria-labelledby="headingCompleta"
+								data-bs-parent="#filterAccordion">
+								<div class="accordion-body">
+
+									<div class="form-check">
+
+										<select class="form-select" th:field="*{completa}"
+											th:value="*{completa}">
+											<option value=""></option>
+											<option value="true">Sí</option>
+											<option value="false">No</option>
+										</select>
+
+									</div>
+
+								</div>
+							</div>
+						</div>
 
 						<!-- Ordenacion -->
 						<div class="accordion-item">

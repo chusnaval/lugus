@@ -25,7 +25,7 @@
 		th:action="@{/series/actualizar/{id}(id=${serie.id})}"
 		th:object="${nuevo}" method="post">
 		<h2 th:text="${serie.titulo}">Título</h2>
-		<input type="hidden" id="idserie" th:value="${serie.id}">
+		<input type="hidden" id="idSerie" th:value="${serie.id}">
 
 		<div class="row">
 			<ul class="list-group mb-4 col-8">
@@ -61,6 +61,9 @@
 				<li class="list-group-item row"><strong class="col-3">Comprado:</strong>
 					<input type="checkbox" th:value="${serie.comprado}"
 					th:field="*{comprado}"></li>
+					<li class="list-group-item row"><strong class="col-3">Completa:</strong>
+					<input type="checkbox" th:value="${serie.completa}"
+					th:field="*{completa}"></li>
 				<li class="list-group-item row"><strong class="col-3">Localización:</strong>
 					<select class="form-select" th:field="*{localizacionCodigo}">
 						<option value=""></option>

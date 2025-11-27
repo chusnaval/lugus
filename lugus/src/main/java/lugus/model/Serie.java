@@ -92,6 +92,9 @@ public class Serie {
 	@Column(name = "ts_baja", columnDefinition = "TIMESTAMP")
 	private Instant tsBaja;
 	
+	@Column
+	private boolean completa;
+	
 	@JsonIgnore
 	@OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude

@@ -197,6 +197,7 @@ public class SeriesController {
 		nuevo.setFormatoCodigo(p.getFormato().getId());
 		nuevo.setGeneroCodigo(p.getGenero().getCodigo());
 		nuevo.setComprado(p.isComprado());
+		nuevo.setCompleta(p.isCompleta());
 
 		if (p.getLocalizacion() != null) {
 			nuevo.setLocalizacionCodigo(p.getLocalizacion().getCodigo());
@@ -244,6 +245,7 @@ public class SeriesController {
 		existing.setGenero(genero);
 		existing.setNotas(nuevo.getNotas());
 		existing.setComprado(nuevo.isComprado());
+		existing.setCompleta(nuevo.isCompleta());
 		existing.calcularCodigo();
 		service.save(existing);
 

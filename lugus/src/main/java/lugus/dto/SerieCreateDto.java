@@ -36,6 +36,8 @@ public class SerieCreateDto {
 	private String localizacionCodigo;
 
 	private boolean comprado;
+	
+	private boolean completa;
 
 	private String notas;
 

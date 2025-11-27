@@ -32,6 +32,8 @@ public class FiltrosDto {
 	private Boolean funda;
 
 	private Boolean comprado;
+	
+	private Boolean completa;
 
 	private Boolean tieneCaratula;
 
@@ -90,6 +92,8 @@ public class FiltrosDto {
 			map.put("funda", funda);
 		if (comprado != null)
 			map.put("comprado", comprado);
+		if (completa != null)
+			map.put("completa", completa);
 		if (tieneCaratula != null)
 			map.put("tieneCaratula", tieneCaratula);
 
