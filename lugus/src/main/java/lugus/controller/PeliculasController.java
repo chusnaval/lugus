@@ -271,6 +271,7 @@ public class PeliculasController {
 		existing.setNotas(nuevo.getNotas());
 		existing.setSteelbook(nuevo.isSteelbook());
 		existing.setFunda(nuevo.isFunda());
+		existing.setComprado(nuevo.isComprado());
 		existing.calcularCodigo();
 		service.save(existing);
 

@@ -243,6 +243,7 @@ public class SeriesController {
 		existing.setAnyoFin(nuevo.getAnyoFin());
 		existing.setGenero(genero);
 		existing.setNotas(nuevo.getNotas());
+		existing.setComprado(nuevo.isComprado());
 		existing.calcularCodigo();
 		service.save(existing);
 
