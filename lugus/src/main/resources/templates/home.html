@@ -72,7 +72,7 @@
 								th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
 								class="card-img-top fixed" th:alt="${p.notas}" /> <img
 								th:if="${p.tieneCaratula == true}"
-								th:src="@{/peliculas/{id}/image(id=${p.id})}"
+								th:src="@{/series/{id}/image(id=${p.id})}"
 								class="card-img-top fixed" th:alt="${p.notas}" /> </span>
 							<h5 class="title fw-bold mb-2" th:text="${p.titulo}"></h5>
 							<div class="row info-line">

@@ -55,7 +55,8 @@
 						<div class="dropdown-divider"></div>
 						<div class="dropdown-menu dropdown-menu-dark custom-dark"
 							aria-labelledby="navbarDropdown">
-							<a class="dropdown-item"
+							<a class="dropdown-item" th:if="${admin}"
+								th:href="@{/series/nuevo}">Nueva</a> <a class="dropdown-item"
 								th:href="@{/series?pagina=0&orden=tituloGest&direccion=ASC&resetFilter=true}">Buscar</a>
 
 						</div></li>

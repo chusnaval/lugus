@@ -39,9 +39,9 @@ btnSave.addEventListener('click', async (e) => {
 const validateTitleAndYear = async function() {
 	const inputTitle = document.getElementById("titulo");
 	const inputTitleGest = document.getElementById("tituloGest");
-	const inputYear = document.getElementById("anyo");
+	const inputYear = document.getElementById("anyoInicio");
 
-	return fetch('/lugus/validate/titlesInYear?title=' + encodeURIComponent(inputTitle.value) + "&titleGest=" + encodeURIComponent(inputTitleGest.value) + "&year=" + encodeURIComponent(inputYear.value), {
+	return fetch('/lugus/validateSerie/titlesInYear?title=' + encodeURIComponent(inputTitle.value) + "&titleGest=" + encodeURIComponent(inputTitleGest.value) + "&year=" + encodeURIComponent(inputYear.value), {
 		method: 'GET',
 		credentials: 'same-origin'
 	}).then(res => {
