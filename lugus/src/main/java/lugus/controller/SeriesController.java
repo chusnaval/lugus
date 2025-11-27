@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,8 +17,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lugus.PermisoException;
 import lugus.dto.FiltrosDto;
+import lugus.model.Actor;
+import lugus.model.Director;
 import lugus.model.Localizacion;
+import lugus.model.Pelicula;
 import lugus.model.Serie;
 import lugus.model.Usuario;
 import lugus.service.LocalizacionService;
@@ -30,10 +35,11 @@ import lugus.service.UsuarioService;
 public class SeriesController {
 
 	private final SerieService service;
-	
+
 	private final LocalizacionService locService;
-	
+
 	private final UsuarioService usuarioService;
+
 	@GetMapping
 	public String listPaginado(Model model, Principal principal, HttpSession session,
 			@RequestParam(required = false) Boolean resetFilter, @RequestParam(required = false) Boolean recuperar,
@@ -72,7 +78,21 @@ public class SeriesController {
 
 		return "series/list";
 	}
-	
+
+	@GetMapping("/{id}")
+	public String detail(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
+			throws PermisoException {
+
+		Serie p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
+
+		model.addAttribute("serie", p);
+
+		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro");
+		model.addAttribute("filtro", filtro);
+
+		return "series/detail";
+	}
+
 	@PostMapping("/volver")
 	public String volver(HttpSession session, RedirectAttributes ra) {
 

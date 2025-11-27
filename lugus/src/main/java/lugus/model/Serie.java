@@ -62,7 +62,7 @@ public class Serie {
 	private int anyoInicio;
 	
 	@Column(nullable = false, name="anyo_fin")
-	private int anyoFin;
+	private Integer anyoFin;
 
 	@Column(nullable = false)
 	@Convert(converter = GeneroConverter.class)
