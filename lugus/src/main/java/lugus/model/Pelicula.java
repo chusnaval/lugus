@@ -19,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -128,6 +129,11 @@ public class Pelicula {
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
 	private final Set<Actor> actores = new HashSet<Actor>();
+	
+	@JsonIgnore
+	@OneToOne(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@ToString.Exclude
+	private PeliculasOtros otros;
 
 	public String getDescLocalizacion() {
 		if (localizacion == null) {
