@@ -83,6 +83,8 @@ public class PeliculasController {
 			}
 		}
 
+		model.addAttribute("orden", filtro.getOrden().orElse("tituloGest"));
+		model.addAttribute("direccion", filtro.getDireccion().orElse("ASC"));
 		// set filter to view
 		model.addAttribute("filtro", filtro);
 		session.setAttribute("filtro", filtro);
@@ -121,6 +123,9 @@ public class PeliculasController {
 		model.addAttribute("fuentesList", fuentes);
 
 		model.addAttribute("pelicula", new PeliculaCreateDto());
+		
+		model.addAttribute("admin", usuario.isAdmin());
+		
 		return "peliculas/form"; // → templates/peliculas/form.html
 	}
 
@@ -167,6 +172,9 @@ public class PeliculasController {
 		List<Actor> actores = actorService.findByPeliculaIdOrderByOrdenAsc(p.getId());
 		model.addAttribute("actores", actores);
 
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		model.addAttribute("admin", usuario.isAdmin());
+		
 		return "peliculas/detail";
 	}
 

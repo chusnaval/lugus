@@ -74,6 +74,8 @@ public class SeriesController {
 			}
 		}
 
+		model.addAttribute("orden", filtro.getOrden().orElse("tituloGest"));
+		model.addAttribute("direccion", filtro.getDireccion().orElse("ASC"));
 		// set filter to view
 		model.addAttribute("filtro", filtro);
 		session.setAttribute("filtro", filtro);
@@ -112,6 +114,9 @@ public class SeriesController {
 		model.addAttribute("fuentesList", fuentes);
 
 		model.addAttribute("serie", new SerieCreateDto());
+		
+		model.addAttribute("admin", usuario.isAdmin());
+		
 		return "series/new"; 
 	}
 
@@ -144,6 +149,9 @@ public class SeriesController {
 		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro");
 		model.addAttribute("filtro", filtro);
 
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		model.addAttribute("admin", usuario.isAdmin());
+		
 		return "series/detail";
 	}
 	
