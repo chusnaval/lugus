@@ -399,6 +399,25 @@ ALTER SEQUENCE lugus.fotoser_id_seq
 GRANT ALL ON SEQUENCE lugus.fotoser_id_seq TO lugus_admin;
 
 GRANT ALL ON SEQUENCE lugus.fotoser_id_seq TO lugus_role;
+
+-- SEQUENCE: lugus.seasons_id_seq
+
+-- DROP SEQUENCE IF EXISTS lugus.seasons_id_seq;
+
+CREATE SEQUENCE IF NOT EXISTS lugus.seasons_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE lugus.seasons_id_seq
+    OWNER TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus.seasons_id_seq TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus.seasons_id_seq TO lugus_role;
+
 -- tables
 -- Table: lugus.fuentes
 
@@ -952,7 +971,7 @@ CREATE INDEX IF NOT EXISTS fki_personal_fk2
     (persona_id ASC NULLS LAST)
     WITH (fillfactor=100, deduplicate_items=True)
     TABLESPACE tb_lugus_index;
-
+	
 -- Table: lugus.series
 
 -- DROP TABLE IF EXISTS lugus.series;
@@ -963,7 +982,7 @@ CREATE TABLE IF NOT EXISTS lugus.series
     titulo character varying(255) COLLATE pg_catalog."default" NOT NULL,
     titulo_gest character varying(255) COLLATE pg_catalog."default" NOT NULL,
     anyo_inicio integer NOT NULL,
-    anyo_fin integer NOT NULL,
+    anyo_fin integer,
     formato smallint NOT NULL,
     genero character varying(3) COLLATE pg_catalog."default" NOT NULL,
     localizacion_codigo character varying(12) COLLATE pg_catalog."default",
@@ -975,6 +994,7 @@ CREATE TABLE IF NOT EXISTS lugus.series
     ts_alta timestamp without time zone NOT NULL,
     ts_modif timestamp without time zone,
     ts_baja timestamp without time zone,
+    completa boolean NOT NULL DEFAULT false,
     CONSTRAINT series_pkey PRIMARY KEY (id),
     CONSTRAINT fk_local_series FOREIGN KEY (localizacion_codigo)
         REFERENCES lugus.localizaciones (codigo) MATCH SIMPLE
@@ -1005,8 +1025,6 @@ GRANT ALL ON TABLE lugus.series TO lugus_admin;
 GRANT SELECT ON TABLE lugus.series TO lugus_readonly;
 
 GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.series TO lugus_role;
-
-
 -- Table: lugus.series_fotos
 
 -- DROP TABLE IF EXISTS lugus.series_fotos;
@@ -1045,6 +1063,35 @@ GRANT ALL ON TABLE lugus.series_fotos TO lugus_admin;
 GRANT SELECT ON TABLE lugus.series_fotos TO lugus_readonly;
 
 GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.series_fotos TO lugus_role;
+
+-- Table: lugus.seasons
+
+-- DROP TABLE IF EXISTS lugus.seasons;
+
+CREATE TABLE IF NOT EXISTS lugus.seasons
+(
+    id integer NOT NULL DEFAULT nextval('lugus.seasons_id_seq'::regclass),
+    series_id integer NOT NULL,
+    "desc" character varying(150) COLLATE pg_catalog."default" NOT NULL,
+    year integer NOT NULL,
+    "order" integer NOT NULL,
+    purchased boolean NOT NULL DEFAULT false,
+    wanted boolean NOT NULL DEFAULT false,
+    published_version character varying(4) COLLATE pg_catalog."default" NOT NULL,
+    purchased_version character varying(4) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT seasons_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_seasons FOREIGN KEY (series_id)
+        REFERENCES lugus.series (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE tb_lugus;
+
+ALTER TABLE IF EXISTS lugus.seasons
+    OWNER to lugus_admin;
 	
 -- views
 -- View: lugus.actores

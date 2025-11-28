@@ -100,6 +100,10 @@ public class Serie {
 	@ToString.Exclude
 	private final Set<SerieFoto> serieFotos = new HashSet<>();
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, orphanRemoval = true)
+	@ToString.Exclude
+	private final Set<Season> seasons = new HashSet<>();
 	
 	public String getDescLocalizacion() {
 		if (localizacion == null) {
