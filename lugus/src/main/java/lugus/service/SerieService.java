@@ -24,9 +24,11 @@ import lugus.model.Formato;
 import lugus.model.Fuente;
 import lugus.model.Genero;
 import lugus.model.Localizacion;
+import lugus.model.Pelicula;
 import lugus.model.Serie;
 import lugus.model.SerieFoto;
 import lugus.repository.SerieSpecification;
+import lugus.repository.PeliculaSpecification;
 import lugus.repository.SerieRepository;
 
 @Service
@@ -79,7 +81,8 @@ public class SerieService {
 		spec = spec.and(SerieSpecification.porGenero(filter.getGenero()));
 		spec = spec.and(SerieSpecification.porLocalizacion(filter.getLocalizacion()));
 		spec = spec.and(SerieSpecification.porNotas(filter.getNotas()));
-
+		spec = spec.and(SerieSpecification.porTitulo(filter.getTexto()));
+		
 		return serieRepo.findAll(spec, pageable);
 	}
 
