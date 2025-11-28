@@ -65,7 +65,6 @@ public class SeriesController {
 			filtro = new FiltrosDto();
 			filtro.setOrden(Optional.of("tituloGest"));
 			filtro.setPack(false);
-			filtro.setComprado(true);
 
 		} else if ((recuperar != null && recuperar)) {
 
