@@ -101,7 +101,7 @@ public class PeliculasController {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
 		model.addAttribute("admin", usuario.isAdmin());
 
-		return "peliculas/moviesList"; // → src/main/resources/templates/peliculas/list.html
+		return "peliculas/list"; 
 	}
 
 	/*
