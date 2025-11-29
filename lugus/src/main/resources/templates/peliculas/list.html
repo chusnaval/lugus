@@ -49,6 +49,11 @@
 								<div class="col-5 text-left" th:text="${p.anyo}"></div>
 								<div class="col-7 text-left" th:text="${p.formato}"></div>
 							</div>
+							<div class="row info-line" th:if="${p.otros!=null}">
+								<div class="col-6 text-left"><img th:src="@{/image/IMDb_Logo.png}" class="imdb_logo_list" alt="IMDb Rating"><span  th:text="${p.otros.ratingFormatted}"></span></div>
+							</div>
+							
+							
 							<div class="row info-line">
 
 								<span class="text-left"

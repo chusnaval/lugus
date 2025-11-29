@@ -37,3 +37,12 @@
 	overflow-clip-margin: content-box;
 	overflow: clip;
 }
+
+.imdb_logo_list {
+	width: 24px;
+	height: 24px;
+	margin-inline-end: 3px;
+	vertical-align: sub;
+	overflow-clip-margin: content-box;
+	overflow: clip;
+}

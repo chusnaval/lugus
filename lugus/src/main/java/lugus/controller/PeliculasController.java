@@ -125,7 +125,7 @@ public class PeliculasController {
 		
 		model.addAttribute("admin", usuario.isAdmin());
 		
-		return "peliculas/form"; // → templates/peliculas/form.html
+		return "peliculas/new"; // → templates/peliculas/form.html
 	}
 
 	/*
@@ -141,8 +141,13 @@ public class PeliculasController {
 		}
 
 		if (br.hasErrors()) {
+			List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
+			model.addAttribute("localizaciones", localizaciones);
+
+			List<Fuente> fuentes = fuenteService.findAll();
+			model.addAttribute("fuentesList", fuentes);
 			// Si hay errores de validación, volvemos al mismo formulario
-			return "peliculas/form";
+			return "peliculas/new";
 		}
 		Pelicula creada = service.crear(dto, session);
 		// Redirigimos al detalle de la película recién creada
