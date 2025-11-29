@@ -1,5 +1,8 @@
 package lugus.model;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -31,17 +34,27 @@ public class PeliculasOtros {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@OneToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "pelicula_id", nullable = true) // FK → localizaciones.codigo
 	private Pelicula pelicula;
-	
-	@Column(name="idmb_id")
+
+	@Column(name = "idmb_id")
 	private String imdbId;
-	
+
 	@Column
 	private Double rating;
 
 	@Column
 	private Integer votes;
+
+	public String getRatingFormatted() {
+		if (rating == null) {
+			return "";
+		} else {
+			NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+			nf.setMinimumFractionDigits(1);
+			return nf.format(rating);
+		}
+	}
 }
