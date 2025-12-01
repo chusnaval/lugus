@@ -167,3 +167,37 @@ personModal.addEventListener('hide.bs.modal', () => {
             </div>
         </div>`;
 });
+
+
+const lfuentes = async function() {
+	const res = await fetch('/lugus/fuentes', {
+		method: 'GET',
+		credentials: 'same-origin'
+	});
+	if (!res.ok) {
+		throw new Error(`Error ${res.status}: ${res.statusText}`);
+	}
+	return res.json();
+}
+
+var valFuentes;
+const ejecutarFuentes = async function() {
+	valFuentes = await lfuentes();
+}();
+
+const fuenteSelect = document.getElementById("fuente");
+
+function calculateFuente(event) {
+	const valor = event.target.value;
+
+	const coincidencia = valFuentes.find(fuente =>
+		// Si el suggest está contenido en el texto del input
+		valor.includes(fuente.suggest.toLowerCase())
+	);
+
+	if (coincidencia) {
+		fuenteSelect.value = coincidencia.id;
+	}
+}
+const urlInput = document.getElementById('url');
+urlInput.addEventListener('input', calculateFuente);
