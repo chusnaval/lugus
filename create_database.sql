@@ -109,6 +109,16 @@ GRANT ALL ON SCHEMA lugus TO lugus_admin;
 GRANT USAGE ON SCHEMA lugus TO lugus_readonly;
 
 GRANT USAGE ON SCHEMA lugus TO lugus_role;
+
+CREATE SCHEMA IF NOT EXISTS imdb
+    AUTHORIZATION lugus_admin;
+
+GRANT ALL ON SCHEMA imdb TO lugus_admin;
+
+GRANT ALL ON SCHEMA imdb TO lugus_role;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA imdb
+GRANT DELETE, INSERT, SELECT, UPDATE ON TABLES TO lugus_role;
   
 -- sequences
 
@@ -1187,18 +1197,19 @@ ALTER TABLE lugus."imdbDirectors"
 GRANT SELECT ON TABLE lugus."imdbDirectors" TO lugus_readonly;
 GRANT SELECT ON TABLE lugus."imdbDirectors" TO lugus_role;
 GRANT ALL ON TABLE lugus."imdbDirectors" TO postgres;
+-- PROCEDURE: lugus.insertar_datos_personales(integer, character varying)
 
-
--- PROCEDURE: lugus.insertar_datos_personales(integer, text)
-
--- DROP PROCEDURE IF EXISTS lugus.insertar_datos_personales(integer, text);
+-- DROP PROCEDURE IF EXISTS lugus.insertar_datos_personales(integer, character varying);
 
 CREATE OR REPLACE PROCEDURE lugus.insertar_datos_personales(
 	IN p_id integer,
-	IN p_imdb text)
+	IN p_imdb character varying)
 LANGUAGE 'plpgsql'
 AS $BODY$
 BEGIN
+	delete from lugus.PELICULAS_PERSONAL where pelicula_id = p_id;
+	delete from lugus.peliculas_otros where pelicula_id = p_id;
+	
 	INSERT INTO lugus.peliculas_otros(
 	 pelicula_id, idmb_id)
 	VALUES ( p_id, p_imdb);
@@ -1231,5 +1242,12 @@ EXCEPTION
         RAISE;           
 END;
 $BODY$;
-ALTER PROCEDURE lugus.insertar_datos_personales(integer, text)
+ALTER PROCEDURE lugus.insertar_datos_personales(integer, character varying)
     OWNER TO lugus_admin;
+
+GRANT EXECUTE ON PROCEDURE lugus.insertar_datos_personales(integer, character varying) TO lugus_admin;
+
+GRANT EXECUTE ON PROCEDURE lugus.insertar_datos_personales(integer, character varying) TO lugus_role;
+
+REVOKE ALL ON PROCEDURE lugus.insertar_datos_personales(integer, character varying) FROM PUBLIC;
+
