@@ -44,4 +44,15 @@ public enum Formato {
 		lista.add(VHS);
 		return lista;
 	}
+
+	/**
+	 * Los DVDs van en carpetas y el resto juntos en estanterias
+	 * @return
+	 */
+	public int getIdParaUbicaciones() {
+		if(this.id>2) {
+			return 2;
+		}
+		return id;
+	}
 }

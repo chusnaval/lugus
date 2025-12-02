@@ -48,7 +48,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PeliculasController {
 
-
 	private final PeliculaService service;
 
 	private final LocalizacionService locService;
@@ -60,7 +59,7 @@ public class PeliculasController {
 	private final ActorService actorService;
 
 	private final UsuarioService usuarioService;
-	
+
 	private final InsertPersonalDataService insertImdbService;
 
 
@@ -76,22 +75,11 @@ public class PeliculasController {
 
 		// si hay filtro anterior y no queremos reiniciarlo
 		if ((resetFilter != null && resetFilter)) {
-			filtro = new FiltrosDto();
-			filtro.setOrden(Optional.of("tituloGest"));
-			filtro.setPack(false);
+			filtro = resetearFiltro();
 
 		} else if ((recuperar != null && recuperar)) {
 
-			if (session.getAttribute("filtro") != null) {
-				int paginaSolicitada = 0;
-				if(filtro.getPagina().isPresent()) {
-					paginaSolicitada = filtro.getPagina().get();
-				}
-				filtro = (FiltrosDto) session.getAttribute("filtro");
-				if(filtro.getPagina().isPresent() && filtro.getPagina().get()!=paginaSolicitada) {
-					filtro.setPagina(Optional.of(paginaSolicitada));
-				}
-			}
+			filtro = recuperarFiltro(session, filtro);
 		}
 
 		model.addAttribute("orden", filtro.getOrden().orElse("tituloGest"));
@@ -113,7 +101,29 @@ public class PeliculasController {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
 		model.addAttribute("admin", usuario.isAdmin());
 
-		return "peliculas/list"; 
+		return "peliculas/list";
+	}
+
+	private FiltrosDto resetearFiltro() {
+		FiltrosDto filtro = new FiltrosDto();
+		filtro.setOrden(Optional.of("tituloGest"));
+		filtro.setPack(false);
+		return filtro;
+	}
+
+	private FiltrosDto recuperarFiltro(HttpSession session, FiltrosDto filtro) {
+		FiltrosDto aux = filtro;
+		if (session.getAttribute("filtro") != null) {
+			int paginaSolicitada = 0;
+			if (aux.getPagina().isPresent()) {
+				paginaSolicitada = aux.getPagina().get();
+			}
+			aux = (FiltrosDto) session.getAttribute("filtro");
+			if (aux.getPagina().isPresent() && aux.getPagina().get() != paginaSolicitada) {
+				aux.setPagina(Optional.of(paginaSolicitada));
+			}
+		}
+		return aux;
 	}
 
 	/*
@@ -134,9 +144,9 @@ public class PeliculasController {
 		model.addAttribute("fuentesList", fuentes);
 
 		model.addAttribute("pelicula", new PeliculaCreateDto());
-		
+
 		model.addAttribute("admin", usuario.isAdmin());
-		
+
 		return "peliculas/new"; // → templates/peliculas/form.html
 	}
 
@@ -162,11 +172,11 @@ public class PeliculasController {
 			return "peliculas/new";
 		}
 		Pelicula creada = service.crear(dto, session);
-		
-		if(dto.getImdbCodigo()!=null && !dto.getImdbCodigo().isBlank()) {
+
+		if (dto.getImdbCodigo() != null && !dto.getImdbCodigo().isBlank()) {
 			insertImdbService.insert(creada.getId(), dto.getImdbCodigo());
 		}
-		
+
 		// Redirigimos al detalle de la película recién creada
 		return "redirect:/peliculas/" + creada.getId();
 	}
@@ -195,7 +205,7 @@ public class PeliculasController {
 
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
 		model.addAttribute("admin", usuario.isAdmin());
-		
+
 		return "peliculas/detail";
 	}
 
@@ -232,6 +242,7 @@ public class PeliculasController {
 
 		List<Localizacion> localizaciones = locService.findAll();
 		model.addAttribute("localizaciones", localizaciones);
+
 
 		model.addAttribute("caratula", new NewCaratulaDTO());
 		// DTO vacío para el formulario “añadir hijo al pack”
@@ -303,8 +314,8 @@ public class PeliculasController {
 		existing.setComprado(nuevo.isComprado());
 		existing.calcularCodigo();
 		service.save(existing);
-		
-		if(nuevo.getImdbCodigo()!=null && !nuevo.getImdbCodigo().isBlank()) {
+
+		if (nuevo.getImdbCodigo() != null && !nuevo.getImdbCodigo().isBlank()) {
 			insertImdbService.insert(existing.getId(), nuevo.getImdbCodigo());
 		}
 
@@ -386,5 +397,4 @@ public class PeliculasController {
 		return "redirect:/peliculas";
 	}
 
-	
 }

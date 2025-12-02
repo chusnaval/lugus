@@ -201,3 +201,28 @@ function calculateFuente(event) {
 }
 const urlInput = document.getElementById('url');
 urlInput.addEventListener('input', calculateFuente);
+
+
+const genero = document.getElementById("generoCodigo");
+const formato = document.getElementById("formatoCodigo");
+const lposlocals = async function(pGenero, pFormato) {
+	const payload = { pGenero, pFormato };
+	const res = await fetch('/lugus/inflocals', {
+		method: 'POST',
+		credentials: 'same-origin',	
+		headers: {
+			'Content-Type': 'application/json'   
+		},
+		body: JSON.stringify(payload)  
+	});
+	if (!res.ok) {
+		throw new Error(`Error ${res.status}: ${res.statusText}`);
+	}
+	return res.json();
+}
+
+var valPosLocalizaciones;
+const ejecutarPosLocalizaciones = async function() {
+	valPosLocalizaciones = await lposlocals(genero.value, formato.value);
+}();
+
