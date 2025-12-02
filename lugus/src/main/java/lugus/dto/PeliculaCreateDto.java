@@ -40,4 +40,6 @@ public class PeliculaCreateDto {
 	private String url;
 	
 	private Integer fuente;
+	
+	private String imdbCodigo;
 }

@@ -54,6 +54,10 @@
 					<div class="text-danger"
 						th:if="${#fields.hasErrors('generoCodigo')}"
 						th:errors="*{generoCodigo}">Error</div></li>
+						
+				<li class="list-group-item row"><strong class="col-3">IMDb Código:</strong>
+					<input type="text" class="form-control" th:field="*{imdbCodigo}" />
+				</li>
 
 				<li class="list-group-item row"><strong class="col-3">Pack:</strong>
 					<input type="checkbox" th:field="*{pack}"> <strong

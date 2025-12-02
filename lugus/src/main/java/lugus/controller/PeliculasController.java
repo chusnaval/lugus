@@ -22,6 +22,7 @@ import lugus.service.DirectorService;
 import lugus.service.DwFotoService;
 import lugus.service.DwFotoServiceI;
 import lugus.service.FuenteService;
+import lugus.service.InsertPersonalDataService;
 import lugus.service.LocalizacionService;
 import lugus.service.PeliculaService;
 import lugus.service.UsuarioService;
@@ -47,6 +48,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PeliculasController {
 
+
 	private final PeliculaService service;
 
 	private final LocalizacionService locService;
@@ -58,6 +60,9 @@ public class PeliculasController {
 	private final ActorService actorService;
 
 	private final UsuarioService usuarioService;
+	
+	private final InsertPersonalDataService insertImdbService;
+
 
 	/*
 	 * ------------------------------------------------- LISTADO DE PELÍCULAS GET
@@ -150,6 +155,11 @@ public class PeliculasController {
 			return "peliculas/new";
 		}
 		Pelicula creada = service.crear(dto, session);
+		
+		if(dto.getImdbCodigo()!=null && !dto.getImdbCodigo().isBlank()) {
+			insertImdbService.insert(creada.getId(), dto.getImdbCodigo());
+		}
+		
 		// Redirigimos al detalle de la película recién creada
 		return "redirect:/peliculas/" + creada.getId();
 	}
@@ -286,6 +296,10 @@ public class PeliculasController {
 		existing.setComprado(nuevo.isComprado());
 		existing.calcularCodigo();
 		service.save(existing);
+		
+		if(nuevo.getImdbCodigo()!=null && !nuevo.getImdbCodigo().isBlank()) {
+			insertImdbService.insert(existing.getId(), nuevo.getImdbCodigo());
+		}
 
 		return "redirect:/peliculas?recuperar=true";
 	}

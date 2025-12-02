@@ -53,7 +53,9 @@
 							th:value="${g.codigo}" th:text="${g.displayName}"
 							th:selected="${pelicula.genero.codigo == g.codigo}"></option>
 				</select></li>
-
+				<li class="list-group-item row"><strong class="col-3">IMDb Código:</strong>
+					<input type="text" class="form-control" th:field="*{imdbCodigo}" />
+				</li>
 				<li class="list-group-item row"><strong class="col-3">Pack:</strong>
 
 					<input type="checkbox" th:value="${pelicula.pack}"
