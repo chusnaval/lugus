@@ -83,7 +83,14 @@ public class PeliculasController {
 		} else if ((recuperar != null && recuperar)) {
 
 			if (session.getAttribute("filtro") != null) {
+				int paginaSolicitada = 0;
+				if(filtro.getPagina().isPresent()) {
+					paginaSolicitada = filtro.getPagina().get();
+				}
 				filtro = (FiltrosDto) session.getAttribute("filtro");
+				if(filtro.getPagina().isPresent() && filtro.getPagina().get()!=paginaSolicitada) {
+					filtro.setPagina(Optional.of(paginaSolicitada));
+				}
 			}
 		}
 
