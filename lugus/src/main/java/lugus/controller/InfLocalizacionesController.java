@@ -1,5 +1,6 @@
 package lugus.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -30,8 +31,17 @@ public class InfLocalizacionesController {
 			@RequestParam final String genero, @RequestParam final Integer formato, @RequestParam final Boolean funda,
 			@RequestParam final Boolean steelbook) {
 		String resultado = "";
-		List<InfLocalizaciones> posibilidades = infLocalizacionesService.findAllByGeneroAndFormato(genero, formato,
-				funda, steelbook);
+		List<InfLocalizaciones> posibilidades = new ArrayList<InfLocalizaciones>();
+		if(formato <= 1 || formato == 4) {
+			posibilidades.addAll(infLocalizacionesService.findAllByGeneroAndFormato(genero, formato,
+					funda, steelbook));	
+		}else {
+			posibilidades.addAll(infLocalizacionesService.findAllByGeneroAndFormato(genero, 2,
+					funda, steelbook));
+			posibilidades.addAll(infLocalizacionesService.findAllByGeneroAndFormato(genero, 3,
+					funda, steelbook));
+		}
+		
 
 		String locAnterior = utlLocalizacionesService.getAnterior(codigo);
 		boolean anteriorCompleta = localizacionCompleta(posibilidades, locAnterior, formato);
@@ -59,8 +69,12 @@ public class InfLocalizacionesController {
 			String genero, Integer formato) {
 		StringBuilder resultado = new StringBuilder();
 		int maximo = formato == 1 ? LIMITE_POR_CARPETA : LIMITE_POR_ESTANTERIA;
+		int contador = 0;
 		for (InfLocalizaciones ubication : posibilidades) {
-			if (ubication.getId().getCodigo().compareTo(localizacion) > 0 && (ubication.getContador() + 1) >= maximo) {
+			if (ubication.getId().getCodigo().compareTo(localizacion) > 0) {
+				contador += ubication.getContador();
+			}
+			if(contador+1>maximo) {
 				resultado.append(ubication.getId().getCodigo()).append(",");
 			}
 		}
