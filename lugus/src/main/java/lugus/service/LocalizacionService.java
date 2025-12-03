@@ -3,10 +3,12 @@ package lugus.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lugus.model.Localizacion;
+import lugus.model.TiposUbicacion;
 import lugus.repository.LocalizacionRepository;
 
 @Service
@@ -23,8 +25,12 @@ public class LocalizacionService {
 		return locRepo.findById(id);
 	}
 
+	public List<Localizacion> findAllOrderByDescripcion(TiposUbicacion tipoUbicacion) {
+		return locRepo.findAllByTiposUbicacion(tipoUbicacion, Sort.by("descripcion").ascending());
+	}
+
 	public List<Localizacion> findAllOrderByDescripcion() {
-		return locRepo.findAllByOrderByDescripcionAsc();
+		return locRepo.findAll(Sort.by("descripcion").ascending());
 	}
 
 }

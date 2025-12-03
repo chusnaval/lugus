@@ -34,4 +34,15 @@ public class TiposUbicacion {
 	@ToString.Exclude
 	private final Set<Localizacion> localizaciones = new HashSet<>();
 
+	/**
+	 * 
+	 * @param id
+	 */
+	public TiposUbicacion(@NotBlank int id) {
+		super();
+		this.id = id;
+	}
+	
+	
+
 }

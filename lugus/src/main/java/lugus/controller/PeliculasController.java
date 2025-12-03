@@ -16,6 +16,7 @@ import lugus.model.Genero;
 import lugus.model.Localizacion;
 import lugus.model.Pelicula;
 import lugus.model.PeliculaFoto;
+import lugus.model.TiposUbicacion;
 import lugus.model.Usuario;
 import lugus.service.ActorService;
 import lugus.service.DirectorService;
@@ -25,6 +26,7 @@ import lugus.service.FuenteService;
 import lugus.service.InsertPersonalDataService;
 import lugus.service.LocalizacionService;
 import lugus.service.PeliculaService;
+import lugus.service.TiposUbicacionService;
 import lugus.service.UsuarioService;
 
 import org.springframework.data.domain.Page;
@@ -61,6 +63,8 @@ public class PeliculasController {
 	private final UsuarioService usuarioService;
 
 	private final InsertPersonalDataService insertImdbService;
+	
+	private final TiposUbicacionService tiposUbicacionService;
 
 
 	/*
@@ -240,7 +244,8 @@ public class PeliculasController {
 		List<Fuente> fuentes = fuenteService.findAll();
 		model.addAttribute("fuentesList", fuentes);
 
-		List<Localizacion> localizaciones = locService.findAll();
+		Optional<TiposUbicacion> tipoUbicacion = tiposUbicacionService.findById(p.getFormato().getIdParaUbicaciones());
+		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion(tipoUbicacion.get());
 		model.addAttribute("localizaciones", localizaciones);
 
 
