@@ -106,4 +106,8 @@ public class PeliculaSpecification {
 			return cb.or(enDirectores);
 		};
 	}
+
+	public static Specification<Pelicula> vigentes() {
+		return (root, query, cb) -> cb.isNull(root.get("tsBaja"));
+	}
 }
