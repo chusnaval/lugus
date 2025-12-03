@@ -428,6 +428,25 @@ GRANT ALL ON SEQUENCE lugus.seasons_id_seq TO lugus_admin;
 
 GRANT ALL ON SEQUENCE lugus.seasons_id_seq TO lugus_role;
 
+-- SEQUENCE: lugus.tipoUbic_id_seq
+
+-- DROP SEQUENCE IF EXISTS lugus."tipoUbic_id_seq";
+
+CREATE SEQUENCE IF NOT EXISTS lugus."tipo_ubic_id_seq"
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE lugus."tipo_ubic_id_seq"
+    OWNER TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus."tipo_ubic_id_seq" TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus."tipo_ubic_id_seq" TO lugus_role;
+
+
 -- tables
 -- Table: lugus.fuentes
 
@@ -455,6 +474,34 @@ GRANT SELECT ON TABLE lugus.fuentes TO lugus_readonly;
 
 GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.fuentes TO lugus_role;
 
+-- Table: lugus.tipos_ubicacion
+
+-- DROP TABLE IF EXISTS lugus.tipos_ubicacion;
+
+CREATE TABLE IF NOT EXISTS lugus.tipos_ubicacion
+(
+    id integer NOT NULL DEFAULT nextval('lugus.tipo_ubic_id_seq'::regclass),
+    description character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT tipos_ubicacion_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE tb_lugus;
+
+ALTER TABLE IF EXISTS lugus.tipos_ubicacion
+    OWNER to lugus_admin;
+
+REVOKE ALL ON TABLE lugus.tipos_ubicacion FROM lugus_readonly;
+REVOKE ALL ON TABLE lugus.tipos_ubicacion FROM lugus_role;
+
+GRANT ALL ON TABLE lugus.tipos_ubicacion TO lugus_admin;
+
+GRANT SELECT ON TABLE lugus.tipos_ubicacion TO lugus_readonly;
+
+GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.tipos_ubicacion TO lugus_role;
+
+COMMENT ON TABLE lugus.tipos_ubicacion
+    IS 'Keeps the ubication types';
+	
 -- Table: lugus.localizaciones
 
 -- DROP TABLE IF EXISTS lugus.localizaciones;
@@ -463,7 +510,13 @@ CREATE TABLE IF NOT EXISTS lugus.localizaciones
 (
     codigo character varying(12) COLLATE pg_catalog."default" NOT NULL,
     descripcion character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT localizaciones_pkey PRIMARY KEY (codigo)
+    ubicacion_tipo_cod integer NOT NULL,
+    CONSTRAINT localizaciones_pkey PRIMARY KEY (codigo),
+    CONSTRAINT ubication_fk1 FOREIGN KEY (ubicacion_tipo_cod)
+        REFERENCES lugus.tipos_ubicacion (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
 )
 
 TABLESPACE tb_lugus;
@@ -479,6 +532,7 @@ GRANT ALL ON TABLE lugus.localizaciones TO lugus_admin;
 GRANT SELECT ON TABLE lugus.localizaciones TO lugus_readonly;
 
 GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.localizaciones TO lugus_role;
+
 -- Table: lugus.log
 
 -- DROP TABLE IF EXISTS lugus.log;

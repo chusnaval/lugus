@@ -13,8 +13,10 @@ import lugus.repository.InfLocalizacionesRepository;
 public class InfLocalizacionesService {
 
 	private final InfLocalizacionesRepository repo;
-	
-	public List<InfLocalizaciones> findAllByGeneroAndFormato(final String genero, final int formato){
-		return repo.findAllByGeneroAndFormatoAndContadorGreaterThan(genero, formato, 0);
+
+	public List<InfLocalizaciones> findAllByGeneroAndFormato(final String genero, final int formato,
+			final boolean funda, final boolean steelbook) {
+		return repo.findAllById_GeneroAndId_FormatoAndId_FundaAndId_SteelbookAndContadorGreaterThan(genero, formato, funda,
+				steelbook, 0);
 	}
 }

@@ -61,30 +61,33 @@ function borrar(id) {
 
 }
 
-document.querySelector('#tablaDirectores tbody')
-	.addEventListener('click', e => {
-		const target = e.target;
-		if (target.matches('i.fa-delete-left')) {
-			const personaId = target.id.substr(4);
-			// Marcar hidden “nuevo_X” a true
-			const hiddenNuevo = document.getElementById(`nuevo_${personaId}`);
-			const hiddenBorrado = document.getElementById(`borrado_${personaId}`);
-			if (hiddenNuevo.value === "true") {
-				target.closest('tr').remove();
-			} else {
-				if(hiddenBorrado.value == "true"){
-					hiddenBorrado.value = false;					
-					document.getElementById(`nombre_${personaId}`).classList.remove('tachado');
-				}else{
-					hiddenBorrado.value = true;
-					document.getElementById(`nombre_${personaId}`).classList.add('tachado');	
-				}
-				
-			}
+if (document.querySelector('#tablaDirectores tbody')) {
+	document.querySelector('#tablaDirectores tbody')
+		.addEventListener('click', e => {
+			const target = e.target;
+			if (target.matches('i.fa-delete-left')) {
+				const personaId = target.id.substr(4);
+				// Marcar hidden “nuevo_X” a true
+				const hiddenNuevo = document.getElementById(`nuevo_${personaId}`);
+				const hiddenBorrado = document.getElementById(`borrado_${personaId}`);
+				if (hiddenNuevo.value === "true") {
+					target.closest('tr').remove();
+				} else {
+					if (hiddenBorrado.value == "true") {
+						hiddenBorrado.value = false;
+						document.getElementById(`nombre_${personaId}`).classList.remove('tachado');
+					} else {
+						hiddenBorrado.value = true;
+						document.getElementById(`nombre_${personaId}`).classList.add('tachado');
+					}
 
-			console.log(`Persona ${personaId} eliminada (delegada)`);
-		}
-	});
+				}
+
+				console.log(`Persona ${personaId} eliminada (delegada)`);
+			}
+		});
+}
+
 // Helper que genera la tabla a partir del array JSON
 function buildTable(list) {
 	const rows = list.map(p => `
@@ -203,17 +206,23 @@ const urlInput = document.getElementById('url');
 urlInput.addEventListener('input', calculateFuente);
 
 
-const genero = document.getElementById("generoCodigo");
-const formato = document.getElementById("formatoCodigo");
-const lposlocals = async function(pGenero, pFormato) {
-	const payload = { pGenero, pFormato };
-	const res = await fetch('/lugus/inflocals', {
+
+const lposlocals = async function(pCodigo, pGenero, pFormato, pFunda, pSteelbook) {
+	
+	const params = new URLSearchParams();
+	params.append('codigo',   pCodigo);
+	params.append('genero',   pGenero);   
+	params.append('formato',  pFormato);  
+	params.append('funda',    pFunda);    
+	params.append('steelbook',pSteelbook);    
+	const url = `/lugus/utl/ubics/calc`;  
+	const res = await fetch(url, {
 		method: 'POST',
-		credentials: 'same-origin',	
+		credentials: 'same-origin',
 		headers: {
-			'Content-Type': 'application/json'   
+		 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
 		},
-		body: JSON.stringify(payload)  
+		 body: params.toString()
 	});
 	if (!res.ok) {
 		throw new Error(`Error ${res.status}: ${res.statusText}`);
@@ -223,6 +232,16 @@ const lposlocals = async function(pGenero, pFormato) {
 
 var valPosLocalizaciones;
 const ejecutarPosLocalizaciones = async function() {
-	valPosLocalizaciones = await lposlocals(genero.value, formato.value);
-}();
+	const codigo = document.getElementById("codigo");
+	const genero = document.getElementById("generoCodigo");
+	const formato = document.getElementById("formatoCodigo");
+	const funda = document.getElementById("funda1");
+	const steelbook = document.getElementById("steelbook1");
+	valPosLocalizaciones = await lposlocals(codigo.value, genero.value, parseInt(formato.value), funda.checked, steelbook.checked);
+	
+	
+}().then(function (){
+	$('#ubicAlert')[0].innerHTML = valPosLocalizaciones.resultado;
+	$('#ubicAlert').alert();	
+});
 

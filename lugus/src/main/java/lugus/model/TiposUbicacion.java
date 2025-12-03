@@ -3,11 +3,9 @@ package lugus.model;
 import java.util.HashSet;
 import java.util.Set;
 
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -18,26 +16,22 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "localizaciones")
+@Table(name = "tipos_ubicacion")
 @Data 
-@EqualsAndHashCode(of = "codigo")
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Localizacion {
-
+public class TiposUbicacion {
+	
 	@Id
 	@NotBlank  
-	private String codigo;
+	private int id;
 	
-	@NotBlank  
-	private String descripcion;
-
+	@Column
+	private String description;
 	
-	@OneToMany(mappedBy = "localizacion")
+	@OneToMany(mappedBy = "tiposUbicacion")
 	@ToString.Exclude
-	private Set<Pelicula> peliculas = new HashSet<>();
-	
-	@ManyToOne
-	@JoinColumn(name = "ubicacion_tipo_cod")
-	private TiposUbicacion tiposUbicacion;
+	private final Set<Localizacion> localizaciones = new HashSet<>();
+
 }
