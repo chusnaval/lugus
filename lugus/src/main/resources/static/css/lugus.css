@@ -176,12 +176,12 @@ ul li, .list-group-item {
 }
 
 h5 {
-	font-family: 'Inter', /* fuente premium */      
-               -apple-system, /* Safari/macOS */      
-                 BlinkMacSystemFont, /* Chrome en macOS */      
-                 'Segoe UI', /* Windows */      
-             Roboto, /* Android/Chrome */      
-                 Helvetica, Arial, /* fallback clásico */      
+	font-family: 'Inter', /* fuente premium */        
+               -apple-system, /* Safari/macOS */        
+                 BlinkMacSystemFont, /* Chrome en macOS */        
+                 'Segoe UI', /* Windows */        
+             Roboto, /* Android/Chrome */        
+                 Helvetica, Arial, /* fallback clásico */        
                  sans-serif; /* última opción */
 	font-weight: 600; /* Semi‑bold, como en Lumo */
 	font-size: 0.775rem; /* 14 px (equivalente a 0.875 rem) */
@@ -251,7 +251,6 @@ h5 {
 	--bs-dropdown-link-active-bg: #444;
 }
 
-
 .fixed-dropdown .dropdown-menu {
 	/* Deshacemos lo que Popper haya puesto en línea */
 	left: auto !important;
@@ -261,28 +260,40 @@ h5 {
 }
 
 .menu-lumo {
-   --lumo-primary: #6c5ce7 !important;            /* color oficial de Lumo */
-    background-color: var(--lumo-primary) !important;
-    color: #fff !important;                           /* texto blanco */
-    border: none !important;
-    border-radius: .4rem !important;                  /* radio similar al de Lumo */
-    padding: .45rem 3rem !important;
-    font-weight: 500;
-    font-size: 1rem;
-    line-height: 1.5;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color .15s ease-in-out,
-                box-shadow .15s ease-in-out;
-    margin-bottom: 2rem !important;
+	--lumo-primary: #6c5ce7 !important; /* color oficial de Lumo */
+	background-color: var(--lumo-primary) !important;
+	color: #fff !important; /* texto blanco */
+	border: none !important;
+	border-radius: .4rem !important; /* radio similar al de Lumo */
+	padding: .45rem 3rem !important;
+	font-weight: 500;
+	font-size: 1rem;
+	line-height: 1.5;
+	text-align: center;
+	cursor: pointer;
+	transition: background-color .15s ease-in-out, box-shadow .15s
+		ease-in-out;
+	margin-bottom: 2rem !important;
 }
 
 .lugus_logo {
-    height: 120px;
-    max-width: 120px;
-    object-fit: cover;
+	height: 120px;
+	max-width: 120px;
+	object-fit: cover;
 }
 
 .tachado {
-    text-decoration: line-through;
+	text-decoration: line-through;
+}
+
+.cover-img {
+	object-fit: cover; /* recorta manteniendo proporción */
+	width: 100%;
+	height: 100%;
+}
+
+.video-wrapper video {
+	width: 100%;
+	height: 100%;
+	object-fit: contain; /* mantiene aspecto del video */
 }

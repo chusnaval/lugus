@@ -1,9 +1,12 @@
 package lugus.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.PermisoException;
+import lugus.config.StorageProperties;
 import lugus.dto.FiltrosDto;
 import lugus.dto.NewCaratulaDTO;
 import lugus.dto.PeliculaChildDto;
@@ -40,7 +43,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -63,9 +73,10 @@ public class PeliculasController {
 	private final UsuarioService usuarioService;
 
 	private final InsertPersonalDataService insertImdbService;
-	
+
 	private final TiposUbicacionService tiposUbicacionService;
 
+	private final StorageProperties storageProperties;
 
 	/*
 	 * ------------------------------------------------- LISTADO DE PELÍCULAS GET
@@ -210,6 +221,16 @@ public class PeliculasController {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
 		model.addAttribute("admin", usuario.isAdmin());
 
+		File file = new File(storageProperties.getNfsRoot(), +id + "_trailer.mkv");
+		if (!file.exists()) {
+			file = new File(storageProperties.getNfsRoot(), +id + "_trailer.mp4");
+		}
+		Path videoPath = Paths.get(file.getPath()).toAbsolutePath().normalize();
+
+		// --- 3️⃣ ¿Existe el archivo? -----------------------------------------------
+		boolean exists = Files.exists(videoPath) && Files.isRegularFile(videoPath);
+		model.addAttribute("hasTrailer", exists);
+
 		return "peliculas/detail";
 	}
 
@@ -226,6 +247,59 @@ public class PeliculasController {
 
 		} else {
 			return new ResponseEntity<>(new byte[0], HttpStatus.NOT_FOUND);
+		}
+
+	}
+
+	@GetMapping("/trailer/{id}")
+	public void trailer(Principal principal, @PathVariable Integer id, HttpServletRequest request,
+			HttpServletResponse response) throws PermisoException, IOException {
+
+		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
+
+		File file = new File(storageProperties.getNfsRoot(), +p.getId() + "_trailer.mkv");
+		if (!file.exists()) {
+			file = new File(storageProperties.getNfsRoot(), +p.getId() + "_trailer.mp4");
+		}
+		Path videoPath = Paths.get(file.getPath()).toAbsolutePath().normalize();
+
+		String rangeHeader = request.getHeader(HttpHeaders.RANGE);
+		long fileLength = Files.size(videoPath);
+		long start = 0;
+		long end = fileLength - 1;
+
+		if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
+			// Ejemplo: bytes=1024-2047
+			String[] ranges = rangeHeader.substring(6).split("-", 2);
+			try {
+				start = Long.parseLong(ranges[0].trim());
+				if (ranges.length > 1 && !ranges[1].isEmpty()) {
+					end = Long.parseLong(ranges[1].trim());
+				}
+			} catch (NumberFormatException ignored) {
+				// Si el rango está mal formado, ignoramos y enviamos todo
+				start = 0;
+				end = fileLength - 1;
+			}
+		}
+
+		long contentLength = end - start + 1;
+
+		try (InputStream input = Files.newInputStream(videoPath);
+				BufferedInputStream bis = new BufferedInputStream(input);
+				OutputStream out = response.getOutputStream()) {
+
+			// Salta hasta el byte de inicio
+			bis.skip(start);
+
+			byte[] buffer = new byte[8192];
+			long bytesToRead = contentLength;
+			int len;
+			while (bytesToRead > 0 && (len = bis.read(buffer, 0, (int) Math.min(buffer.length, bytesToRead))) != -1) {
+				out.write(buffer, 0, len);
+				bytesToRead -= len;
+			}
+			out.flush();
 		}
 
 	}
@@ -247,7 +321,6 @@ public class PeliculasController {
 		Optional<TiposUbicacion> tipoUbicacion = tiposUbicacionService.findById(p.getFormato().getIdParaUbicaciones());
 		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion(tipoUbicacion.get());
 		model.addAttribute("localizaciones", localizaciones);
-
 
 		model.addAttribute("caratula", new NewCaratulaDTO());
 		// DTO vacío para el formulario “añadir hijo al pack”
