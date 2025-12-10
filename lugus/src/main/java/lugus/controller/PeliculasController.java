@@ -16,6 +16,8 @@ import lugus.model.Director;
 import lugus.model.Formato;
 import lugus.model.Fuente;
 import lugus.model.Genero;
+import lugus.model.ImdbTitleAkas;
+import lugus.model.ImdbTitleBasics;
 import lugus.model.Localizacion;
 import lugus.model.Pelicula;
 import lugus.model.PeliculaFoto;
@@ -26,6 +28,8 @@ import lugus.service.DirectorService;
 import lugus.service.DwFotoService;
 import lugus.service.DwFotoServiceI;
 import lugus.service.FuenteService;
+import lugus.service.ImdbTitleAkasService;
+import lugus.service.ImdbTitleBasicsService;
 import lugus.service.InsertPersonalDataService;
 import lugus.service.LocalizacionService;
 import lugus.service.PeliculaService;
@@ -78,6 +82,9 @@ public class PeliculasController {
 
 	private final StorageProperties storageProperties;
 
+	private final ImdbTitleBasicsService imdbTitleBasicsService;
+
+	private final ImdbTitleAkasService imdbTitleAkasService;
 	/*
 	 * ------------------------------------------------- LISTADO DE PELÍCULAS GET
 	 * /peliculas -------------------------------------------------
@@ -163,6 +170,41 @@ public class PeliculasController {
 		model.addAttribute("admin", usuario.isAdmin());
 
 		return "peliculas/new"; // → templates/peliculas/form.html
+	}
+
+	@GetMapping("/petition/{id}")
+	public String createPeticion(Principal principal, Model model, @PathVariable String id) throws PermisoException {
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		if (!usuario.isAdmin()) {
+			throw new PermisoException("No tiene permisos");
+		}
+
+		List<Fuente> fuentes = fuenteService.findAll();
+		model.addAttribute("fuentesList", fuentes);
+		PeliculaCreateDto dto = new PeliculaCreateDto();
+		dto.setImdbCodigo(id);
+
+		Optional<ImdbTitleBasics> itb = imdbTitleBasicsService.findById(id);
+		Optional<ImdbTitleAkas> ita = imdbTitleAkasService.findByTitleId(id);
+		if (ita.isPresent()) {
+			dto.setTitulo(ita.get().getTitle());
+			dto.setTituloGest(ita.get().getTitle());
+		} else {
+			if (itb.isPresent()) {
+				dto.setTitulo(itb.get().getOriginaltitle());
+			}
+		}
+
+		if (itb.isPresent() && itb.get().getStartyear() != null && !itb.get().getStartyear().isBlank()) {
+			dto.setAnyo(Integer.parseInt(itb.get().getStartyear()));
+			dto.setNotas(String.join(",", itb.get().getGenres()));
+		}
+
+		model.addAttribute("pelicula", dto);
+
+		model.addAttribute("admin", usuario.isAdmin());
+
+		return "peliculas/petition"; 
 	}
 
 	/*
