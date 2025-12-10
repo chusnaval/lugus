@@ -21,11 +21,13 @@ import lugus.model.Filmography;
 import lugus.model.ImdbTitleAkas;
 import lugus.model.ImdbTitleBasics;
 import lugus.model.ImdbTitlePrincipals;
+import lugus.model.Pelicula;
 import lugus.model.PeliculasOtros;
 import lugus.model.Persona;
 import lugus.service.ImdbTitleAkasService;
 import lugus.service.ImdbTitleBasicsService;
 import lugus.service.ImdbTitlePrincipalsService;
+import lugus.service.PeliculaService;
 import lugus.service.PeliculasOtrosService;
 import lugus.service.PersonaService;
 
@@ -44,6 +46,9 @@ public class FilmographyController {
 
 	private final ImdbTitleAkasService imdbTitleAkasService;
 
+	private final PeliculaService peliculaService;
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@GetMapping("/{id}")
 	public String detail(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
 			throws PermisoException {
@@ -71,10 +76,16 @@ public class FilmographyController {
 
 					film.setStartyear(Integer.parseInt(itb.get().getStartyear()));
 					film.setTconst(itp.getId().getTconst());
-					
+
 					List<PeliculasOtros> po = peliculasOtrosService.findByImdbId(itp.getId().getTconst());
 					if (!po.isEmpty()) {
 						film.setPeliculaId(po.get(0).getPelicula().getId());
+
+						Optional<Pelicula> pel = peliculaService.findById(po.get(0).getPelicula().getId());
+						if (pel.isPresent()) {
+							film.setComprado(pel.get().isComprado());
+							film.setBuscado(!pel.get().isComprado());
+						}
 					}
 
 					Optional<ImdbTitleAkas> ita = imdbTitleAkasService.findByTitleId(itp.getId().getTconst());
@@ -83,10 +94,12 @@ public class FilmographyController {
 					} else {
 						film.setTitle(itb.get().getOriginaltitle());
 					}
-					
+
 					mapFilms.put(itp.getId().getTconst(), film);
-				}else {
-					film.setCategory(film.getCategory() + " - " + itp.getId().getCategory());
+				} else {
+					if (film.getCategory() != null && !film.getCategory().contains(itp.getId().getCategory())) {
+						film.setCategory(film.getCategory() + " - " + itp.getId().getCategory());
+					}
 				}
 
 			}

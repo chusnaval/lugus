@@ -111,6 +111,10 @@
 			<table th:unless="${directores.empty}" class="table table-sm">
 				<tbody>
 					<tr th:each="dir : ${directores}">
+					<td> <a th:href="@{/filmography/{id}(id=${dir.persona})}"
+	       					style="color:inherit;">
+	       					<i class="fa-solid fa-angle-right"></i>
+    					</a></td>
 						<td th:text="${dir.nombre}"></td>
 					</tr>
 				</tbody>
