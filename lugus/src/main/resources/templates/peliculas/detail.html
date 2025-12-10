@@ -64,7 +64,7 @@
 			<li class="list-group-item row"><strong class="col-3">Código
 					interno:</strong> <span class="col-9" th:text="${pelicula.codigo}"></span></li>
 			<li class="list-group-item row"><strong class="col-3">Localización:</strong>
-				<span class="col-9" th:text="${pelicula.localizacion.descripcion}"></span></li>
+				<span class="col-9" th:if="${pelicula.localizacion!=null}" th:text="${pelicula.localizacion.descripcion}"></span></li>
 		</ul>
 	</div>
 	<div th:if="${pelicula.padre != null}">
@@ -122,7 +122,11 @@
 			<table th:unless="${actores.empty}" class="table table-xl">
 				<tbody>
 					<tr th:each="act : ${actores}">
-						<td th:text="${act.nombre}"></td>
+						<td> <a th:href="@{/filmography/{id}(id=${act.persona})}"
+	       					style="color:inherit;">
+	       					<i class="fa-solid fa-angle-right"></i>
+    					</a></td>
+    					<td th:text="${act.nombre}"></td>
 						<td th:text="${act.personaje}"></td>
 					</tr>
 				</tbody>
