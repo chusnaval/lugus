@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import lugus.model.PeliculasOtros;
+import lugus.model.films.PeliculasOtros;
+
 
 public interface PeliculasOtrosRepository extends JpaRepository<PeliculasOtros, Integer> {
 

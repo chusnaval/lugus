@@ -2,7 +2,7 @@ package lugus.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import lugus.model.Genero;
+import lugus.model.values.Genero;
 
 /**
  * Convierte entre {@link Genero} y su código (String) para la base de datos.

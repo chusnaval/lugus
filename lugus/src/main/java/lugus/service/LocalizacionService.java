@@ -7,8 +7,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.Localizacion;
-import lugus.model.TiposUbicacion;
+import lugus.model.core.Localizacion;
+import lugus.model.core.TiposUbicacion;
 import lugus.repository.LocalizacionRepository;
 
 @Service

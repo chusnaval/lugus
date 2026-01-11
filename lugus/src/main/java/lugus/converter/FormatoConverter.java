@@ -2,7 +2,7 @@ package lugus.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import lugus.model.Formato;
+import lugus.model.values.Formato;
 
 /**
  * Convierte entre {@link Formato} y su identificador numérico (short) para la base de datos.

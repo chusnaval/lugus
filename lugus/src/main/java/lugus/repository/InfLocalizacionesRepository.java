@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import lugus.model.InfLocalizaciones;
-import lugus.model.InfLocalizacionesId;
+import lugus.model.inf.InfLocalizaciones;
+import lugus.model.inf.InfLocalizacionesId;
 
 public interface InfLocalizacionesRepository extends JpaRepository<InfLocalizaciones, InfLocalizacionesId> {
 

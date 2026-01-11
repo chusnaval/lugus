@@ -112,7 +112,7 @@
 											th:value="*{formato}">
 											<option value=""></option>
 											<option
-												th:each="f : ${T(lugus.model.Formato).valoresOrdenados()}"
+												th:each="f : ${T(lugus.model.values.Formato).valoresOrdenados()}"
 												th:value="${f.id}" th:text="${f}"></option>
 										</select>
 									</div>
@@ -139,7 +139,7 @@
 										<select class="form-select" th:field="*{genero}">
 											<option value=""></option>
 											<option
-												th:each="g : ${T(lugus.model.Genero).valoresOrdenados()}"
+												th:each="g : ${T(lugus.model.values.Genero).valoresOrdenados()}"
 												th:value="${g.codigo}" th:text="${g.displayName}"></option>
 										</select>
 									</div>

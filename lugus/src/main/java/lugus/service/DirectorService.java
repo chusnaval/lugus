@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.Director;
+import lugus.model.people.Director;
 import lugus.repository.DirectorRepository;
 
 @Service

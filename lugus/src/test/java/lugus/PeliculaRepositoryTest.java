@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import lugus.model.Formato;
-import lugus.model.Genero;
-import lugus.model.Pelicula;
+import lugus.model.films.Pelicula;
+import lugus.model.values.Formato;
+import lugus.model.values.Genero;
 import lugus.repository.PeliculaRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.InfLocalizaciones;
+import lugus.model.inf.InfLocalizaciones;
 import lugus.repository.InfLocalizacionesRepository;
 
 @Service

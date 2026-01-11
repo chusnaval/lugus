@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lugus.dto.FiltrosDto;
 import lugus.dto.PeliculaChildDto;
 import lugus.dto.PeliculaCreateDto;
-import lugus.model.Formato;
-import lugus.model.Fuente;
-import lugus.model.Genero;
-import lugus.model.Localizacion;
-import lugus.model.Pelicula;
-import lugus.model.PeliculaFoto;
+import lugus.model.core.Fuente;
+import lugus.model.core.Localizacion;
+import lugus.model.films.Pelicula;
+import lugus.model.films.PeliculaFoto;
+import lugus.model.values.Formato;
+import lugus.model.values.Genero;
 import lugus.repository.PeliculaRepository;
 import lugus.repository.PeliculaSpecification;
 

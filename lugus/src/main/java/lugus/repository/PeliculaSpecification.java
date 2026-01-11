@@ -7,10 +7,10 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import lugus.model.Actor;
-import lugus.model.Director;
-import lugus.model.Localizacion;
-import lugus.model.Pelicula;
+import lugus.model.core.Localizacion;
+import lugus.model.films.Pelicula;
+import lugus.model.people.Actor;
+import lugus.model.people.Director;
 
 public class PeliculaSpecification {
 

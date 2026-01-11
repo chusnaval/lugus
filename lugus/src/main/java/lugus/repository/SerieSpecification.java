@@ -4,8 +4,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import lugus.model.Localizacion;
-import lugus.model.Serie;
+import lugus.model.core.Localizacion;
+import lugus.model.series.Serie;
 
 public class SerieSpecification {
 

@@ -1,7 +1,7 @@
 package lugus.controller;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.Usuario;
+import lugus.model.user.Usuario;
 import lugus.service.PeliculaService;
 import lugus.service.SerieService;
 import lugus.service.UsuarioService;

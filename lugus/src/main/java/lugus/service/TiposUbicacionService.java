@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.TiposUbicacion;
+import lugus.model.core.TiposUbicacion;
 import lugus.repository.TiposUbicacionRepository;
 
 @Service

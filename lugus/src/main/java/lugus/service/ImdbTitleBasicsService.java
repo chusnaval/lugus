@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.ImdbTitleBasics;
+import lugus.model.imdb.ImdbTitleBasics;
 import lugus.repository.ImdbTitleBasicsRepository;
 @Service
 @RequiredArgsConstructor

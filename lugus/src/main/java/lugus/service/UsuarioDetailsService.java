@@ -4,7 +4,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
-import lugus.model.Usuario;
+import lugus.model.user.Usuario;
 import lugus.repository.RolRepository;
 import lugus.repository.UsuarioRepository;
 

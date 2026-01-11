@@ -446,6 +446,41 @@ GRANT ALL ON SEQUENCE lugus."tipo_ubic_id_seq" TO lugus_admin;
 
 GRANT ALL ON SEQUENCE lugus."tipo_ubic_id_seq" TO lugus_role;
 
+-- SEQUENCE: lugus.grupos_id_seq
+
+-- DROP SEQUENCE IF EXISTS lugus.grupos_id_seq;
+
+CREATE SEQUENCE IF NOT EXISTS lugus.grupos_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE lugus.grupos_id_seq
+    OWNER TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus.grupos_id_seq TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus.grupos_id_seq TO lugus_role;
+
+-- SEQUENCE: lugus.grupel_id_seq
+
+-- DROP SEQUENCE IF EXISTS lugus.grupel_id_seq;
+
+CREATE SEQUENCE IF NOT EXISTS lugus.grupel_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE lugus.grupel_id_seq
+    OWNER TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus.grupel_id_seq TO lugus_admin;
+
+GRANT ALL ON SEQUENCE lugus.grupel_id_seq TO lugus_role;
 
 -- tables
 -- Table: lugus.fuentes
@@ -1035,6 +1070,64 @@ CREATE INDEX IF NOT EXISTS fki_personal_fk2
     (persona_id ASC NULLS LAST)
     WITH (fillfactor=100, deduplicate_items=True)
     TABLESPACE tb_lugus_index;
+
+
+-- Table: lugus.grupos
+
+-- DROP TABLE IF EXISTS lugus.grupos;
+
+CREATE TABLE IF NOT EXISTS lugus.grupos
+(
+    id integer NOT NULL DEFAULT nextval('lugus.grupos_id_seq'::regclass),
+    name character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT grupos_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE tb_lugus;
+
+ALTER TABLE IF EXISTS lugus.grupos
+    OWNER to lugus_admin;
+
+REVOKE ALL ON TABLE lugus.grupos FROM lugus_readonly;
+REVOKE ALL ON TABLE lugus.grupos FROM lugus_role;
+
+GRANT ALL ON TABLE lugus.grupos TO lugus_admin;
+
+GRANT SELECT ON TABLE lugus.grupos TO lugus_readonly;
+
+GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.grupos TO lugus_role;
+
+COMMENT ON TABLE lugus.grupos
+    IS 'Almacena los grupos de peliculas.';
+
+-- Table: lugus.grupos_peliculas
+
+-- DROP TABLE IF EXISTS lugus.grupos_peliculas;
+
+CREATE TABLE IF NOT EXISTS lugus.grupos_peliculas
+(
+    id integer NOT NULL DEFAULT nextval('lugus.grupel_id_seq'::regclass),
+    grupo_id integer NOT NULL,
+    peliculas_id integer NOT NULL,
+    CONSTRAINT grupos_peliculas_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE tb_lugus;
+
+ALTER TABLE IF EXISTS lugus.grupos_peliculas
+    OWNER to lugus_admin;
+
+REVOKE ALL ON TABLE lugus.grupos_peliculas FROM lugus_readonly;
+REVOKE ALL ON TABLE lugus.grupos_peliculas FROM lugus_role;
+
+GRANT ALL ON TABLE lugus.grupos_peliculas TO lugus_admin;
+
+GRANT SELECT ON TABLE lugus.grupos_peliculas TO lugus_readonly;
+
+GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.grupos_peliculas TO lugus_role;
+
+COMMENT ON TABLE lugus.grupos_peliculas
+    IS 'Relación de peliculas que pertenecen a un grupo.';
 	
 -- Table: lugus.series
 

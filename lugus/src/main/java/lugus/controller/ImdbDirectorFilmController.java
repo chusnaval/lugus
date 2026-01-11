@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.ImdbDirectorFilm;
+import lugus.model.imdb.ImdbDirectorFilm;
 import lugus.service.ImdbDirectorFilmService;
 
 @Controller

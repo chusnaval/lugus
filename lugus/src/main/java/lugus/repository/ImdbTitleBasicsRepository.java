@@ -2,7 +2,7 @@ package lugus.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import lugus.model.ImdbTitleBasics;
+import lugus.model.imdb.ImdbTitleBasics;
 
 public interface ImdbTitleBasicsRepository extends JpaRepository<ImdbTitleBasics, String> {
 

@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.Fuente;
+import lugus.model.core.Fuente;
 import lugus.repository.FuenteRepository;
 
 @Service

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.ImdbDirector;
+import lugus.model.imdb.ImdbDirector;
 import lugus.repository.ImdbDirectorRepository;
 
 @Service

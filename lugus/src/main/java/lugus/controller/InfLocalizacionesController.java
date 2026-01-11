@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.InfLocalizaciones;
+import lugus.model.inf.InfLocalizaciones;
 import lugus.service.InfLocalizacionesService;
 import lugus.service.UtlLocalizacionesService;
 

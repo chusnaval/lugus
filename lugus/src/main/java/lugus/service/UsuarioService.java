@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.Usuario;
+import lugus.model.user.Usuario;
 import lugus.repository.UsuarioRepository;
 
 @Service

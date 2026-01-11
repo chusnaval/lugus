@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
-import lugus.model.Serie;
+import lugus.model.series.Serie;
 import lugus.service.SerieService;
 
 @RestController 

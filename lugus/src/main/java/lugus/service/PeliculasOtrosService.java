@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.PeliculasOtros;
+import lugus.model.films.PeliculasOtros;
 import lugus.repository.PeliculasOtrosRepository;
 
 @Service

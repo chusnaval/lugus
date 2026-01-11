@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.Persona;
+import lugus.model.people.Persona;
 import lugus.repository.PersonaRepository;
 @Service
 @RequiredArgsConstructor

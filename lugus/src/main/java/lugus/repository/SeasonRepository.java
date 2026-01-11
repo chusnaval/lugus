@@ -2,7 +2,8 @@ package lugus.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import lugus.model.Season;
+import lugus.model.series.Season;
+
 
 public interface SeasonRepository extends JpaRepository<Season, Integer>{
 
