@@ -43,19 +43,26 @@
 
 				<li class="list-group-item row"><strong class="col-3">Formato:</strong>
 					<select class="form-select" th:field="*{formatoCodigo}">
-						<option th:each="f : ${T(lugus.model.values.Formato).valoresOrdenados()}"
+						<option
+							th:each="f : ${T(lugus.model.values.Formato).valoresOrdenados()}"
 							th:value="${f.id}" th:text="${f}"
 							th:selected="${pelicula.formato.id == f.id}"></option>
 				</select></li>
 				<li class="list-group-item row"><strong class="col-3">Género:</strong>
 					<select class="form-select" th:field="*{generoCodigo}">
-						<option th:each="g : ${T(lugus.model.values.Genero).valoresOrdenados()}"
+						<option
+							th:each="g : ${T(lugus.model.values.Genero).valoresOrdenados()}"
 							th:value="${g.codigo}" th:text="${g.displayName}"
 							th:selected="${pelicula.genero.codigo == g.codigo}"></option>
 				</select></li>
 				<li class="list-group-item row"><strong class="col-3">IMDb
 						Código:</strong> <input type="text" class="form-control"
 					th:field="*{imdbCodigo}" /></li>
+
+				<li class="list-group-item row"><strong class="col-3">Letterboxd
+						Rating:</strong> <input type="text" th:value="${pelicula.otros.lbRating}"
+					th:field="*{lbRating}" maxlength="3"></li>
+
 				<li class="list-group-item row"><strong class="col-3">Pack:</strong>
 
 					<input type="checkbox" th:value="${pelicula.pack}"
@@ -66,7 +73,9 @@
 					<input type="checkbox" th:value="${pelicula.funda}"
 					th:field="*{funda}"> <strong class="col-3">Comprado:</strong>
 					<input type="checkbox" th:value="${pelicula.comprado}"
-					th:field="*{comprado}"></li>
+					th:field="*{comprado}"> <strong class="col-3">Visto:</strong>
+					<input type="checkbox" th:value="${pelicula.otros.vista}"
+					th:field="*{vista}"></li>
 				<li class="list-group-item row"><strong class="col-3">Localización:</strong>
 					<select class="form-select" th:field="*{localizacionCodigo}">
 						<option value=""></option>
@@ -197,13 +206,15 @@
 			</div>
 			<div class="col-md-2">
 				<select class="form-select" th:field="*{formatoCodigo}">
-					<option th:each="f : ${T(lugus.model.values.Formato).valoresOrdenados()}"
+					<option
+						th:each="f : ${T(lugus.model.values.Formato).valoresOrdenados()}"
 						th:value="${f.id}" th:text="${f}"></option>
 				</select>
 			</div>
 			<div class="col-md-2">
 				<select class="form-select" th:field="*{generoCodigo}">
-					<option th:each="g : ${T(lugus.model.values.Genero).valoresOrdenados()}"
+					<option
+						th:each="g : ${T(lugus.model.values.Genero).valoresOrdenados()}"
 						th:value="${g.codigo}" th:text="${g.displayName}"></option>
 				</select>
 			</div>

@@ -47,6 +47,12 @@ public class PeliculasOtros {
 
 	@Column
 	private Integer votes;
+	
+	@Column(name="lbrating")
+	private Float lbRating;
+	
+	@Column(name="vista")
+	private Boolean vista;
 
 	public String getRatingFormatted() {
 		if (rating == null) {

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,68 +49,68 @@ public class FilmographyController {
 
 	private final PeliculaService peliculaService;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@GetMapping("/{id}")
 	public String detail(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
 			throws PermisoException {
 
 		Persona person = personaService.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("Persona no encontrada"));
-
 		model.addAttribute("person", person);
-		Map<String, Filmography> mapFilms = new HashMap<>();
-		List<ImdbTitlePrincipals> aux = imdbTitlePrincipalsService.findAllByIdNconst(person.getNconst());
-		for (ImdbTitlePrincipals itp : aux) {
-
-			Optional<ImdbTitleBasics> itb = imdbTitleBasicsService.findById(itp.getId().getTconst());
-			if (itb.isPresent() && itb.get().getStartyear() != null
-					&& ("movie".equals(itb.get().getTitletype()) || "tvMovie".equals(itb.get().getTitletype()))) {
-
-				Filmography film = mapFilms.get(itp.getId().getTconst());
-
-				if (film == null) {
-
-					film = new Filmography();
-					film.setId(id);
-					film.setNconst(person.getNconst());
-					film.setCategory(itp.getId().getCategory());
-
-					film.setStartyear(Integer.parseInt(itb.get().getStartyear()));
-					film.setTconst(itp.getId().getTconst());
-
-					List<PeliculasOtros> po = peliculasOtrosService.findByImdbId(itp.getId().getTconst());
-					if (!po.isEmpty()) {
-						film.setPeliculaId(po.get(0).getPelicula().getId());
-
-						Optional<Pelicula> pel = peliculaService.findById(po.get(0).getPelicula().getId());
-						if (pel.isPresent()) {
-							film.setComprado(pel.get().isComprado());
-							film.setBuscado(!pel.get().isComprado());
-						}
-					}
-
-					Optional<ImdbTitleAkas> ita = imdbTitleAkasService.findByTitleId(itp.getId().getTconst());
-					if (ita.isPresent()) {
-						film.setTitle(ita.get().getTitle());
-					} else {
-						film.setTitle(itb.get().getOriginaltitle());
-					}
-
-					mapFilms.put(itp.getId().getTconst(), film);
-				} else {
-					if (film.getCategory() != null && !film.getCategory().contains(itp.getId().getCategory())) {
-						film.setCategory(film.getCategory() + " - " + itp.getId().getCategory());
-					}
-				}
-
-			}
-		}
-		List<Filmography> films = new ArrayList(mapFilms.values());
-		Collections.sort(films, (o1, o2) -> o1.getStartyear().compareTo(o2.getStartyear()));
-
-		model.addAttribute("films", films);
+		model.addAttribute("films", buildFilmsList(person));
 
 		return "filmography/detail";
+	}
+
+	private List<Filmography> buildFilmsList(Persona person) {
+
+		List<ImdbTitlePrincipals> aux = imdbTitlePrincipalsService.findAllByIdNconst(person.getNconst());
+		List<Filmography> films = aux.stream().filter(itp -> {
+			Optional<ImdbTitleBasics> itb = imdbTitleBasicsService.findById(itp.getId().getTconst());
+			return itb.isPresent() && itb.get().getStartyear() != null && itb.get().isAMovie();
+		}).collect(Collectors.groupingBy(itp -> itp.getId().getTconst())).values().stream().map(list -> {
+			ImdbTitlePrincipals first = list.get(0);
+			ImdbTitleBasics itb = imdbTitleBasicsService.findById(first.getId().getTconst()).get();
+			Filmography film = buildNewFilmography(person, first, Optional.of(itb));
+			list.stream().skip(1).forEach(itp -> film.appendCategory(itp.getId().getCategory()));
+
+			return film;
+		}).collect(Collectors.toList());
+
+		Collections.sort(films, (o1, o2) -> o1.getStartyear().compareTo(o2.getStartyear()));
+		return films;
+	}
+
+	private Filmography buildNewFilmography(Persona person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb) {
+		Filmography film = new Filmography();
+		film.setId(person.getId());
+		film.setNconst(person.getNconst());
+		film.setCategory(itp.getId().getCategory());
+		film.setStartyear(Integer.parseInt(itb.get().getStartyear()));
+		film.setTconst(itp.getId().getTconst());
+
+		boolean isFilmRegister = peliculasOtrosService.isFilmRegistered(itp.getId().getTconst());
+		if (isFilmRegister) {
+			film.setPeliculaId(peliculasOtrosService.getIdFilm(itp.getId().getTconst()));
+			Optional<Pelicula> pel = peliculaService.findById(film.getPeliculaId());
+			film.setComprado(pel.isPresent() && pel.get().isComprado());
+			film.setBuscado(!film.isComprado());
+		}
+
+		Optional<ImdbTitleAkas> ita = imdbTitleAkasService.findByTitleId(itp.getId().getTconst());
+		film.setTitle(getTitle(ita, itb));
+
+		return film;
+	}
+
+
+	private String getTitle(Optional<ImdbTitleAkas> ita, Optional<ImdbTitleBasics> itb) {
+		if (ita.isPresent()) {
+			return ita.get().getTitle();
+		}
+		if (itb.isPresent()) {
+			return itb.get().getOriginaltitle();
+		}
+		return "";
 	}
 
 }

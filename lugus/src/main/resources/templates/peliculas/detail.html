@@ -55,16 +55,28 @@
 				th:class="${pelicula.funda == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
 				aria-hidden="true"></i><strong class="col-3">Comprado:</strong><i
 				th:class="${pelicula.comprado == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
+				aria-hidden="true"></i> <strong class="col-3">Visto:</strong><i
+				th:class="${pelicula.otros.vista == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
 				aria-hidden="true"></i></li>
-			<li class="list-group-item row"><strong class="col-3"><img
+				
+			<li class="list-group-item row">
+			
+				<strong class="col-3"><img
 					th:src="@{/image/IMDb_Logo.png}" class="imdb_logo_detail"
-					alt="IMDb Rating"></strong><span class="col-9"
-				th:if="${pelicula.otros}"
-				th:text="${pelicula.otros.ratingFormatted}"></span></li>
+					alt="IMDb Rating"></strong><span class="col-3"
+					th:if="${pelicula.otros}"
+					th:text="${pelicula.otros.ratingFormatted}"></span>
+				
+				<strong	class="col-3">Letterboxd</strong><span class="col-3"
+					th:if="${pelicula.otros}" th:text="${pelicula.otros.lbRating}"></span>
+			
+			</li>
+				
 			<li class="list-group-item row"><strong class="col-3">Código
 					interno:</strong> <span class="col-9" th:text="${pelicula.codigo}"></span></li>
 			<li class="list-group-item row"><strong class="col-3">Localización:</strong>
-				<span class="col-9" th:if="${pelicula.localizacion!=null}" th:text="${pelicula.localizacion.descripcion}"></span></li>
+				<span class="col-9" th:if="${pelicula.localizacion}"
+				th:text="${pelicula.localizacion.descripcion}"></span></li>
 		</ul>
 	</div>
 	<div th:if="${pelicula.padre != null}">
@@ -111,10 +123,9 @@
 			<table th:unless="${directores.empty}" class="table table-sm">
 				<tbody>
 					<tr th:each="dir : ${directores}">
-					<td> <a th:href="@{/filmography/{id}(id=${dir.persona})}"
-	       					style="color:inherit;">
-	       					<i class="fa-solid fa-angle-right"></i>
-    					</a></td>
+						<td><a th:href="@{/filmography/{id}(id=${dir.persona})}"
+							style="color: inherit;"> <i class="fa-solid fa-angle-right"></i>
+						</a></td>
 						<td th:text="${dir.nombre}"></td>
 					</tr>
 				</tbody>
@@ -126,11 +137,10 @@
 			<table th:unless="${actores.empty}" class="table table-xl">
 				<tbody>
 					<tr th:each="act : ${actores}">
-						<td> <a th:href="@{/filmography/{id}(id=${act.persona})}"
-	       					style="color:inherit;">
-	       					<i class="fa-solid fa-angle-right"></i>
-    					</a></td>
-    					<td th:text="${act.nombre}"></td>
+						<td><a th:href="@{/filmography/{id}(id=${act.persona})}"
+							style="color: inherit;"> <i class="fa-solid fa-angle-right"></i>
+						</a></td>
+						<td th:text="${act.nombre}"></td>
 						<td th:text="${act.personaje}"></td>
 					</tr>
 				</tbody>

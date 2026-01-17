@@ -46,8 +46,16 @@ public class PeliculaService {
 		return peliculaRepo.findAll();
 	}
 
+	/**
+	 * Return a film by its id
+	 * @param id
+	 * @return
+	 */
 	public Optional<Pelicula> findById(Integer id) {
-		return peliculaRepo.findById(id);
+		if(id!=null) {
+			return peliculaRepo.findById(id);
+		}
+		return Optional.empty();
 	}
 
 	@Transactional

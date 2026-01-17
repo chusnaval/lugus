@@ -46,4 +46,11 @@ public class ImdbTitleBasics {
 	@Column
 	private String[] genres;
 	
+	/**
+	 * Calculate if its a movie or another type
+	 * @return
+	 */
+	public boolean isAMovie() {
+		return "movie".equals(this.getTitletype()) || "tvMovie".equals(this.getTitletype());
+	}
 }

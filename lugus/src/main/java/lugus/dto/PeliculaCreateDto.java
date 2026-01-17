@@ -42,4 +42,8 @@ public class PeliculaCreateDto {
 	private Integer fuente;
 	
 	private String imdbCodigo;
+	
+	private Float lbRating;
+	
+	private boolean vista;
 }
