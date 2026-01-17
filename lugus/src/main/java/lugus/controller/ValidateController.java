@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lugus.model.films.Pelicula;
-import lugus.service.PeliculaService;
+import lugus.service.films.PeliculaService;
 
 @RestController 
 @RequestMapping("/validate")

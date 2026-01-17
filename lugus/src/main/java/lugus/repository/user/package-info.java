@@ -1,0 +1,1 @@
+package lugus.repository.user;

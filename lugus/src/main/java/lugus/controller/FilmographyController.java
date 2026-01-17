@@ -25,12 +25,12 @@ import lugus.model.people.Persona;
 import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.imdb.ImdbTitlePrincipals;
-import lugus.service.ImdbTitleAkasService;
-import lugus.service.ImdbTitleBasicsService;
-import lugus.service.ImdbTitlePrincipalsService;
-import lugus.service.PeliculaService;
-import lugus.service.PeliculasOtrosService;
-import lugus.service.PersonaService;
+import lugus.service.films.PeliculaService;
+import lugus.service.films.PeliculasOtrosService;
+import lugus.service.imdb.ImdbTitleAkasService;
+import lugus.service.imdb.ImdbTitleBasicsService;
+import lugus.service.imdb.ImdbTitlePrincipalsService;
+import lugus.service.people.PersonaService;
 
 @Controller
 @RequestMapping("/filmography")

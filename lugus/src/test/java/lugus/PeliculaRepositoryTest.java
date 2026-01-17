@@ -8,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import lugus.model.films.Pelicula;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
-import lugus.repository.PeliculaRepository;
+import lugus.repository.films.PeliculaRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

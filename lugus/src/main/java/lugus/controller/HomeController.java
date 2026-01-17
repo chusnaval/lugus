@@ -2,9 +2,9 @@ package lugus.controller;
 
 import lombok.RequiredArgsConstructor;
 import lugus.model.user.Usuario;
-import lugus.service.PeliculaService;
-import lugus.service.SerieService;
-import lugus.service.UsuarioService;
+import lugus.service.films.PeliculaService;
+import lugus.service.series.SerieService;
+import lugus.service.user.UsuarioService;
 
 import java.security.Principal;
 

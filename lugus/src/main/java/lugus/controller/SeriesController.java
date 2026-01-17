@@ -35,12 +35,12 @@ import lugus.model.series.SerieFoto;
 import lugus.model.user.Usuario;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
-import lugus.service.DwFotoService;
-import lugus.service.DwFotoServiceI;
-import lugus.service.FuenteService;
-import lugus.service.LocalizacionService;
-import lugus.service.SerieService;
-import lugus.service.UsuarioService;
+import lugus.service.core.FuenteService;
+import lugus.service.core.LocalizacionService;
+import lugus.service.films.DwFotoService;
+import lugus.service.films.DwFotoServiceI;
+import lugus.service.series.SerieService;
+import lugus.service.user.UsuarioService;
 
 @Controller
 @RequestMapping("/series")

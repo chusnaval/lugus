@@ -9,10 +9,10 @@ import lugus.dto.PeliculaChildDto;
 import lugus.model.films.Pelicula;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
-import lugus.repository.PeliculaRepository;
-import lugus.service.FuenteService;
-import lugus.service.LocalizacionService;
-import lugus.service.PeliculaService;
+import lugus.repository.films.PeliculaRepository;
+import lugus.service.core.FuenteService;
+import lugus.service.core.LocalizacionService;
+import lugus.service.films.PeliculaService;
 
 import java.io.IOException;
 import java.util.Optional;

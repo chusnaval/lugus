@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lugus.model.core.Fuente;
-import lugus.service.FuenteService;
+import lugus.service.core.FuenteService;
 @RestController 
 @RequestMapping("/fuentes")
 @RequiredArgsConstructor

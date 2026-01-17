@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lugus.model.inf.InfLocalizaciones;
-import lugus.service.InfLocalizacionesService;
-import lugus.service.UtlLocalizacionesService;
+import lugus.service.core.UtlLocalizacionesService;
+import lugus.service.inf.InfLocalizacionesService;
 
 @RestController
 @RequestMapping

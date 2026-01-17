@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.RequiredArgsConstructor;
 import lugus.model.imdb.ImdbDirectorFilm;
-import lugus.service.ImdbDirectorFilmService;
+import lugus.service.imdb.ImdbDirectorFilmService;
 
 @Controller
 @RequestMapping("/directors")
