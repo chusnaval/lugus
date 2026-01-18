@@ -30,7 +30,7 @@
 			<tr th:each="f : ${films}">
 
 				<td><a th:if="${f.pelicula!=null}"
-					th:href="@{'/peliculas/' + ${f.pelicula}}" style="color: inherit;"><i
+					th:href="@{'/peliculas/' + ${f.pelicula.id}}" style="color: inherit;"><i
 						th:class="${f.pelicula.comprado==true ? 
                  'fas fa-check-circle text-success col-1' : 
                  (f.pelicula!=null && f.pelicula.comprado==false ? 
@@ -40,7 +40,7 @@
 						th:attr="aria-disabled=${f.pelicula==null}" aria-hidden="true"></i>
 				</a> <a th:id="${'pet_' + f.itb.tconst}" th:if="${f.pelicula==null}"
 					data-bs-toggle="modal" data-bs-target="#confirmModal"
-					th:data-bs-whatever="${f.itb}" style="color: inherit;"><i
+					th:data-bs-whatever="${f.itb.tconst}" style="color: inherit;"><i
 						class="far fa-times-circle text-danger col-1 peticion"
 						aria-hidden="true"></i> </a></td>
 
