@@ -45,12 +45,12 @@
 		<ul class="pagination justify-content-center">
 			<li class="page-item"
 				th:classappend="${pageGroup.number == 0} ? 'disabled'"><a
-				th:replace="~{layout/paging :: paging(0, '<<', 'Primera Página')}"></a>
+				th:replace="~{layout/paging :: paging('/group/list?pagina=', 0, '<<', 'Primera Página')}"></a>
 			</li>
 
 			<li class="page-item font-weight-bold"
 				th:classappend="${pageGroup.number == 0} ? 'disabled'"><a
-				th:replace="~{layout/paging :: paging(${pageGroup.number - 1}, 'Anterior', 'Página Anterior')}"></a>
+				th:replace="~{layout/paging :: paging('/group/list?pagina=', ${pageGroup.number - 1}, 'Anterior', 'Página Anterior')}"></a>
 			</li>
 
 			<li class="page-item disabled" th:if="${pageGroup.number - 2 > 1}"><a
@@ -60,7 +60,7 @@
 				th:classappend="${page == pageGroup.number+1} ? 'active'"
 				th:each="page : ${#numbers.sequence(pageGroup.number > 2 ? pageGroup.number - 2 : 1, pageGroup.number + 2 < pageGroup.totalPages ? pageGroup.number + 2 : pageGroup.totalPages)}">
 				<a
-				th:replace="~{layout/paging :: paging(${page}-1, ${page}, 'Página ' + ${page})}"></a>
+				th:replace="~{layout/paging :: paging('/group/list?pagina=',${page}-1, ${page}, 'Página ' + ${page})}"></a>
 			</li>
 
 			<li class="page-item disabled"
@@ -69,12 +69,12 @@
 
 			<li class="page-item font-weight-bold"
 				th:classappend="${pageGroup.number == pageGroup.totalPages} ? 'disabled'"><a
-				th:replace="~{layout/paging :: paging(${pageGroup.number+1},'Siguiente', 'Página Siguiente')}"></a>
+				th:replace="~{layout/paging :: paging('/group/list?pagina=', ${pageGroup.number+1},'Siguiente', 'Página Siguiente')}"></a>
 			</li>
 
 			<li class="page-item"
 				th:classappend="${pageGroup.number == pageGroup.totalPages} ? 'disabled'"><a
-				th:replace="~{layout/paging :: paging(${pageGroup.totalPages}, '>>', 'Última Página')}"></a>
+				th:replace="~{layout/paging :: paging('/group/list?pagina=', ${pageGroup.totalPages}, '>>', 'Última Página')}"></a>
 			</li>
 
 		</ul>

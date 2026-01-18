@@ -78,12 +78,12 @@
 		<ul class="pagination justify-content-center">
 			<li class="page-item"
 				th:classappend="${pagePeliculas.number == 0} ? 'disabled'"><a
-				th:replace="~{layout/paging :: paging(0, '<<', 'Primera Página')}"></a>
+				th:replace="~{layout/paging :: paging('/peliculas?recuperar=true&pagina=', 0, '<<', 'Primera Página')}"></a>
 			</li>
 
 			<li class="page-item font-weight-bold"
 				th:classappend="${pagePeliculas.number == 0} ? 'disabled'"><a
-				th:replace="~{layout/paging :: paging(${pagePeliculas.number - 1}, 'Anterior', 'Página Anterior')}"></a>
+				th:replace="~{layout/paging :: paging('/peliculas?recuperar=true&pagina=', ${pagePeliculas.number - 1}, 'Anterior', 'Página Anterior')}"></a>
 			</li>
 
 			<li class="page-item disabled"
@@ -94,7 +94,7 @@
 				th:classappend="${page == pagePeliculas.number+1} ? 'active'"
 				th:each="page : ${#numbers.sequence(pagePeliculas.number > 2 ? pagePeliculas.number - 2 : 1, pagePeliculas.number + 2 < pagePeliculas.totalPages ? pagePeliculas.number + 2 : pagePeliculas.totalPages)}">
 				<a
-				th:replace="~{layout/paging :: paging(${page}-1, ${page}, 'Página ' + ${page})}"></a>
+				th:replace="~{layout/paging :: paging('/peliculas?recuperar=true&pagina=', ${page}-1, ${page}, 'Página ' + ${page})}"></a>
 			</li>
 
 			<li class="page-item disabled"
@@ -103,12 +103,12 @@
 
 			<li class="page-item font-weight-bold"
 				th:classappend="${pagePeliculas.number == pagePeliculas.totalPages} ? 'disabled'"><a
-				th:replace="~{layout/paging :: paging(${pagePeliculas.number+1},'Siguiente', 'Página Siguiente')}"></a>
+				th:replace="~{layout/paging :: paging('/peliculas?recuperar=true&pagina=', ${pagePeliculas.number+1},'Siguiente', 'Página Siguiente')}"></a>
 			</li>
 
 			<li class="page-item"
 				th:classappend="${pagePeliculas.number == pagePeliculas.totalPages} ? 'disabled'"><a
-				th:replace="~{layout/paging :: paging(${pagePeliculas.totalPages}, '>>', 'Última Página')}"></a>
+				th:replace="~{layout/paging :: paging('/peliculas?recuperar=true&pagina=', ${pagePeliculas.totalPages}, '>>', 'Última Página')}"></a>
 			</li>
 
 		</ul>

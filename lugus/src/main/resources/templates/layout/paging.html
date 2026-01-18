@@ -8,8 +8,8 @@
 </head>
 
 <body>
-	<a th:fragment="paging(pagina, label, tooltip)" class="page-link"
-		th:href="@{'/peliculas?recuperar=true&pagina=' + *{pagina}   
+	<a th:fragment="paging(action, pagina, label, tooltip)" class="page-link"
+		th:href="@{*{action} + *{pagina}   
                 + '&orden=' + *{orden} + '&direccion=' + *{direccion}}"
 		th:title="${tooltip}" rel="tooltip"> [[${label}]] </a>
 </body>
