@@ -56,7 +56,7 @@
 				aria-hidden="true"></i><strong class="col-3">Comprado:</strong><i
 				th:class="${pelicula.comprado == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
 				aria-hidden="true"></i> <strong class="col-3">Visto:</strong><i
-				th:class="${pelicula.otros.vista == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
+				th:class="${pelicula.otros!= null && pelicula.otros.vista == true? 'fas fa-check-circle text-success col-1' : 'far fa-times-circle text-danger col-1'}"
 				aria-hidden="true"></i></li>
 				
 			<li class="list-group-item row">

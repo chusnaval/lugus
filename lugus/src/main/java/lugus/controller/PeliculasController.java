@@ -378,12 +378,19 @@ public class PeliculasController {
 		nuevo.setComprado(p.isComprado());
 		nuevo.setSteelbook(p.isSteelbook());
 		nuevo.setPack(p.isPack());
-		nuevo.setVista(p.getOtros().getVista());
-		nuevo.setLbRating(p.getOtros().getLbRating());
 		nuevo.setNotas(p.getNotas());
+		
+		if(p.getOtros() != null) {
+			nuevo.setVista(p.getOtros().getVista());
+			nuevo.setLbRating(p.getOtros().getLbRating());
+		}else {
+			nuevo.setVista(false);
+		}
 
 		if (p.getLocalizacion() != null) {
 			nuevo.setLocalizacionCodigo(p.getLocalizacion().getCodigo());
+		}else {
+			nuevo.setLocalizacionCodigo("");
 		}
 
 		model.addAttribute("nuevo", nuevo);
