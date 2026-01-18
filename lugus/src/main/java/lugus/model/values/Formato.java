@@ -41,6 +41,7 @@ public enum Formato {
 		lista.add(DVD);
 		lista.add(BLURAY);
 		lista.add(ULTRAHD);
+		lista.add(DIGITAL);
 		lista.add(VHS);
 		return lista;
 	}
