@@ -26,7 +26,6 @@ import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
-import lugus.repository.films.PeliculaSpecification;
 import lugus.repository.series.SerieRepository;
 import lugus.repository.series.SerieSpecification;
 import lugus.service.core.FuenteService;

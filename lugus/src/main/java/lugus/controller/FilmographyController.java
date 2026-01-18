@@ -77,14 +77,14 @@ public class FilmographyController {
 	}
 
 	private Filmography buildNewFilmography(Persona person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb) {
-		Filmography film = new Filmography();
-		film.setId(person.getId());
-		film.setNconst(person.getNconst());
-		film.setCategory(itp.getId().getCategory());
-		film.setStartyear(Integer.parseInt(itb.get().getStartyear()));
-		film.setTconst(itp.getId().getTconst());
-
+		
+		Optional<ImdbTitleAkas> ita = imdbTitleAkasService.findByTitleId(itp.getId().getTconst());
 		boolean isFilmRegister = peliculasOtrosService.isFilmRegistered(itp.getId().getTconst());
+		
+		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
+				.category(itp.getId().getCategory()).tconst(itp.getId().getTconst())
+				.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
+
 		if (isFilmRegister) {
 			film.setPeliculaId(peliculasOtrosService.getIdFilm(itp.getId().getTconst()));
 			Optional<Pelicula> pel = peliculaService.findById(film.getPeliculaId());
@@ -92,12 +92,9 @@ public class FilmographyController {
 			film.setBuscado(!film.isComprado());
 		}
 
-		Optional<ImdbTitleAkas> ita = imdbTitleAkasService.findByTitleId(itp.getId().getTconst());
-		film.setTitle(getTitle(ita, itb));
 
 		return film;
 	}
-
 
 	private String getTitle(Optional<ImdbTitleAkas> ita, Optional<ImdbTitleBasics> itb) {
 		if (ita.isPresent()) {
