@@ -16,6 +16,7 @@ import lugus.model.core.Localizacion;
 import lugus.model.core.TiposUbicacion;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
+import lugus.model.groups.GroupFilms;
 import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.people.Actor;
@@ -29,6 +30,7 @@ import lugus.service.core.TiposUbicacionService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
 import lugus.service.films.PeliculaService;
+import lugus.service.groups.GroupFilmsService;
 import lugus.service.imdb.ImdbTitleAkasService;
 import lugus.service.imdb.ImdbTitleBasicsService;
 import lugus.service.people.ActorService;
@@ -85,6 +87,8 @@ public class PeliculasController {
 	private final ImdbTitleBasicsService imdbTitleBasicsService;
 
 	private final ImdbTitleAkasService imdbTitleAkasService;
+	
+	private final GroupFilmsService groupFilmsService;
 	/*
 	 * ------------------------------------------------- LISTADO DE PELÍCULAS GET
 	 * /peliculas -------------------------------------------------
@@ -273,6 +277,9 @@ public class PeliculasController {
 		boolean exists = Files.exists(videoPath) && Files.isRegularFile(videoPath);
 		model.addAttribute("hasTrailer", exists);
 
+		List<GroupFilms> grupos = groupFilmsService.findByPelicula(id);
+		model.addAttribute("grupos", grupos);
+		
 		return "peliculas/detail";
 	}
 

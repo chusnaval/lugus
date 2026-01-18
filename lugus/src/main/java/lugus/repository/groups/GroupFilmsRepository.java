@@ -10,4 +10,6 @@ public interface GroupFilmsRepository extends JpaRepository<GroupFilms, Integer>
 
 	List<GroupFilms> findAllByGroupIdOrderByOrden(Integer id);
 
+	List<GroupFilms> findAllByPeliculaIdOrderByGroupName(Integer id);
+
 }

@@ -18,5 +18,9 @@ GroupFilmsService {
 	public List<GroupFilms> findByGroup(Integer id) {
 		return groupFilmsRepository.findAllByGroupIdOrderByOrden(id);
 	}
+	
+	public List<GroupFilms> findByPelicula(Integer id) {
+		return groupFilmsRepository.findAllByPeliculaIdOrderByGroupName(id);
+	}
 
 }
