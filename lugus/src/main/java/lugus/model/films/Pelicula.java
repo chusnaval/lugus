@@ -31,6 +31,7 @@ import lombok.ToString;
 import lugus.converter.FormatoConverter;
 import lugus.converter.GeneroConverter;
 import lugus.model.core.Localizacion;
+import lugus.model.groups.GroupFilms;
 import lugus.model.people.Actor;
 import lugus.model.people.Director;
 import lugus.model.people.PeliculasPersonal;

@@ -1,4 +1,4 @@
-package lugus.model.films;
+package lugus.model.groups;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lugus.model.films.Pelicula;
+import lugus.model.imdb.ImdbTitleBasics;
 
 @Entity
 @Table(name = "grupos_peliculas")
@@ -32,8 +34,11 @@ public class GroupFilms {
 	private Pelicula pelicula;
 	
 	@Column(nullable = false)
-	private int order;
+	private int orden;
 	
-	@Column(nullable = false, name = "imdb_id")
-	private String imdbId;
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(nullable = false, name = "imdb_id")
+	private ImdbTitleBasics itb;
+	
+	
 }

@@ -1,4 +1,4 @@
-package lugus.model.films;
+package lugus.model.groups;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -19,4 +19,6 @@ public class Group {
 	private int id;
 	
 	private String name;
+	
+	private transient boolean hasFilms = false;
 }
