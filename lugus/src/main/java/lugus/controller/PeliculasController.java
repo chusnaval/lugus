@@ -380,6 +380,7 @@ public class PeliculasController {
 		nuevo.setPack(p.isPack());
 		nuevo.setVista(p.getOtros().getVista());
 		nuevo.setLbRating(p.getOtros().getLbRating());
+		nuevo.setNotas(p.getNotas());
 
 		if (p.getLocalizacion() != null) {
 			nuevo.setLocalizacionCodigo(p.getLocalizacion().getCodigo());
