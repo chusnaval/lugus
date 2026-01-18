@@ -30,10 +30,11 @@
 			<div th:each="p, iStat : ${pageGroup.content}" id="tabla-peliculas"
 				class="film col-12 col-sm-6 col-md-3 col-lg-2 card-bg card-borde ms-1">
 				<a th:href="@{/group/{id}(id=${p.id})}"
-					th:classappend="${p.hasFilms==false} ? 'link-disabled'"
 					th:attr="aria-disabled=${p.hasFilms==false}" aria-hidden="true"
 					class="text-decoration-none d-block custom-card-link fixed-height">
-					<h5 class="title fw-bold mb-2" th:text="${p.name}"></h5>
+					<h5 class="title fw-bold mb-2"
+						th:classappend="${p.hasFilms==false} ? 'letra-gris'"
+						th:text="${p.name}"></h5>
 				</a>
 			</div>
 		</div>

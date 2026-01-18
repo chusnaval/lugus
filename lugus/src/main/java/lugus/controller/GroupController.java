@@ -39,10 +39,14 @@ public class GroupController {
 			throws PermisoException {
 
 		Optional<Group> group = groupsService.findById(id);
-		List<GroupFilms> films = groupFilmsService.findByGroup(id);
-		
 		model.addAttribute("group", group.get());
+		
+		List<GroupFilms> films = groupFilmsService.findByGroup(id);
 		model.addAttribute("films", films);
+		
+		// admin rigth
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		model.addAttribute("admin", usuario.isAdmin());
 		
 		return "groups/detail";
 	}

@@ -25,6 +25,10 @@
 	background: #d0ebff;
 }
 
+.letra-gris {
+	color: #696969;
+}
+
 #floatBtn {
 	position: fixed; /* Fixed/sticky position */
 	bottom: 20px; /* Place the button at the bottom of the page */
