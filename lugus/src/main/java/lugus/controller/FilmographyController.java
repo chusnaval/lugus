@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import lugus.PermisoException;
 import lugus.model.people.Filmography;
+import lugus.exception.PermisoException;
 import lugus.model.films.Pelicula;
 import lugus.model.people.Persona;
 import lugus.model.imdb.ImdbTitleAkas;

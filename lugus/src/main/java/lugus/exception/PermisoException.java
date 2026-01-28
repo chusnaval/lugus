@@ -1,4 +1,4 @@
-package lugus;
+package lugus.exception;
 
 public class PermisoException extends Exception {
 

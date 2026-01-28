@@ -29,7 +29,6 @@ import lugus.model.films.PeliculaFoto;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Fuente {
 
 

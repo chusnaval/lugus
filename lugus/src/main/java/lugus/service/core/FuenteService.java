@@ -13,17 +13,25 @@ import lugus.repository.core.FuenteRepository;
 @RequiredArgsConstructor
 public class FuenteService {
 
-	private final FuenteRepository fuenteRepository;
+	private final FuenteRepository repository;
 
 	public Optional<Fuente> findById(Integer id) {
-		return fuenteRepository.findById(id);
+		return repository.findById(id);
 	}
 
 	public List<Fuente> findAll() {
-		return fuenteRepository.findAll();
+		return repository.findAll();
 	}
 
 	public List<Fuente> findBySuggestIsNotNull() {
-		return fuenteRepository.findBySuggestIsNotNull();
+		return repository.findBySuggestIsNotNull();
+	}
+
+	public Fuente save(Fuente source) {
+		return repository.save(source);
+	}
+
+	public void deleteById(Integer id) {
+		repository.deleteById(id);
 	}
 }

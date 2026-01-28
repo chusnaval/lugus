@@ -40,6 +40,12 @@ public class GroupFilms {
 	@JoinColumn(nullable = false, name = "imdb_id")
 	private ImdbTitleBasics itb;
 
+	/**
+	 * We prefer the usual stored title film
+	 * but  in another case we choose original title in IMDB
+	 * 
+	 * @return
+	 */
 	public String getTitle() {
 		String titulo = "";
 		if (pelicula != null) {
