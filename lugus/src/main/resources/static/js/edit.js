@@ -172,8 +172,8 @@ personModal.addEventListener('hide.bs.modal', () => {
 });
 
 
-const lfuentes = async function() {
-	const res = await fetch('/lugus/fuentes', {
+const lsources = async function() {
+	const res = await fetch('/lugus/v1/api/sources/suggested', {
 		method: 'GET',
 		credentials: 'same-origin'
 	});
@@ -183,27 +183,27 @@ const lfuentes = async function() {
 	return res.json();
 }
 
-var valFuentes;
-const ejecutarFuentes = async function() {
-	valFuentes = await lfuentes();
+var valSources;
+const execSources = async function() {
+	valSources = await lsources();
 }();
 
-const fuenteSelect = document.getElementById("fuente");
+const sourceSelect = document.getElementById("source");
 
-function calculateFuente(event) {
+function calculateSource(event) {
 	const valor = event.target.value;
 
-	const coincidencia = valFuentes.find(fuente =>
+	const coincidencia = valSources.find(source =>
 		// Si el suggest está contenido en el texto del input
-		valor.includes(fuente.suggest.toLowerCase())
+		valor.includes(source.suggest.toLowerCase())
 	);
 
 	if (coincidencia) {
-		fuenteSelect.value = coincidencia.id;
+		sourceSelect.value = coincidencia.id;
 	}
 }
 const urlInput = document.getElementById('url');
-urlInput.addEventListener('input', calculateFuente);
+urlInput.addEventListener('input', calculateSource);
 
 
 

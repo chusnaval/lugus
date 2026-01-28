@@ -16,5 +16,5 @@ public class NewCaratulaDTO {
 	private String url;
 
 	
-	private int fuente;
+	private int source;
 }

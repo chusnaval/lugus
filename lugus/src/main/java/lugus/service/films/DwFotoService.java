@@ -8,7 +8,7 @@ import java.net.URL;
 public class DwFotoService implements DwFotoServiceI {
 
 	@Override
-	public byte[] descargar(Integer fuente, String url) throws IOException {
+	public byte[] descargar(Integer source, String url) throws IOException {
 		URL imgUrl = new URL(url);
 		try (InputStream in = imgUrl.openStream(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 

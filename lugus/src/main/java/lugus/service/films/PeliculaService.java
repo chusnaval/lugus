@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lugus.dto.FiltrosDto;
 import lugus.dto.PeliculaChildDto;
 import lugus.dto.PeliculaCreateDto;
-import lugus.model.core.Fuente;
+import lugus.model.core.Source;
 import lugus.model.core.Localizacion;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
@@ -12,7 +12,7 @@ import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.repository.films.PeliculaRepository;
 import lugus.repository.films.PeliculaSpecification;
-import lugus.service.core.FuenteService;
+import lugus.service.core.SourceService;
 import lugus.service.core.LocalizacionService;
 
 import org.springframework.data.domain.Page;
@@ -42,7 +42,7 @@ public class PeliculaService {
 	private static final int NUM_ELEMENTS_PER_PAGE = 30;
 	private final PeliculaRepository peliculaRepo;
 	private final LocalizacionService locService;
-	private final FuenteService fuenteService;
+	private final SourceService sourceService;
 
 	public List<Pelicula> findAll() {
 		return peliculaRepo.findAll();
@@ -78,11 +78,11 @@ public class PeliculaService {
 
 		if (dto.getUrl() != null && !dto.getUrl().isEmpty()) {
 			final DwFotoServiceI dwFotoService = new DwFotoService();
-			Optional<Fuente> fuenteObj = fuenteService.findById(dto.getFuente());
+			Optional<Source> sourceObj = sourceService.findById(dto.getSource());
 			PeliculaFoto pf = new PeliculaFoto();
 			pf.setUrl(dto.getUrl());
-			pf.setFuente(fuenteObj.get());
-			pf.setFoto(dwFotoService.descargar(dto.getFuente(), dto.getUrl()));
+			pf.setSource(sourceObj.get());
+			pf.setFoto(dwFotoService.descargar(dto.getSource(), dto.getUrl()));
 			pf.setCaratula(true);
 
 			saved.addCaratula(pf);

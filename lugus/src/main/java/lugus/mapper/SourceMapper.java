@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lugus.dto.core.SourceDTO;
-import lugus.model.core.Fuente;
+import lugus.model.core.Source;
 
 @Component
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class SourceMapper {
 
-	public SourceDTO mapToDTO(Fuente source) {
+	public SourceDTO mapToDTO(Source source) {
 		SourceDTO dto = new SourceDTO();
 		dto.setId(source.getId());
 		dto.setDescription(source.getDescripcion());
@@ -21,8 +21,8 @@ public class SourceMapper {
 		
 	}
 
-	public Fuente mapToEntity(SourceDTO dto) {
-		Fuente source = new Fuente();
+	public Source mapToEntity(SourceDTO dto) {
+		Source source = new Source();
 		source.setId(dto.getId());
 		source.setDescripcion(dto.getDescription());
 		source.setSuggest(dto.getSuggest());

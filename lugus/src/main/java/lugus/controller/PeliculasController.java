@@ -11,7 +11,7 @@ import lugus.dto.NewCaratulaDTO;
 import lugus.dto.PeliculaChildDto;
 import lugus.dto.PeliculaCreateDto;
 import lugus.exception.PermisoException;
-import lugus.model.core.Fuente;
+import lugus.model.core.Source;
 import lugus.model.core.Localizacion;
 import lugus.model.core.TiposUbicacion;
 import lugus.model.films.Pelicula;
@@ -24,7 +24,7 @@ import lugus.model.people.Director;
 import lugus.model.user.Usuario;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
-import lugus.service.core.FuenteService;
+import lugus.service.core.SourceService;
 import lugus.service.core.LocalizacionService;
 import lugus.service.core.TiposUbicacionService;
 import lugus.service.films.DwFotoService;
@@ -70,7 +70,7 @@ public class PeliculasController {
 
 	private final LocalizacionService locService;
 
-	private final FuenteService fuenteService;
+	private final SourceService sourceService;
 
 	private final DirectorService directorService;
 
@@ -166,8 +166,8 @@ public class PeliculasController {
 		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
 		model.addAttribute("localizaciones", localizaciones);
 
-		List<Fuente> fuentes = fuenteService.findAll();
-		model.addAttribute("fuentesList", fuentes);
+		List<Source> sources = sourceService.findAll();
+		model.addAttribute("sourcesList", sources);
 
 		model.addAttribute("pelicula", new PeliculaCreateDto());
 
@@ -183,8 +183,8 @@ public class PeliculasController {
 			throw new PermisoException("No tiene permisos");
 		}
 
-		List<Fuente> fuentes = fuenteService.findAll();
-		model.addAttribute("fuentesList", fuentes);
+		List<Source> sources = sourceService.findAll();
+		model.addAttribute("sourcesList", sources);
 		PeliculaCreateDto dto = new PeliculaCreateDto();
 		dto.setImdbCodigo(id);
 
@@ -227,8 +227,8 @@ public class PeliculasController {
 			List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
 			model.addAttribute("localizaciones", localizaciones);
 
-			List<Fuente> fuentes = fuenteService.findAll();
-			model.addAttribute("fuentesList", fuentes);
+			List<Source> sources = sourceService.findAll();
+			model.addAttribute("sourcesList", sources);
 			// Si hay errores de validación, volvemos al mismo formulario
 			return "peliculas/new";
 		}
@@ -364,8 +364,8 @@ public class PeliculasController {
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 		model.addAttribute("pelicula", p);
 
-		List<Fuente> fuentes = fuenteService.findAll();
-		model.addAttribute("fuentesList", fuentes);
+		List<Source> sources = sourceService.findAll();
+		model.addAttribute("sourcesList", sources);
 
 		Optional<TiposUbicacion> tipoUbicacion = tiposUbicacionService.findById(p.getFormato().getIdParaUbicaciones());
 		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion(tipoUbicacion.get());
@@ -479,11 +479,11 @@ public class PeliculasController {
 		}
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
-		Optional<Fuente> fuenteObj = fuenteService.findById(dto.getFuente());
+		Optional<Source> sourceObj = sourceService.findById(dto.getSource());
 		PeliculaFoto pf = new PeliculaFoto();
 		pf.setUrl(dto.getUrl());
-		pf.setFuente(fuenteObj.get());
-		pf.setFoto(dwFotoService.descargar(dto.getFuente(), dto.getUrl()));
+		pf.setSource(sourceObj.get());
+		pf.setFoto(dwFotoService.descargar(dto.getSource(), dto.getUrl()));
 		pf.setCaratula(true);
 
 		Optional<Pelicula> pelicula = service.findById(id);

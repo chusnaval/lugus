@@ -28,14 +28,14 @@ import lugus.dto.FiltrosDto;
 import lugus.dto.NewCaratulaDTO;
 import lugus.dto.SerieCreateDto;
 import lugus.exception.PermisoException;
-import lugus.model.core.Fuente;
+import lugus.model.core.Source;
 import lugus.model.core.Localizacion;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
 import lugus.model.user.Usuario;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
-import lugus.service.core.FuenteService;
+import lugus.service.core.SourceService;
 import lugus.service.core.LocalizacionService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
@@ -53,7 +53,7 @@ public class SeriesController {
 
 	private final UsuarioService usuarioService;
 
-	private final FuenteService fuenteService;
+	private final SourceService sourceService;
 	
 	@GetMapping
 	public String listPaginado(Model model, Principal principal, HttpSession session,
@@ -109,8 +109,8 @@ public class SeriesController {
 		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
 		model.addAttribute("localizaciones", localizaciones);
 
-		List<Fuente> fuentes = fuenteService.findAll();
-		model.addAttribute("fuentesList", fuentes);
+		List<Source> sources = sourceService.findAll();
+		model.addAttribute("sourcesList", sources);
 
 		model.addAttribute("serie", new SerieCreateDto());
 		
@@ -188,8 +188,8 @@ public class SeriesController {
 		Serie p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Serie no encontrada"));
 		model.addAttribute("serie", p);
 
-		List<Fuente> fuentes = fuenteService.findAll();
-		model.addAttribute("fuentesList", fuentes);
+		List<Source> sources = sourceService.findAll();
+		model.addAttribute("sourcesList", sources);
 
 		List<Localizacion> localizaciones = locService.findAll();
 		model.addAttribute("localizaciones", localizaciones);
@@ -269,11 +269,11 @@ public class SeriesController {
 		}
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
-		Optional<Fuente> fuenteObj = fuenteService.findById(dto.getFuente());
+		Optional<Source> sourceObj = sourceService.findById(dto.getSource());
 		SerieFoto pf = new SerieFoto();
 		pf.setUrl(dto.getUrl());
-		pf.setFuente(fuenteObj.get());
-		pf.setFoto(dwFotoService.descargar(dto.getFuente(), dto.getUrl()));
+		pf.setSource(sourceObj.get());
+		pf.setFoto(dwFotoService.descargar(dto.getSource(), dto.getUrl()));
 		pf.setCaratula(true);
 
 		Optional<Serie> serie = service.findById(id);

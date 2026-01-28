@@ -10,7 +10,7 @@ import lugus.model.films.Pelicula;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.repository.films.PeliculaRepository;
-import lugus.service.core.FuenteService;
+import lugus.service.core.SourceService;
 import lugus.service.core.LocalizacionService;
 import lugus.service.films.PeliculaService;
 
@@ -24,13 +24,13 @@ class PeliculaServiceTest {
 
     private PeliculaRepository repo;
 	private LocalizacionService locService;
-	private FuenteService fuenteService;
+	private SourceService sourceService;
     private PeliculaService service;
 
     @BeforeEach
     void setUp() {
         repo = mock(PeliculaRepository.class);
-        service = new PeliculaService(repo, locService, fuenteService);
+        service = new PeliculaService(repo, locService, sourceService);
     }
 
     @Test

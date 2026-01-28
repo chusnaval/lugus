@@ -147,8 +147,8 @@
 				<input class="form-control" th:field="*{url}" placeholder="url" />
 			</div>
 			<div class="col-md-2">
-				<select class="form-select" th:field="*{fuente}">
-					<option th:each="f : ${fuentesList}" th:value="${f.id}"
+				<select class="form-select" th:field="*{source}">
+					<option th:each="f : ${sourcesList}" th:value="${f.id}"
 						th:text="${f.descripcion}"></option>
 				</select>
 			</div>

@@ -3,9 +3,6 @@ package lugus.model.core;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,7 +26,7 @@ import lugus.model.films.PeliculaFoto;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Fuente {
+public class Source {
 
 
 	@Id
@@ -42,8 +39,7 @@ public class Fuente {
 	@Column(name="suggest")
 	private String suggest;
 	
-	@JsonIgnore
-	@OneToMany(mappedBy = "fuente")
+	@OneToMany(mappedBy = "source")
 	@ToString.Exclude
 	private final Set<PeliculaFoto> peliculaFotos = new HashSet<>();
 }

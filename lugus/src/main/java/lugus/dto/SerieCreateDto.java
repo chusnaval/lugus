@@ -43,5 +43,5 @@ public class SerieCreateDto {
 
 	private String url;
 
-	private Integer fuente;
+	private Integer source;
 }

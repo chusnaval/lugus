@@ -39,7 +39,7 @@ public class PeliculaCreateDto {
 	
 	private String url;
 	
-	private Integer fuente;
+	private Integer source;
 	
 	private String imdbCodigo;
 	

@@ -6,28 +6,28 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.core.Fuente;
-import lugus.repository.core.FuenteRepository;
+import lugus.model.core.Source;
+import lugus.repository.core.SourceRepository;
 
 @Service
 @RequiredArgsConstructor
-public class FuenteService {
+public class SourceService {
 
-	private final FuenteRepository repository;
+	private final SourceRepository repository;
 
-	public Optional<Fuente> findById(Integer id) {
+	public Optional<Source> findById(Integer id) {
 		return repository.findById(id);
 	}
 
-	public List<Fuente> findAll() {
+	public List<Source> findAll() {
 		return repository.findAll();
 	}
 
-	public List<Fuente> findBySuggestIsNotNull() {
+	public List<Source> findBySuggestIsNotNull() {
 		return repository.findBySuggestIsNotNull();
 	}
 
-	public Fuente save(Fuente source) {
+	public Source save(Source source) {
 		return repository.save(source);
 	}
 

@@ -4,6 +4,6 @@ import java.io.IOException;
 
 public interface DwFotoServiceI {
 
-	byte[] descargar(Integer fuente, String url) throws IOException;
+	byte[] descargar(Integer source, String url) throws IOException;
 
 }

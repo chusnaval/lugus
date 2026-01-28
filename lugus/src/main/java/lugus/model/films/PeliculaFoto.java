@@ -18,7 +18,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lugus.model.core.Fuente;
+import lugus.model.core.Source;
 
 @Entity
 @Table(name = "peliculas_fotos")
@@ -43,7 +43,7 @@ public class PeliculaFoto {
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "fuente_id", nullable = true) // FK → peliculaFotos.codigo
-	private Fuente fuente;
+	private Source source;
 	
     @Column
 	private byte[] foto;
