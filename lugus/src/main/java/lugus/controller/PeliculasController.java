@@ -13,7 +13,7 @@ import lugus.dto.PeliculaCreateDto;
 import lugus.exception.PermisoException;
 import lugus.model.core.Source;
 import lugus.model.core.Location;
-import lugus.model.core.TiposUbicacion;
+import lugus.model.core.LocationType;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
 import lugus.model.groups.GroupFilms;
@@ -26,7 +26,7 @@ import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.service.core.SourceService;
 import lugus.service.core.LocationService;
-import lugus.service.core.TiposUbicacionService;
+import lugus.service.core.LocationTypeService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
 import lugus.service.films.PeliculaService;
@@ -80,7 +80,7 @@ public class PeliculasController {
 
 	private final InsertPersonalDataService insertImdbService;
 
-	private final TiposUbicacionService tiposUbicacionService;
+	private final LocationTypeService locationTypeService;
 
 	private final StorageProperties storageProperties;
 
@@ -367,8 +367,8 @@ public class PeliculasController {
 		List<Source> sources = sourceService.findAll();
 		model.addAttribute("sourcesList", sources);
 
-		Optional<TiposUbicacion> tipoUbicacion = tiposUbicacionService.findById(p.getFormato().getIdParaUbicaciones());
-		List<Location> locations = locService.findAllOrderByDescripcion(tipoUbicacion.get());
+		Optional<LocationType> locationType = locationTypeService.findById(p.getFormato().getIdParaUbicaciones());
+		List<Location> locations = locService.findAllOrderByDescripcion(locationType.get());
 		model.addAttribute("locations", locations);
 
 		model.addAttribute("caratula", new NewCaratulaDTO());

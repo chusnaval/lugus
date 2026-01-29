@@ -21,7 +21,7 @@ import lombok.ToString;
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
-public class TiposUbicacion {
+public class LocationType {
 	
 	@Id
 	@NotBlank  
@@ -30,7 +30,7 @@ public class TiposUbicacion {
 	@Column
 	private String description;
 	
-	@OneToMany(mappedBy = "tiposUbicacion")
+	@OneToMany(mappedBy = "locationType")
 	@ToString.Exclude
 	private final Set<Location> locations = new HashSet<>();
 
@@ -38,7 +38,7 @@ public class TiposUbicacion {
 	 * 
 	 * @param id
 	 */
-	public TiposUbicacion(@NotBlank int id) {
+	public LocationType(@NotBlank int id) {
 		super();
 		this.id = id;
 	}

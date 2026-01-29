@@ -40,5 +40,5 @@ public class Location {
 	
 	@ManyToOne
 	@JoinColumn(name = "ubicacion_tipo_cod")
-	private TiposUbicacion tiposUbicacion;
+	private LocationType locationType;
 }

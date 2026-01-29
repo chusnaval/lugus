@@ -23,7 +23,7 @@ import lugus.service.core.LocationService;
 @RestController
 @RequestMapping("/v1/api/locations")
 @RequiredArgsConstructor
-public class LocationApiSource {
+public class LocationApiController {
 
 	private final LocationService service;
 
@@ -36,9 +36,9 @@ public class LocationApiSource {
 	}
 
 	@PostMapping
-	LocationDTO newSource(@RequestBody LocationDTO dto) {
-		Location source = service.save(mapper.mapToEntity(dto));
-		return mapper.mapToDTO(source);
+	LocationDTO newLocation(@RequestBody LocationDTO dto) {
+		Location location = service.save(mapper.mapToEntity(dto));
+		return mapper.mapToDTO(location);
 	}
 
 	@GetMapping("/{id}")
@@ -49,9 +49,9 @@ public class LocationApiSource {
 
 	@PutMapping("/{id}")
 	LocationDTO replaceEmployee(@RequestBody LocationDTO newSource, @PathVariable String id) {
-		Optional<Location> source = service.findById(id);
-		if (source.isPresent()) {
-			Location obj = source.get();
+		Optional<Location> location = service.findById(id);
+		if (location.isPresent()) {
+			Location obj = location.get();
 			obj.setDescripcion(newSource.getDescripcion());
 			obj = service.save(obj);
 

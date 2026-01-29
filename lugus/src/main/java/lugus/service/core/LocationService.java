@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lugus.model.core.Location;
-import lugus.model.core.TiposUbicacion;
+import lugus.model.core.LocationType;
 import lugus.repository.core.LocationRepository;
 
 @Service
@@ -25,8 +25,8 @@ public class LocationService {
 		return locRepo.findById(id);
 	}
 
-	public List<Location> findAllOrderByDescripcion(TiposUbicacion tipoUbicacion) {
-		return locRepo.findAllByTiposUbicacion(tipoUbicacion, Sort.by("descripcion").ascending());
+	public List<Location> findAllOrderByDescripcion(LocationType locationType) {
+		return locRepo.findAllByLocationType(locationType, Sort.by("descripcion").ascending());
 	}
 
 	public List<Location> findAllOrderByDescripcion() {

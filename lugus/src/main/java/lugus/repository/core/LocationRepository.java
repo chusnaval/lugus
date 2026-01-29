@@ -6,12 +6,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import lugus.model.core.Location;
-import lugus.model.core.TiposUbicacion;
+import lugus.model.core.LocationType;
 
 public interface LocationRepository extends JpaRepository<Location, String> {
 
 	List<Location> findAll();
 
-	List<Location> findAllByTiposUbicacion(TiposUbicacion tipoObj, Sort sort);
+	List<Location> findAllByLocationType(LocationType tipoObj, Sort sort);
 
 }
