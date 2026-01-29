@@ -33,4 +33,12 @@ public class LocationService {
 		return locRepo.findAll(Sort.by("descripcion").ascending());
 	}
 
+	public Location save(Location loc) {
+		return locRepo.save(loc);
+	}
+
+	public void deleteById(String id) {
+		locRepo.deleteById(id);
+	}
+
 }
