@@ -32,7 +32,7 @@ public class TiposUbicacion {
 	
 	@OneToMany(mappedBy = "tiposUbicacion")
 	@ToString.Exclude
-	private final Set<Localizacion> localizaciones = new HashSet<>();
+	private final Set<Location> locations = new HashSet<>();
 
 	/**
 	 * 

@@ -38,7 +38,7 @@ public class PeliculaFoto {
 	private String url;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "pelicula_id", nullable = true) // FK → localizaciones.codigo
+	@JoinColumn(name = "pelicula_id", nullable = true) // FK → locations.code
 	private Pelicula pelicula;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)

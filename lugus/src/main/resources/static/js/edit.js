@@ -230,18 +230,18 @@ const lposlocals = async function(pCodigo, pGenero, pFormato, pFunda, pSteelbook
 	return res.json();
 }
 
-var valPosLocalizaciones;
-const ejecutarPosLocalizaciones = async function() {
+var valPosLocations;
+const ejecutarPosLocations = async function() {
 	const codigo = document.getElementById("codigo");
 	const genero = document.getElementById("generoCodigo");
 	const formato = document.getElementById("formatoCodigo");
 	const funda = document.getElementById("funda1");
 	const steelbook = document.getElementById("steelbook1");
-	valPosLocalizaciones = await lposlocals(codigo.value, genero.value, parseInt(formato.value), funda.checked, steelbook.checked);
+	valPosLocations = await lposlocals(codigo.value, genero.value, parseInt(formato.value), funda.checked, steelbook.checked);
 	
 	
 }().then(function (){
-	$('#ubicAlert')[0].innerHTML = valPosLocalizaciones.resultado;
+	$('#ubicAlert')[0].innerHTML = valPosLocations.resultado;
 	$('#ubicAlert').alert();	
 });
 

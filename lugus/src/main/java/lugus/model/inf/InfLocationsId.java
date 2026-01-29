@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class InfLocalizacionesId implements Serializable {
+public class InfLocationsId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 	

@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lugus.converter.FormatoConverter;
 import lugus.converter.GeneroConverter;
-import lugus.model.core.Localizacion;
+import lugus.model.core.Location;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 
@@ -58,8 +58,8 @@ public class Serie {
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "localizacion_codigo", nullable = true) // FK → localizaciones.codigo
-	private Localizacion localizacion;
+	@JoinColumn(name = "localizacion_codigo", nullable = true) // FK → location.code
+	private Location location;
 
 	@Column(nullable = false, name="anyo_inicio")
 	private int anyoInicio;
@@ -108,11 +108,11 @@ public class Serie {
 	@ToString.Exclude
 	private final Set<Season> seasons = new HashSet<>();
 	
-	public String getDescLocalizacion() {
-		if (localizacion == null) {
+	public String getDescLocation() {
+		if (location == null) {
 			return "";
 		}
-		return localizacion.getDescripcion();
+		return location.getDescripcion();
 	}
 
 	public boolean tieneCaratula() {

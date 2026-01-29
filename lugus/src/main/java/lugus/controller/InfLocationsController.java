@@ -10,48 +10,48 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.inf.InfLocalizaciones;
-import lugus.service.core.UtlLocalizacionesService;
-import lugus.service.inf.InfLocalizacionesService;
+import lugus.model.inf.InfLocations;
+import lugus.service.core.UtlLocationService;
+import lugus.service.inf.InfLocationsService;
 
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
-public class InfLocalizacionesController {
+public class InfLocationsController {
 
 	private static final int LIMITE_POR_CARPETA = 28;
 	private static final int LIMITE_POR_ESTANTERIA = 60;
 
-	private final InfLocalizacionesService infLocalizacionesService;
+	private final InfLocationsService infLocService;
 
-	private final UtlLocalizacionesService utlLocalizacionesService;
+	private final UtlLocationService utlLocService;
 
 	@PostMapping("/utl/ubics/calc")
 	public ResponseEntity<String> findByGeneroAndFormato(@RequestParam final String codigo,
 			@RequestParam final String genero, @RequestParam final Integer formato, @RequestParam final Boolean funda,
 			@RequestParam final Boolean steelbook) {
 		String resultado = "";
-		List<InfLocalizaciones> posibilidades = new ArrayList<InfLocalizaciones>();
+		List<InfLocations> posibilidades = new ArrayList<InfLocations>();
 		if(formato <= 1 || formato == 4) {
-			posibilidades.addAll(infLocalizacionesService.findAllByGeneroAndFormato(genero, formato,
+			posibilidades.addAll(infLocService.findAllByGeneroAndFormato(genero, formato,
 					funda, steelbook));	
 		}else {
-			posibilidades.addAll(infLocalizacionesService.findAllByGeneroAndFormato(genero, 2,
+			posibilidades.addAll(infLocService.findAllByGeneroAndFormato(genero, 2,
 					funda, steelbook));
-			posibilidades.addAll(infLocalizacionesService.findAllByGeneroAndFormato(genero, 3,
+			posibilidades.addAll(infLocService.findAllByGeneroAndFormato(genero, 3,
 					funda, steelbook));
 		}
 		
 
-		String locAnterior = utlLocalizacionesService.getAnterior(codigo);
-		boolean anteriorCompleta = localizacionCompleta(posibilidades, locAnterior, formato);
+		String locAnterior = utlLocService.getAnterior(codigo);
+		boolean anteriorCompleta = completeLocation(posibilidades, locAnterior, formato);
 
-		String locPosterior = utlLocalizacionesService.getPosterior(codigo);
-		boolean posteriorCompleta = localizacionCompleta(posibilidades, locPosterior, formato);
+		String locPosterior = utlLocService.getPosterior(codigo);
+		boolean posteriorCompleta = completeLocation(posibilidades, locPosterior, formato);
 
-		if (!anteriorCompleta) {
+		if (!anteriorCompleta && locAnterior != null) {
 			resultado = "La ubicación debería ser: " + locAnterior;
-		} else if (!posteriorCompleta) {
+		} else if (!posteriorCompleta  && locPosterior != null) {
 			resultado = "La ubicación debería ser: " + locPosterior;
 		} else { // both complete
 			// tendremos que desplezar elementos ubicaciones siguientes
@@ -65,27 +65,27 @@ public class InfLocalizacionesController {
 		return ResponseEntity.ok("{\"resultado\": \"" + resultado + "\"}");
 	}
 
-	private String ubicacionesCompletasPosteriores(List<InfLocalizaciones> posibilidades, String localizacion,
+	private String ubicacionesCompletasPosteriores(List<InfLocations> posibilidades, String location,
 			String genero, Integer formato) {
 		StringBuilder resultado = new StringBuilder();
 		int maximo = formato == 1 ? LIMITE_POR_CARPETA : LIMITE_POR_ESTANTERIA;
 		int contador = 0;
-		for (InfLocalizaciones ubication : posibilidades) {
-			if (ubication.getId().getCodigo().compareTo(localizacion) > 0) {
-				contador += ubication.getContador();
+		for (InfLocations infLocation : posibilidades) {
+			if (infLocation.getId().getCodigo().compareTo(location) > 0) {
+				contador += infLocation.getContador();
 			}
 			if(contador+1>maximo) {
-				resultado.append(ubication.getId().getCodigo()).append(",");
+				resultado.append(infLocation.getId().getCodigo()).append(",");
 			}
 		}
 
 		return resultado.substring(0, resultado.lastIndexOf(",") > 0 ? resultado.lastIndexOf(",") : resultado.length());
 	}
 
-	private boolean localizacionCompleta(List<InfLocalizaciones> posibilidades, String localizacion, Integer formato) {
+	private boolean completeLocation(List<InfLocations> posibilidades, String location, Integer formato) {
 		int contador = 0;
-		for (InfLocalizaciones ubication : posibilidades) {
-			if (localizacion.contains(ubication.getId().getCodigo())) {
+		for (InfLocations ubication : posibilidades) {
+			if (location!= null && location.contains(ubication.getId().getCodigo())) {
 				contador = ubication.getContador();
 			}
 		}

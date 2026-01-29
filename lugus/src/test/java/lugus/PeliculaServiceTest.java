@@ -11,7 +11,7 @@ import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.repository.films.PeliculaRepository;
 import lugus.service.core.SourceService;
-import lugus.service.core.LocalizacionService;
+import lugus.service.core.LocationService;
 import lugus.service.films.PeliculaService;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class PeliculaServiceTest {
 
     private PeliculaRepository repo;
-	private LocalizacionService locService;
+	private LocationService locService;
 	private SourceService sourceService;
     private PeliculaService service;
 

@@ -8,7 +8,7 @@ import lugus.repository.core.GetPosteriorRepository;
 
 @Service
 @RequiredArgsConstructor
-public class UtlLocalizacionesService {
+public class UtlLocationService {
 
 	private final GetAnteriorRepository getAnteriorRepository;
 	

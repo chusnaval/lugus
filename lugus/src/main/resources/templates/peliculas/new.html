@@ -68,9 +68,9 @@
 					th:field="*{comprado}"></li>
 
 				<li class="list-group-item row"><strong class="col-3">Localización:</strong>
-					<select class="form-select" th:field="*{localizacionCodigo}">
+					<select class="form-select" th:field="*{locationCode}">
 						<option value=""></option>
-						<option th:each="l : ${localizaciones}" th:value="${l.codigo}"
+						<option th:each="l : ${locations}" th:value="${l.codigo}"
 							th:text="${l.descripcion}"></option>
 				</select>
 				

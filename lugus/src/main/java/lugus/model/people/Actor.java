@@ -26,7 +26,7 @@ public class Actor {
 	private int id;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "pelicula_id", nullable = true) // FK → localizaciones.codigo
+	@JoinColumn(name = "pelicula_id", nullable = true) // FK → movie.id
 	private Pelicula pelicula;
 	
 	@Column(name="persona_id")

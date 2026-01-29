@@ -16,11 +16,11 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
-public class InfLocalizaciones {
+public class InfLocations {
 	
 	@Id
 	@EmbeddedId
-	private InfLocalizacionesId id;
+	private InfLocationsId id;
 	
 	
 	@Column

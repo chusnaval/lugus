@@ -12,7 +12,7 @@ import lugus.dto.PeliculaChildDto;
 import lugus.dto.PeliculaCreateDto;
 import lugus.exception.PermisoException;
 import lugus.model.core.Source;
-import lugus.model.core.Localizacion;
+import lugus.model.core.Location;
 import lugus.model.core.TiposUbicacion;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
@@ -25,7 +25,7 @@ import lugus.model.user.Usuario;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.service.core.SourceService;
-import lugus.service.core.LocalizacionService;
+import lugus.service.core.LocationService;
 import lugus.service.core.TiposUbicacionService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
@@ -68,7 +68,7 @@ public class PeliculasController {
 
 	private final PeliculaService service;
 
-	private final LocalizacionService locService;
+	private final LocationService locService;
 
 	private final SourceService sourceService;
 
@@ -120,8 +120,8 @@ public class PeliculasController {
 		model.addAttribute("numResultado", "Resultados encontrados: " + resultado.getTotalElements());
 
 		// select for filter
-		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
-		model.addAttribute("localizaciones", localizaciones);
+		List<Location> locations = locService.findAllOrderByDescripcion();
+		model.addAttribute("locations", locations);
 
 		// admin rigth
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
@@ -163,8 +163,8 @@ public class PeliculasController {
 			throw new PermisoException("No tiene permisos");
 		}
 
-		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
-		model.addAttribute("localizaciones", localizaciones);
+		List<Location> locations = locService.findAllOrderByDescripcion();
+		model.addAttribute("locations", locations);
 
 		List<Source> sources = sourceService.findAll();
 		model.addAttribute("sourcesList", sources);
@@ -224,8 +224,8 @@ public class PeliculasController {
 		}
 
 		if (br.hasErrors()) {
-			List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
-			model.addAttribute("localizaciones", localizaciones);
+			List<Location> locations = locService.findAllOrderByDescripcion();
+			model.addAttribute("locations", locations);
 
 			List<Source> sources = sourceService.findAll();
 			model.addAttribute("sourcesList", sources);
@@ -368,8 +368,8 @@ public class PeliculasController {
 		model.addAttribute("sourcesList", sources);
 
 		Optional<TiposUbicacion> tipoUbicacion = tiposUbicacionService.findById(p.getFormato().getIdParaUbicaciones());
-		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion(tipoUbicacion.get());
-		model.addAttribute("localizaciones", localizaciones);
+		List<Location> locations = locService.findAllOrderByDescripcion(tipoUbicacion.get());
+		model.addAttribute("locations", locations);
 
 		model.addAttribute("caratula", new NewCaratulaDTO());
 		// DTO vacío para el formulario “añadir hijo al pack”
@@ -394,10 +394,10 @@ public class PeliculasController {
 			nuevo.setVista(false);
 		}
 
-		if (p.getLocalizacion() != null) {
-			nuevo.setLocalizacionCodigo(p.getLocalizacion().getCodigo());
+		if (p.getLocation() != null) {
+			nuevo.setLocationCode(p.getLocation().getCodigo());
 		}else {
-			nuevo.setLocalizacionCodigo("");
+			nuevo.setLocationCode("");
 		}
 
 		model.addAttribute("nuevo", nuevo);
@@ -432,16 +432,16 @@ public class PeliculasController {
 		Formato formato = Formato.getById(nuevo.getFormatoCodigo());
 		Genero genero = Genero.getById(nuevo.getGeneroCodigo());
 
-		Localizacion loc = null;
-		if (nuevo.getLocalizacionCodigo() != null && !nuevo.getLocalizacionCodigo().isBlank()) {
-			loc = locService.findById(nuevo.getLocalizacionCodigo())
+		Location loc = null;
+		if (nuevo.getLocationCode() != null && !nuevo.getLocationCode().isBlank()) {
+			loc = locService.findById(nuevo.getLocationCode())
 					.orElseThrow(() -> new IllegalArgumentException("Localización no encontrada"));
 		}
 
 		existing.setTitulo(nuevo.getTitulo());
 		existing.setTituloGest(nuevo.getTituloGest());
 		existing.setFormato(formato);
-		existing.setLocalizacion(loc);
+		existing.setLocation(loc);
 		existing.setAnyo(nuevo.getAnyo());
 		existing.setGenero(genero);
 		existing.setPack(nuevo.isPack());

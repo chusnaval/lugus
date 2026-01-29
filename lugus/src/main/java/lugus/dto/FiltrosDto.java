@@ -39,7 +39,7 @@ public class FiltrosDto {
 
 	private String genero;
 
-	private String localizacion;
+	private String location;
 
 	private String notas;
 
@@ -63,8 +63,8 @@ public class FiltrosDto {
 			map.put("titulo", titulo);
 		if (genero != null && !genero.isBlank())
 			map.put("genero", genero);
-		if (localizacion != null && !localizacion.isBlank())
-			map.put("localizacion", localizacion);
+		if (location != null && !location.isBlank())
+			map.put("location", location);
 		if (notas != null && !notas.isBlank())
 			map.put("notas", notas);
 		if (orden.isPresent() && !orden.get().isBlank())

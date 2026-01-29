@@ -29,14 +29,14 @@ import lugus.dto.NewCaratulaDTO;
 import lugus.dto.SerieCreateDto;
 import lugus.exception.PermisoException;
 import lugus.model.core.Source;
-import lugus.model.core.Localizacion;
+import lugus.model.core.Location;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
 import lugus.model.user.Usuario;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.service.core.SourceService;
-import lugus.service.core.LocalizacionService;
+import lugus.service.core.LocationService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
 import lugus.service.series.SerieService;
@@ -49,7 +49,7 @@ public class SeriesController {
 
 	private final SerieService service;
 
-	private final LocalizacionService locService;
+	private final LocationService locService;
 
 	private final UsuarioService usuarioService;
 
@@ -85,8 +85,8 @@ public class SeriesController {
 		model.addAttribute("numResultado", "Resultados encontrados: " + resultado.getTotalElements());
 
 		// select for filter
-		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
-		model.addAttribute("localizaciones", localizaciones);
+		List<Location> locations = locService.findAllOrderByDescripcion();
+		model.addAttribute("locations", locations);
 
 		// admin rigth
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
@@ -106,8 +106,8 @@ public class SeriesController {
 			throw new PermisoException("No tiene permisos");
 		}
 
-		List<Localizacion> localizaciones = locService.findAllOrderByDescripcion();
-		model.addAttribute("localizaciones", localizaciones);
+		List<Location> locations = locService.findAllOrderByDescripcion();
+		model.addAttribute("locations", locations);
 
 		List<Source> sources = sourceService.findAll();
 		model.addAttribute("sourcesList", sources);
@@ -191,8 +191,8 @@ public class SeriesController {
 		List<Source> sources = sourceService.findAll();
 		model.addAttribute("sourcesList", sources);
 
-		List<Localizacion> localizaciones = locService.findAll();
-		model.addAttribute("localizaciones", localizaciones);
+		List<Location> locations = locService.findAll();
+		model.addAttribute("locations", locations);
 
 		model.addAttribute("caratula", new NewCaratulaDTO());
 
@@ -206,8 +206,8 @@ public class SeriesController {
 		nuevo.setComprado(p.isComprado());
 		nuevo.setCompleta(p.isCompleta());
 
-		if (p.getLocalizacion() != null) {
-			nuevo.setLocalizacionCodigo(p.getLocalizacion().getCodigo());
+		if (p.getLocation() != null) {
+			nuevo.setLocationCode(p.getLocation().getCodigo());
 		}
 
 		model.addAttribute("nuevo", nuevo);
@@ -237,16 +237,16 @@ public class SeriesController {
 		Formato formato = Formato.getById(nuevo.getFormatoCodigo());
 		Genero genero = Genero.getById(nuevo.getGeneroCodigo());
 
-		Localizacion loc = null;
-		if (nuevo.getLocalizacionCodigo() != null && !nuevo.getLocalizacionCodigo().isBlank()) {
-			loc = locService.findById(nuevo.getLocalizacionCodigo())
+		Location loc = null;
+		if (nuevo.getLocationCode() != null && !nuevo.getLocationCode().isBlank()) {
+			loc = locService.findById(nuevo.getLocationCode())
 					.orElseThrow(() -> new IllegalArgumentException("Localización no encontrada"));
 		}
 
 		existing.setTitulo(nuevo.getTitulo());
 		existing.setTituloGest(nuevo.getTituloGest());
 		existing.setFormato(formato);
-		existing.setLocalizacion(loc);
+		existing.setLocation(loc);
 		existing.setAnyoInicio(nuevo.getAnyoInicio());
 		existing.setAnyoFin(nuevo.getAnyoFin());
 		existing.setGenero(genero);

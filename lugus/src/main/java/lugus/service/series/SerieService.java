@@ -20,8 +20,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.FiltrosDto;
 import lugus.dto.SerieCreateDto;
+import lugus.exception.LugusNotFoundException;
 import lugus.model.core.Source;
-import lugus.model.core.Localizacion;
+import lugus.model.core.Location;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
 import lugus.model.values.Formato;
@@ -29,7 +30,7 @@ import lugus.model.values.Genero;
 import lugus.repository.series.SerieRepository;
 import lugus.repository.series.SerieSpecification;
 import lugus.service.core.SourceService;
-import lugus.service.core.LocalizacionService;
+import lugus.service.core.LocationService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
 
@@ -40,7 +41,7 @@ public class SerieService {
 	private static final int NUM_ELEMENTS_PER_HOME = 5;
 	private static final int NUM_ELEMENTS_PER_PAGE = 30;
 	private final SerieRepository serieRepo;
-	private final LocalizacionService locService;
+	private final LocationService locService;
 	private final SourceService sourceService;
 
 	public List<Serie> findAll() {
@@ -81,7 +82,7 @@ public class SerieService {
 		spec = spec.and(SerieSpecification.porComprado(filter.getComprado()));
 		spec = spec.and(SerieSpecification.porFormato(filter.getFormato()));
 		spec = spec.and(SerieSpecification.porGenero(filter.getGenero()));
-		spec = spec.and(SerieSpecification.porLocalizacion(filter.getLocalizacion()));
+		spec = spec.and(SerieSpecification.byLocation(filter.getLocation()));
 		spec = spec.and(SerieSpecification.porNotas(filter.getNotas()));
 		spec = spec.and(SerieSpecification.porTitulo(filter.getTexto()));
 		
@@ -118,7 +119,7 @@ public class SerieService {
 
 	@Transactional
 	public Serie crear(@Valid SerieCreateDto dto, HttpSession session) throws IOException {
-		Localizacion loc = findLocalizacion(dto);
+		Location loc = findLocation(dto);
 
 		String user = (String) session.getAttribute("usuarioConectado");
 
@@ -127,7 +128,7 @@ public class SerieService {
 
 		Serie p = Serie.builder().titulo(dto.getTitulo()).tituloGest(dto.getTituloGest())
 				.anyoInicio(dto.getAnyoInicio()).anyoFin(dto.getAnyoFin()).formato(formato).genero(genero)
-				.comprado(dto.isComprado()).completa(dto.isCompleta()).notas(dto.getNotas()).localizacion(loc).usrAlta(user).tsAlta(Instant.now())
+				.comprado(dto.isComprado()).completa(dto.isCompleta()).notas(dto.getNotas()).location(loc).usrAlta(user).tsAlta(Instant.now())
 				.build();
 		p.calcularCodigo();
 		Serie saved = serieRepo.save(p);
@@ -148,11 +149,11 @@ public class SerieService {
 		return saved;
 	}
 	
-	private Localizacion findLocalizacion(SerieCreateDto dto) {
-		Localizacion loc = null;
-		if (dto.getLocalizacionCodigo() != null && !dto.getLocalizacionCodigo().isBlank()) {
-			loc = locService.findById(dto.getLocalizacionCodigo())
-					.orElseThrow(() -> new IllegalArgumentException("Localización no encontrada"));
+	private Location findLocation(SerieCreateDto dto) {
+		Location loc = null;
+		if (dto.getLocationCode() != null && !dto.getLocationCode().isBlank()) {
+			loc = locService.findById(dto.getLocationCode())
+					.orElseThrow(() -> new LugusNotFoundException(dto.getLocationCode()));
 		}
 		return loc;
 	}

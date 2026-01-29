@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lugus.dto.FiltrosDto;
 import lugus.dto.PeliculaChildDto;
 import lugus.dto.PeliculaCreateDto;
+import lugus.exception.LugusNotFoundException;
 import lugus.model.core.Source;
-import lugus.model.core.Localizacion;
+import lugus.model.core.Location;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
 import lugus.model.values.Formato;
@@ -13,7 +14,7 @@ import lugus.model.values.Genero;
 import lugus.repository.films.PeliculaRepository;
 import lugus.repository.films.PeliculaSpecification;
 import lugus.service.core.SourceService;
-import lugus.service.core.LocalizacionService;
+import lugus.service.core.LocationService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +42,7 @@ public class PeliculaService {
 	private static final int NUM_ELEMENTS_PER_HOME = 5;
 	private static final int NUM_ELEMENTS_PER_PAGE = 30;
 	private final PeliculaRepository peliculaRepo;
-	private final LocalizacionService locService;
+	private final LocationService locService;
 	private final SourceService sourceService;
 
 	public List<Pelicula> findAll() {
@@ -62,7 +63,7 @@ public class PeliculaService {
 
 	@Transactional
 	public Pelicula crear(PeliculaCreateDto dto, HttpSession session) throws IOException {
-		Localizacion loc = findLocalizacion(dto);
+		Location loc = findLocation(dto);
 
 		String user = (String) session.getAttribute("usuarioConectado");
 
@@ -71,7 +72,7 @@ public class PeliculaService {
 
 		Pelicula p = Pelicula.builder().titulo(dto.getTitulo()).tituloGest(dto.getTituloGest()).anyo(dto.getAnyo())
 				.formato(formato).genero(genero).pack(dto.isPack()).steelbook(dto.isSteelbook()).funda(dto.isFunda())
-				.comprado(dto.isComprado()).notas(dto.getNotas()).localizacion(loc).usrAlta(user).tsAlta(Instant.now())
+				.comprado(dto.isComprado()).notas(dto.getNotas()).location(loc).usrAlta(user).tsAlta(Instant.now())
 				.build();
 		p.calcularCodigo();
 		Pelicula saved = peliculaRepo.save(p);
@@ -92,11 +93,11 @@ public class PeliculaService {
 		return saved;
 	}
 
-	private Localizacion findLocalizacion(PeliculaCreateDto dto) {
-		Localizacion loc = null;
-		if (dto.getLocalizacionCodigo() != null && !dto.getLocalizacionCodigo().isBlank()) {
-			loc = locService.findById(dto.getLocalizacionCodigo())
-					.orElseThrow(() -> new IllegalArgumentException("Localización no encontrada"));
+	private Location findLocation(PeliculaCreateDto dto) {
+		Location loc = null;
+		if (dto.getLocationCode() != null && !dto.getLocationCode().isBlank()) {
+			loc = locService.findById(dto.getLocationCode())
+					.orElseThrow(() -> new LugusNotFoundException(dto.getLocationCode()));
 		}
 		return loc;
 	}
@@ -125,7 +126,7 @@ public class PeliculaService {
 
 		Pelicula p = Pelicula.builder().titulo(dto.getTitulo()).tituloGest(dto.getTitulo()).anyo(dto.getAnyo())
 				.formato(formato).genero(genero).pack(false).steelbook(padre.isSteelbook()).funda(padre.isFunda())
-				.comprado(padre.isComprado()).notas(padre.getNotas()).localizacion(padre.getLocalizacion())
+				.comprado(padre.isComprado()).notas(padre.getNotas()).location(padre.getLocation())
 				.usrAlta(user).tsAlta(Instant.now()).build();
 		p.calcularCodigo();
 		Pelicula saved = peliculaRepo.save(p);
@@ -181,7 +182,7 @@ public class PeliculaService {
 		spec = spec.and(PeliculaSpecification.porFormato(filter.getFormato()));
 
 		spec = spec.and(PeliculaSpecification.porGenero(filter.getGenero()));
-		spec = spec.and(PeliculaSpecification.porLocalizacion(filter.getLocalizacion()));
+		spec = spec.and(PeliculaSpecification.byLocation(filter.getLocation()));
 		spec = spec.and(PeliculaSpecification.porNotas(filter.getNotas()));
 		spec = spec.and(PeliculaSpecification.vigentes());
 		

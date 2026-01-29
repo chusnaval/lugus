@@ -4,7 +4,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import lugus.model.core.Localizacion;
+import lugus.model.core.Location;
 import lugus.model.series.Serie;
 
 public class SerieSpecification {
@@ -32,14 +32,14 @@ public class SerieSpecification {
 				: cb.like(cb.lower(root.get("notas")), "%" + notas.toLowerCase() + "%");
 	}
 
-	public static Specification<Serie> porLocalizacion(String localizacion) {
+	public static Specification<Serie> byLocation(String location) {
 		return (root, query, cb) -> {
-			if (localizacion == null || localizacion.isBlank()) {
+			if (location == null || location.isBlank()) {
 				return null;
 			}
 
-			Join<Serie, Localizacion> generoJoin = root.join("localizacion", JoinType.INNER);
-			return cb.equal(generoJoin.get("localizacion"), localizacion);
+			Join<Serie, Location> generoJoin = root.join("localizacion", JoinType.INNER);
+			return cb.equal(generoJoin.get("localizacion"), location);
 		};
 	}
 

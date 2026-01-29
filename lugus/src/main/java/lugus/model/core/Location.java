@@ -24,7 +24,7 @@ import lugus.model.films.Pelicula;
 @EqualsAndHashCode(of = "codigo")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Localizacion {
+public class Location {
 
 	@Id
 	@NotBlank  
@@ -34,7 +34,7 @@ public class Localizacion {
 	private String descripcion;
 
 	
-	@OneToMany(mappedBy = "localizacion")
+	@OneToMany(mappedBy = "location")
 	@ToString.Exclude
 	private Set<Pelicula> peliculas = new HashSet<>();
 	

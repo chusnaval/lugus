@@ -38,11 +38,11 @@ public class SerieFoto {
 	private String url;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "serie_id", nullable = true) // FK → localizaciones.codigo
+	@JoinColumn(name = "serie_id", nullable = true) // FK → serie.id
 	private Serie serie;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "fuente_id", nullable = true) // FK → peliculaFotos.codigo
+	@JoinColumn(name = "fuente_id", nullable = true) // FK → source.id
 	private Source source;
 	
     @Column

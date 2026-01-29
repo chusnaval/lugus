@@ -32,8 +32,8 @@ public class SerieCreateDto {
 	@NotNull(message = "El género es obligatorio")
 	private String generoCodigo;
 
-	// localizacion es opcional
-	private String localizacionCodigo;
+	// location is optional
+	private String locationCode;
 
 	private boolean comprado;
 	

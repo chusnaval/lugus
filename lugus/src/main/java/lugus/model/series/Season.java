@@ -36,7 +36,7 @@ public class Season {
 	private int id;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "serie_id", nullable = true) // FK → localizaciones.codigo
+	@JoinColumn(name = "serie_id", nullable = true) // FK → serie.id
 	private Serie serie;
 	
 	@Column

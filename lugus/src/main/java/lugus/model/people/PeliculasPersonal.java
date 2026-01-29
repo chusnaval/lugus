@@ -34,11 +34,11 @@ public class PeliculasPersonal {
 	private int id;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "pelicula_id", nullable = true) // FK → localizaciones.codigo
+	@JoinColumn(name = "pelicula_id", nullable = true) // FK → movie.id
 	private Pelicula pelicula;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "persona_id", nullable = true) // FK → localizaciones.codigo
+	@JoinColumn(name = "persona_id", nullable = true) // FK → people.id
 	private Persona persona;
 	
 	@Column

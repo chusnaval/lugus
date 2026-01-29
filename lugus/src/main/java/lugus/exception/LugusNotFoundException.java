@@ -11,6 +11,10 @@ public class LugusNotFoundException extends RuntimeException {
 		super("Resource not found {}" + id);
 	}
 
+	public LugusNotFoundException(String id) {
+		super("Resource not found {}" + id);
+	}
+
 	/**
 	 * 
 	 */

@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lugus.converter.FormatoConverter;
 import lugus.converter.GeneroConverter;
-import lugus.model.core.Localizacion;
+import lugus.model.core.Location;
 import lugus.model.groups.GroupFilms;
 import lugus.model.people.Actor;
 import lugus.model.people.Director;
@@ -64,8 +64,8 @@ public class Pelicula {
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "localizacion_codigo", nullable = true) // FK → localizaciones.codigo
-	private Localizacion localizacion;
+	@JoinColumn(name = "localizacion_codigo", nullable = true) // FK → location.code
+	private Location location;
 
 	@Column(nullable = false)
 	private int anyo;
@@ -147,11 +147,11 @@ public class Pelicula {
 	@ToString.Exclude
 	private final Set<GroupFilms> groups = new HashSet<GroupFilms>();
 
-	public String getDescLocalizacion() {
-		if (localizacion == null) {
+	public String getDescLocation() {
+		if (location == null) {
 			return "";
 		}
-		return localizacion.getDescripcion();
+		return location.getDescripcion();
 	}
 
 	public boolean tieneCaratula() {

@@ -7,7 +7,7 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import lugus.model.core.Localizacion;
+import lugus.model.core.Location;
 import lugus.model.films.Pelicula;
 import lugus.model.people.Actor;
 import lugus.model.people.Director;
@@ -56,14 +56,14 @@ public class PeliculaSpecification {
 				: cb.like(cb.lower(root.get("notas")), "%" + notas.toLowerCase() + "%");
 	}
 
-	public static Specification<Pelicula> porLocalizacion(String localizacion) {
+	public static Specification<Pelicula> byLocation(String location) {
 		return (root, query, cb) -> {
-			if (localizacion == null || localizacion.isBlank()) {
+			if (location == null || location.isBlank()) {
 				return null;
 			}
 
-			Join<Pelicula, Localizacion> generoJoin = root.join("localizacion", JoinType.INNER);
-			return cb.equal(generoJoin.get("localizacion"), localizacion);
+			Join<Pelicula, Location> generoJoin = root.join("localizacion", JoinType.INNER);
+			return cb.equal(generoJoin.get("localizacion"), location);
 		};
 	}
 

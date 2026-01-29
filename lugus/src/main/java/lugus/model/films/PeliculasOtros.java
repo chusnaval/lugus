@@ -36,7 +36,7 @@ public class PeliculasOtros {
 	private int id;
 
 	@OneToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "pelicula_id", nullable = true) // FK → localizaciones.codigo
+	@JoinColumn(name = "pelicula_id", nullable = true) // FK → locations.code
 	private Pelicula pelicula;
 
 	@Column(name = "idmb_id")
