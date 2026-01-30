@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.SourceDTO;
 import lugus.exception.LugusNotFoundException;
-import lugus.mapper.SourceMapper;
+import lugus.mapper.core.SourceMapper;
 import lugus.model.core.Source;
 import lugus.service.core.SourceService;
 

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.LocationTypeDTO;
 import lugus.exception.LugusNotFoundException;
-import lugus.mapper.LocationTypeMapper;
+import lugus.mapper.core.LocationTypeMapper;
 import lugus.model.core.LocationType;
 import lugus.service.core.LocationTypeService;
 

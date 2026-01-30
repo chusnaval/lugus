@@ -1,4 +1,4 @@
-package lugus.mapper;
+package lugus.mapper.core;
 
 import org.springframework.stereotype.Component;
 
