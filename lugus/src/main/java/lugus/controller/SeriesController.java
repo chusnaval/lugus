@@ -39,7 +39,7 @@ import lugus.service.core.SourceService;
 import lugus.service.core.LocationService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
-import lugus.service.series.SerieService;
+import lugus.service.series.SeriesService;
 import lugus.service.user.UsuarioService;
 
 @Controller
@@ -47,7 +47,7 @@ import lugus.service.user.UsuarioService;
 @RequiredArgsConstructor
 public class SeriesController {
 
-	private final SerieService service;
+	private final SeriesService service;
 
 	private final LocationService locService;
 

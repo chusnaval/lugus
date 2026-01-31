@@ -36,7 +36,7 @@ import lugus.service.films.DwFotoServiceI;
 
 @Service
 @RequiredArgsConstructor
-public class SerieService {
+public class SeriesService {
 
 	private static final int NUM_ELEMENTS_PER_HOME = 5;
 	private static final int NUM_ELEMENTS_PER_PAGE = 30;
@@ -85,6 +85,28 @@ public class SerieService {
 		spec = spec.and(SerieSpecification.byLocation(filter.getLocation()));
 		spec = spec.and(SerieSpecification.porNotas(filter.getNotas()));
 		spec = spec.and(SerieSpecification.porTitulo(filter.getTexto()));
+		
+		return serieRepo.findAll(spec, pageable);
+	}
+	
+	/**
+	 * Complete movies search with all filters available
+	 * 
+	 * @param filter
+	 * @param page
+	 * @param field
+	 * @param direction
+	 * @return
+	 */
+	public Page<Serie> wanted() {
+		Sort sort = Sort.by(Direction.fromString("ASC"),"tituloGest");
+
+		Pageable pageable = PageRequest.of(0, 1000, sort);
+
+		Specification<Serie> spec = Specification.where(null);
+
+		spec = spec.or(SerieSpecification.porComprado(false));
+		spec = spec.or(SerieSpecification.porCompleta(false));
 		
 		return serieRepo.findAll(spec, pageable);
 	}

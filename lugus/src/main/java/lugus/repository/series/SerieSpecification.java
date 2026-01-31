@@ -18,6 +18,11 @@ public class SerieSpecification {
 	public static Specification<Serie> porComprado(Boolean comprado) {
 		return (root, query, cb) -> (comprado == null) ? null : cb.equal(root.get("comprado"), comprado);
 	}
+	
+	public static Specification<Serie> porCompleta(Boolean completa) {
+		return (root, query, cb) -> (completa == null) ? null : cb.equal(root.get("completa"), completa);
+	}
+
 
 	public static Specification<Serie> porFormato(Integer formato) {
 		return (root, query, cb) -> (formato == null) ? null : cb.equal(root.get("formato"), formato);

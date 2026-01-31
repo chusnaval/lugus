@@ -18,14 +18,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lugus.model.series.Serie;
-import lugus.service.series.SerieService;
+import lugus.service.series.SeriesService;
 
 @RestController 
 @RequestMapping("/validateSerie")
 @RequiredArgsConstructor
 public class ValidateSeriesController {
 
-	private final SerieService service;
+	private final SeriesService service;
 
 	@GetMapping("/titlesInYear")
 	public ResponseEntity<Serie> validateTitlesInYear(@RequestParam final String title,
