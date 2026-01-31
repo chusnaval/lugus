@@ -40,4 +40,11 @@ public class FilmApiController {
 		}
 		return result;
 	}
+	
+	@GetMapping("/random/wanted")
+	PeliculaCreateDto randomw() throws LugusNotFoundException {
+		Page<Pelicula> page = service.wanted();
+		int number = (int) (Math.random() * page.getNumberOfElements()) + 1;
+		return mapper.mapToDTO(page.getContent().get(number));
+	}
 }
