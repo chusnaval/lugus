@@ -203,7 +203,7 @@ public class PeliculaService {
 	}
 	
 	public Page<Pelicula> wanted() {
-		Sort sort = Sort.by("ASC", "tituloGest");
+		Sort sort = Sort.by(Sort.Order.desc("tituloGest"));
 
 		Pageable pageable = PageRequest.of(0, 1000, sort);
 
