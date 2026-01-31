@@ -1,4 +1,4 @@
-package lugus.api.films;
+package lugus.api.groups;
 
 import java.util.ArrayList;
 import java.util.List;

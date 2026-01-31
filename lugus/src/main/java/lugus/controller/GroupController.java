@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import lugus.dto.FiltrosDto;
+import lugus.dto.core.FiltrosDto;
 import lugus.exception.PermisoException;
 import lugus.model.groups.Group;
 import lugus.model.groups.GroupFilms;

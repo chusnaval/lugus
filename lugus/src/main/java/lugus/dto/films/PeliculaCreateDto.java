@@ -1,4 +1,4 @@
-package lugus.dto;
+package lugus.dto.films;
 
 import jakarta.validation.constraints.*;
 import lombok.*;

@@ -1,4 +1,4 @@
-package lugus.dto;
+package lugus.dto.media;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

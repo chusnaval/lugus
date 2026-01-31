@@ -1,4 +1,4 @@
-package lugus.dto;
+package lugus.dto.core;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import lugus.dto.PeliculaChildDto;
+import lugus.dto.films.PeliculaChildDto;
 import lugus.model.films.Pelicula;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;

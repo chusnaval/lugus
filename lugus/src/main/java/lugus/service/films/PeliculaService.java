@@ -1,9 +1,9 @@
 package lugus.service.films;
 
 import lombok.RequiredArgsConstructor;
-import lugus.dto.FiltrosDto;
-import lugus.dto.PeliculaChildDto;
-import lugus.dto.PeliculaCreateDto;
+import lugus.dto.core.FiltrosDto;
+import lugus.dto.films.PeliculaChildDto;
+import lugus.dto.films.PeliculaCreateDto;
 import lugus.exception.LugusNotFoundException;
 import lugus.model.core.Source;
 import lugus.model.core.Location;

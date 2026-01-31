@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.dto.FiltrosDto;
+import lugus.dto.core.FiltrosDto;
 import lugus.model.groups.Group;
 import lugus.repository.groups.GroupRepository;
 
