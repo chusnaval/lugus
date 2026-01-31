@@ -202,6 +202,18 @@ public class PeliculaService {
 		return peliculaRepo.findAll(spec, pageable);
 	}
 	
+	public Page<Pelicula> wanted() {
+		Sort sort = Sort.by("ASC", "tituloGest");
+
+		Pageable pageable = PageRequest.of(0, 1000, sort);
+
+		Specification<Pelicula> spec = Specification.where(null);
+
+		spec = spec.and(PeliculaSpecification.porComprado(false));
+
+		return peliculaRepo.findAll(spec, pageable);
+	}
+	
 	public Page<Pelicula> findForHome() {
 		Sort sort = buildSort(Optional.of("compra"), Optional.of("ASC"));
 

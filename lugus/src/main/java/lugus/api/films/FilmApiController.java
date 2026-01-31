@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.PeliculaCreateDto;
 import lugus.exception.LugusNotFoundException;
 import lugus.mapper.films.FilmMapper;
@@ -34,9 +33,7 @@ public class FilmApiController {
 
 	@GetMapping("/wanted")
 	List<PeliculaCreateDto> wanted() throws LugusNotFoundException {
-		FiltrosDto filter = new FiltrosDto();
-		filter.setComprado(false);
-		Page<Pelicula> page = service.findAllBy(filter);
+		Page<Pelicula> page = service.wanted();
 		List<PeliculaCreateDto> result = new ArrayList<PeliculaCreateDto>();
 		for (Pelicula p : page.getContent()) {
 			result.add(mapper.mapToDTO(p));
