@@ -104,8 +104,8 @@ public class ImgMubisDownloader {
 
 				encontrados.add(-1);// para poder seleccionar que no encuentra
 
-				Scanner myObj = new Scanner(System.in);
-				try {
+				;
+				try (Scanner myObj = new Scanner(System.in)) {
 					while (!correct) {
 						System.out.println("Enter id localizado (-1 si no esta listado): ");
 						String userId = myObj.next();
