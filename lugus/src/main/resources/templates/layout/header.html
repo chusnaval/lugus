@@ -74,7 +74,14 @@
 					<li class="nav-item inactive" th:if="${admin}"><span
 						class="custom-dark nav-link disabled" id="adminBtn"
 						data-bs-toggle="dropdown" aria-expanded="false"
-						data-bs-popper="static" aria-label="Menú de usuario">Gestión</span></li>
+						data-bs-popper="static" aria-label="Menú de usuario">Gestión</span>
+						<div class="dropdown-divider"></div>
+						<div class="dropdown-menu dropdown-menu-dark custom-dark"
+							aria-labelledby="navbarDropdown">
+							<a class="dropdown-item" th:if="${admin}"
+								th:href="@{/management/locations}">Ubicaciones</a> 
+						</div>
+						</li>
 
 					<li class="nav-item inactive"><span
 						class="custom-dark nav-link disabled" id="helpBtn"
