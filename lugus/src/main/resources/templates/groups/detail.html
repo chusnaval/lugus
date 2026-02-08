@@ -25,6 +25,10 @@
 
 	<h2 th:text="${group.name}">Name</h2>
 
+	<div th:if="${films.empty}">
+		<h5 >No hay películas registradas aún, o bien no he tenido tiempo o no se ha comprado/visto ninguna del grupo.</h5>
+		
+	</div>
 	<table th:unless="${films.empty}" class="table table-sm">
 		<tbody>
 			<tr th:each="f : ${films}">
@@ -38,6 +42,7 @@
                      'far fa-times-circle text-danger col-1')}"
 						th:classappend="${f.pelicula==null} ? 'link-disabled'"
 						th:attr="aria-disabled=${f.pelicula==null}" aria-hidden="true"></i>
+						
 				</a> <a th:id="${'pet_' + f.itb.tconst}" th:if="${f.pelicula==null}"
 					data-bs-toggle="modal" data-bs-target="#confirmModal"
 					th:data-bs-whatever="${f.itb.tconst}" style="color: inherit;"><i
@@ -52,7 +57,7 @@
 	</table>
 
 
-	<button type="button" id="backButton" onclick="history.back()" title="Volver">Volver</button>
+	<button type="button" id="backButton" onclick="history.back()" title="Volver" class="btn btn-sm btn-lumo">Volver</button>
 
 
 	<div class="modal fade" id="confirmModal" tabindex="-1"

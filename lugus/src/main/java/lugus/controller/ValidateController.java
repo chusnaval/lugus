@@ -30,7 +30,9 @@ public class ValidateController {
 	@GetMapping("/titlesInYear")
 	public ResponseEntity<Pelicula> validateTitlesInYear(@RequestParam final String title,
 			@RequestParam final String titleGest, final Integer year) {
+		
 		List<Pelicula> similars = service.findByTitlesInYear(title, titleGest, year);
+		
 		if (similars != null && !similars.isEmpty()) {
 			return ResponseEntity.ok(similars.get(0));
 		} else {
@@ -43,6 +45,7 @@ public class ValidateController {
 
 		@ExceptionHandler(ConstraintViolationException.class)
 		public ResponseEntity<Map<String, Object>> handleValidation(ConstraintViolationException ex) {
+			
 			Map<String, Object> body = new LinkedHashMap<>();
 			body.put("timestamp", Instant.now());
 			body.put("status", HttpStatus.BAD_REQUEST.value());
@@ -51,6 +54,7 @@ public class ValidateController {
 			List<String> errors = ex.getConstraintViolations().stream()
 					.map(cv -> cv.getPropertyPath() + ": " + cv.getMessage()).collect(Collectors.toList());
 			body.put("errors", errors);
+			
 			return ResponseEntity.badRequest().body(body);
 		}
 	}
