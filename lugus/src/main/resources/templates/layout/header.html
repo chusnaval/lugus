@@ -71,15 +71,15 @@
 						data-bs-toggle="dropdown" aria-expanded="false"
 						data-bs-popper="static" aria-label="Menú de usuario">Libros</span></li>
 
-					<li class="nav-item inactive" th:if="${admin}"><span
-						class="custom-dark nav-link disabled" id="adminBtn"
+					<li class="nav-item dropdown" th:if="${admin}"><span
+						class="custom-dark nav-link dropdown-toggle" id="managementBtn"
 						data-bs-toggle="dropdown" aria-expanded="false"
-						data-bs-popper="static" aria-label="Menú de usuario">Gestión</span>
+						data-bs-popper="static" aria-label="Gestión">Gestión</span>
 						<div class="dropdown-divider"></div>
 						<div class="dropdown-menu dropdown-menu-dark custom-dark"
 							aria-labelledby="navbarDropdown">
 							<a class="dropdown-item" th:if="${admin}"
-								th:href="@{/management/locations}">Ubicaciones</a> 
+								th:href="@{/locations/list}">Ubicaciones</a> 
 						</div>
 						</li>
 

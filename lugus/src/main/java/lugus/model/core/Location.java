@@ -3,7 +3,6 @@ package lugus.model.core;
 import java.util.HashSet;
 import java.util.Set;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -20,25 +19,28 @@ import lugus.model.films.Pelicula;
 
 @Entity
 @Table(name = "localizaciones")
-@Data 
+@Data
 @EqualsAndHashCode(of = "codigo")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Location {
 
 	@Id
-	@NotBlank  
+	@NotBlank
 	private String codigo;
-	
-	@NotBlank  
+
+	@NotBlank
 	private String descripcion;
 
-	
 	@OneToMany(mappedBy = "location")
 	@ToString.Exclude
 	private Set<Pelicula> peliculas = new HashSet<>();
-	
+
 	@ManyToOne
 	@JoinColumn(name = "ubicacion_tipo_cod")
 	private LocationType locationType;
+
+	public String countFilms() {
+		return "(" + peliculas.size() + ")";
+	}
 }

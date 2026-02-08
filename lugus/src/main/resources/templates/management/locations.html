@@ -22,19 +22,21 @@
 <body class="p-4">
 
 	<div th:replace="~{layout/header :: header}"></div>
-	<h3>Grupos</h3>
-	<div th:replace="~{layout/filters :: filters}"></div>
+	<h3>Ubicaciones</h3>
 
 	<div class="container-fluid">
-		<div class="row justify-content-center g-4">
-			<div th:each="p, iStat : ${locGroup.content}" id="tabla-locations"
-				class="film col-12 col-sm-6 col-md-3 col-lg-2 card-bg card-borde ms-1">
-				<a th:href="@{/locations/{id}(id=${p.codigo})}"
-					aria-hidden="true"
-					class="text-decoration-none d-block custom-card-link fixed-height">
-					<h5 class="title fw-bold mb-2" th:text="${p.descripcion}"></h5>
-				</a>
-			</div>
+		<div class="row justify-content-center">
+			<table class="table table-sm">
+				<tbody>
+					<tr th:each="p, iStat : ${locGroup.content}">
+						<td th:text="${p.codigo}"></td>
+						<td th:text="${p.descripcion}"></td>
+						<td th:text="${p.countFilms}"></td>
+						<td th:text="${p.locationType.description}"></td>
+					</tr>
+				</tbody>
+			</table>
+
 		</div>
 	</div>
 
