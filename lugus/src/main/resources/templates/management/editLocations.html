@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<title th:text="${location.descripcion}">Detalle</title>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+	crossorigin="anonymous"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet" crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+	crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link th:href="@{/css/lugus.css}" rel="stylesheet">
+<link th:href="@{/css/botones.css}" rel="stylesheet">
+
+
+</head>
+<body class="container mt-4">
+	<div th:replace="~{layout/header :: header}"></div>
+
+	<form th:action="@{/locations/update/{id}(id=${location.codigo})}"
+		th:object="${nuevo}" method="post">
+
+		<h2 th:text="${location.descripcion}">Título</h2>
+		<input type="hidden" id="idLocation" th:value="${location.codigo}">
+
+		<br />
+		<div class="row">
+			Modificar nombre: <input type="text"
+				th:value="${location.descripcion}"
+				th:field="${location.descripcion}" />
+			<button type="submit" class="btn btn-primary">Guardar</button>
+		</div>
+
+
+		<br /> <br />
+		<div class="row">
+			Migrar peliculas asociadas:<br /> <br /> Ubicación destino <select
+				class="form-select">
+				<option th:each="f : ${otherLocs}" th:value="${f.codigo}"
+					th:text="${f.descripcion}"></option>
+			</select>
+			<button type="button" id="migrateButton" title="Migrar"
+				class="btn btn-sm btn-lumo">Migrar</button>
+		</div>
+		<br /> <br />
+		<h5>Peliculas Asociadas</h5>
+		<div class="row">
+			<table th:unless="${location.peliculas.empty}" class="table table-sm">
+				<tbody>
+					<tr th:each="f, iStat : ${location.peliculas}">
+						<td th:text="${iStat.count}"></td>
+						<td th:text="${f.titulo}"></td>
+						<td th:text="${f.codigo}"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<hr />
+	</form>
+
+	<button type="button" id="backButton" onclick="history.back()"
+		title="Volver" class="btn btn-sm btn-lumo">Volver</button>
+
+
+	<div class="modal fade" id="confirmModal" tabindex="-1"
+		aria-labelledby="confirmModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content bg-dark text-white">
+				<div class="modal-header bg-dark text-white">
+					<h5 class="modal-title" id="confirmModalLabel">Confirmación
+						requerida</h5>
+
+
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="Cerrar"></button>
+				</div>
+				<div class="modal-body">Se van a mover todas las peliculas a
+					otra ubicación.</div>
+				<div class="modal-footer">
+					<form>
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal" id="cancelBtn">Cancelar</button>
+						<button class="btn btn-secondary" data-bs-dismiss="modal"
+							id="acceptBtn">Aceptar</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script th:inline="javascript">
+		const oldCode = '${location.codigo}';
+	</script>
+
+	<script src="/lugus/js/migrateLoc.js" defer="defer"></script>
+</body>
+</html>

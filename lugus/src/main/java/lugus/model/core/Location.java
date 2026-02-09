@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,7 @@ public class Location {
 	@NotBlank
 	private String descripcion;
 
+	@OrderBy("codigo ASC")
 	@OneToMany(mappedBy = "location")
 	@ToString.Exclude
 	private Set<Pelicula> peliculas = new HashSet<>();

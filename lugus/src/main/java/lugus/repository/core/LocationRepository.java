@@ -19,4 +19,6 @@ public interface LocationRepository extends JpaRepository<Location, String> {
 
 	Page<Location> findAll(Specification<Location> spec, Pageable pageable);
 
+	List<Location> findByCodigoNot(String code);
+
 }

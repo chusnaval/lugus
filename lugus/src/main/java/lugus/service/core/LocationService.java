@@ -58,4 +58,9 @@ public class LocationService {
 		return locRepo.findAll(spec, pageable);
 	}
 
+	public List<Location> findAllExcept(String id) {
+		
+		return locRepo.findByCodigoNot(id);
+	}
+
 }
