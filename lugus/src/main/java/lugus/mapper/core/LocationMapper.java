@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lugus.dto.core.LocationDTO;
 import lugus.model.core.Location;
+import lugus.model.core.LocationType;
 
 
 @Component
@@ -23,8 +24,10 @@ public class LocationMapper {
 
 	public Location mapToEntity(LocationDTO dto) {
 		Location local = new Location();
-		local.setCodigo(local.getCodigo());
-		local.setDescripcion(local.getDescripcion());
+		local.setCodigo(dto.getCodigo());
+		local.setDescripcion(dto.getDescripcion());
+		local.setLocationType(new LocationType(dto.getType()));
+		
 		return local;
 	}
 }

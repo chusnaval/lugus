@@ -10,5 +10,6 @@ public class LocationDTO {
 
 	private String descripcion;
 	
+	private int type;
 	
 }

@@ -23,18 +23,21 @@
 
 	<div th:replace="~{layout/header :: header}"></div>
 	<h3>Ubicaciones</h3>
-
+	<br>
+	<a th:href="@{/locations/new/}" class="link-info">Crear Ubicación</a>
+	<br/>
+	<br/>
 	<div class="container-fluid">
 		<div class="row justify-content-center">
 			<table class="table table-sm">
 				<tbody>
 					<tr th:each="p, iStat : ${locGroup.content}">
 						<td th:text="${p.codigo}"></td>
-						<td><a th:href="@{/locations/editLoc/{id}(id=${p.codigo})}"><i class="fa-regular fa-pen-to-square"></i></a></td>
+						<td><a th:href="@{/locations/editLoc/{id}(id=${p.codigo})}" class="link-info"><i class="fa-regular fa-pen-to-square"></i></a></td>
 						<td th:text="${p.descripcion}"></td>
 						<td th:text="${p.countFilms}"></td>
 						<td th:text="${p.locationType.description}"></td>
-						<td><a th:href="@{/locations/deleteLoc/{id}(id=${p.codigo})}"><i class="fa-solid fa-delete-left"></i></a></td>
+						<td><a th:href="@{/locations/deleteLoc/{id}(id=${p.codigo})}" class="link-danger"><i class="fa-solid fa-delete-left"></i></a></td>
 					</tr>
 				</tbody>
 			</table>

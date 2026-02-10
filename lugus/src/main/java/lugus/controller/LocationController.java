@@ -1,10 +1,10 @@
 package lugus.controller;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -12,7 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +23,10 @@ import lugus.dto.core.LocationDTO;
 import lugus.exception.LugusNotFoundException;
 import lugus.exception.PermisoException;
 import lugus.mapper.core.LocationMapper;
-import lugus.mapper.films.FilmMapper;
 import lugus.model.core.Location;
 import lugus.model.user.Usuario;
 import lugus.service.core.LocationService;
+import lugus.service.core.LocationTypeService;
 import lugus.service.user.UsuarioService;
 
 @Controller
@@ -36,7 +38,23 @@ public class LocationController {
 
 	private final UsuarioService usuarioService;
 
+	private final LocationTypeService locTypeService;
+
 	private final LocationMapper mapper;
+
+	@GetMapping("/new/")
+	public String newLocation(Model model) {
+		model.addAttribute("location", new LocationDTO());
+		model.addAttribute("locTypes", locTypeService.findAll());
+		return "management/locationNew";
+	}
+
+	@PostMapping("/saveNew")
+	public ModelAndView saveNew(@ModelAttribute LocationDTO dto) throws IOException {
+		Location location = mapper.mapToEntity(dto);
+		service.save(location);
+		return new ModelAndView("redirect:/locations/list");
+	}
 
 	@GetMapping("/list")
 	public String list(Principal principal, HttpSession session, Model model, @ModelAttribute FiltrosDto filtro)
@@ -63,7 +81,7 @@ public class LocationController {
 	}
 
 	@GetMapping("/deleteLoc/{id}")
-	public String delete(Principal principal, @PathVariable String id, Model model) throws PermisoException {
+	public ModelAndView delete(Principal principal, @PathVariable String id, Model model) throws PermisoException {
 		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
 		if (!usuario.isAdmin()) {
 			throw new PermisoException("No tienes permiso para hacer esto");
@@ -80,7 +98,7 @@ public class LocationController {
 
 		service.deleteById(id);
 		model.addAttribute("admin", usuario.isAdmin());
-		return "management/locations";
+		return new ModelAndView("redirect:/locations/list");
 	}
 
 	@GetMapping("/editLoc/{id}")
