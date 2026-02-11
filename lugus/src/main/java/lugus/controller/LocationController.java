@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import jakarta.servlet.http.HttpSession;
@@ -27,6 +28,7 @@ import lugus.model.core.Location;
 import lugus.model.user.Usuario;
 import lugus.service.core.LocationService;
 import lugus.service.core.LocationTypeService;
+import lugus.service.films.PeliculaService;
 import lugus.service.user.UsuarioService;
 
 @Controller
@@ -35,6 +37,8 @@ import lugus.service.user.UsuarioService;
 public class LocationController {
 
 	private final LocationService service;
+	
+	private final PeliculaService peliculaService;
 
 	private final UsuarioService usuarioService;
 
@@ -78,6 +82,21 @@ public class LocationController {
 		model.addAttribute("numResultado", "Resultados encontrados: " + resultado.getTotalElements());
 
 		return "management/locations";
+	}
+	
+	@PostMapping("/migrate")
+	public ModelAndView migrate(Principal principal, Model model, @RequestParam String oldLoc, @RequestParam String newLoc) throws PermisoException {
+		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
+		if (!usuario.isAdmin()) {
+			throw new PermisoException("No tienes permiso para hacer esto");
+		}
+		
+		int count = peliculaService.updateLocationForAll(oldLoc, newLoc);
+		
+		model.addAttribute("updatedRows", count);
+		model.addAttribute("admin", usuario.isAdmin());
+		
+		return new ModelAndView("redirect:/locations/list");
 	}
 
 	@GetMapping("/deleteLoc/{id}")

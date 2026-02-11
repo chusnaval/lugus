@@ -1,30 +1,21 @@
 document.getElementById("migrateButton").addEventListener("click", async function () {
     const value = document.getElementById("newLocation").value;
-
+	const oldCode = document.getElementById("idLocation").value;
     if (!value) {
         alert("Selecciona una ubicación primero");
         return;
     }
 
-    const url = `/locations/migrate/old/${oldCode}/new/${value}`;
+    const url = encodeURI(`/lugus/locations/migrate?oldLoc=${oldCode}&newLoc=${value}`);
 
     try {
         const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            }
+            method: "POST"
         });
 
         if (!response.ok) {
             throw new Error("Error en la migración");
         }
-
-        // cerrar modal solo si fue bien
-        const modal = bootstrap.Modal.getInstance(
-            document.getElementById("confirmModal")
-        );
-        modal.hide();
 
         alert("Migración completada");
 

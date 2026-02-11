@@ -257,6 +257,11 @@ public class PeliculaService {
 		
 		return result;
 	}
+
+	public int updateLocationForAll(String oldLocation, String newLocation) {
+		return peliculaRepo.updateLocationByCode(oldLocation, newLocation);
+		
+	}
 	
 	
 }

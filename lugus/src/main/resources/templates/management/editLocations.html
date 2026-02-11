@@ -40,7 +40,7 @@
 		<br /> <br />
 		<div class="row">
 			Migrar peliculas asociadas:<br /> <br /> Ubicación destino <select
-				class="form-select">
+				class="form-select" id="newLocation">
 				<option th:each="f : ${otherLocs}" th:value="${f.codigo}"
 					th:text="${f.descripcion}"></option>
 			</select>
@@ -92,9 +92,6 @@
 			</div>
 		</div>
 	</div>
-	<script th:inline="javascript">
-		const oldCode = '${location.codigo}';
-	</script>
 
 	<script src="/lugus/js/migrateLoc.js" defer="defer"></script>
 </body>
