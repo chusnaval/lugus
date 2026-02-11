@@ -37,7 +37,7 @@
 						<td th:text="${p.descripcion}"></td>
 						<td th:text="${p.countFilms}"></td>
 						<td th:text="${p.locationType.description}"></td>
-						<td><a th:href="@{/locations/deleteLoc/{id}(id=${p.codigo})}" class="link-danger"><i class="fa-solid fa-delete-left"></i></a></td>
+						<td><a th:if="${p.countFilms}=='(0)'" th:href="@{/locations/deleteLoc/{id}(id=${p.codigo})}" class="link-danger"><i class="fa-solid fa-delete-left"></i></a></td>
 					</tr>
 				</tbody>
 			</table>
