@@ -21,7 +21,6 @@ import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.people.Actor;
 import lugus.model.people.Director;
-import lugus.model.user.Usuario;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.service.core.SourceService;
@@ -36,13 +35,13 @@ import lugus.service.imdb.ImdbTitleBasicsService;
 import lugus.service.people.ActorService;
 import lugus.service.people.DirectorService;
 import lugus.service.people.InsertPersonalDataService;
-import lugus.service.user.UsuarioService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -76,8 +75,6 @@ public class PeliculasController {
 
 	private final ActorService actorService;
 
-	private final UsuarioService usuarioService;
-
 	private final InsertPersonalDataService insertImdbService;
 
 	private final LocationTypeService locationTypeService;
@@ -87,7 +84,7 @@ public class PeliculasController {
 	private final ImdbTitleBasicsService imdbTitleBasicsService;
 
 	private final ImdbTitleAkasService imdbTitleAkasService;
-	
+
 	private final GroupFilmsService groupFilmsService;
 	/*
 	 * ------------------------------------------------- LISTADO DE PELÍCULAS GET
@@ -123,10 +120,6 @@ public class PeliculasController {
 		List<Location> locations = locService.findAllOrderByDescripcion();
 		model.addAttribute("locations", locations);
 
-		// admin rigth
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		model.addAttribute("admin", usuario.isAdmin());
-
 		return "peliculas/list";
 	}
 
@@ -156,12 +149,9 @@ public class PeliculasController {
 	 * ------------------------------------------------- FORMULARIO DE CREACIÓN GET
 	 * /peliculas/nuevo -------------------------------------------------
 	 */
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/nuevo")
 	public String createForm(Principal principal, Model model) throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		List<Location> locations = locService.findAllOrderByDescripcion();
 		model.addAttribute("locations", locations);
@@ -171,17 +161,12 @@ public class PeliculasController {
 
 		model.addAttribute("pelicula", new PeliculaCreateDto());
 
-		model.addAttribute("admin", usuario.isAdmin());
-
 		return "peliculas/new"; // → templates/peliculas/form.html
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/petition/{id}")
 	public String createPeticion(Principal principal, Model model, @PathVariable String id) throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		List<Source> sources = sourceService.findAll();
 		model.addAttribute("sourcesList", sources);
@@ -206,22 +191,17 @@ public class PeliculasController {
 
 		model.addAttribute("pelicula", dto);
 
-		model.addAttribute("admin", usuario.isAdmin());
-
-		return "peliculas/petition"; 
+		return "peliculas/petition";
 	}
 
 	/*
 	 * ------------------------------------------------- GUARDAR NUEVA PELÍCULA POST
 	 * /peliculas -------------------------------------------------
 	 */
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping
 	public String create(Principal principal, @Valid @ModelAttribute("pelicula") PeliculaCreateDto dto,
 			BindingResult br, Model model, HttpSession session) throws PermisoException, IOException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		if (br.hasErrors()) {
 			List<Location> locations = locService.findAllOrderByDescripcion();
@@ -264,9 +244,6 @@ public class PeliculasController {
 		List<Actor> actores = actorService.findByPeliculaIdOrderByOrdenAsc(p.getId());
 		model.addAttribute("actores", actores);
 
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		model.addAttribute("admin", usuario.isAdmin());
-
 		File file = new File(storageProperties.getNfsRoot(), +id + "_trailer.mkv");
 		if (!file.exists()) {
 			file = new File(storageProperties.getNfsRoot(), +id + "_trailer.mp4");
@@ -279,7 +256,7 @@ public class PeliculasController {
 
 		List<GroupFilms> grupos = groupFilmsService.findByPelicula(id);
 		model.addAttribute("grupos", grupos);
-		
+
 		return "peliculas/detail";
 	}
 
@@ -353,13 +330,10 @@ public class PeliculasController {
 
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/editar/{id}")
 	public String edit(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
 			throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
 		model.addAttribute("pelicula", p);
@@ -386,17 +360,17 @@ public class PeliculasController {
 		nuevo.setSteelbook(p.isSteelbook());
 		nuevo.setPack(p.isPack());
 		nuevo.setNotas(p.getNotas());
-		
-		if(p.getOtros() != null) {
+
+		if (p.getOtros() != null) {
 			nuevo.setVista(p.getOtros().getVista());
 			nuevo.setLbRating(p.getOtros().getLbRating());
-		}else {
+		} else {
 			nuevo.setVista(false);
 		}
 
 		if (p.getLocation() != null) {
 			nuevo.setLocationCode(p.getLocation().getCodigo());
-		}else {
+		} else {
 			nuevo.setLocationCode("");
 		}
 
@@ -413,13 +387,10 @@ public class PeliculasController {
 		return "peliculas/edit"; // → templates/peliculas/detail.html
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/actualizar/{id}")
 	public String actualizar(Principal principal, HttpSession session, @PathVariable Integer id, RedirectAttributes ra,
 			@Valid @ModelAttribute PeliculaCreateDto nuevo) throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		Optional<Pelicula> opt = service.findById(id);
 
@@ -455,11 +426,11 @@ public class PeliculasController {
 		if (nuevo.getImdbCodigo() != null && !nuevo.getImdbCodigo().isBlank()) {
 			insertImdbService.insert(existing.getId(), nuevo.getImdbCodigo());
 		}
-		
+
 		existing.getOtros().setLbRating(nuevo.getLbRating());
 		existing.getOtros().setVista(nuevo.isVista());
 		service.save(existing);
-		
+
 		return "redirect:/peliculas?recuperar=true";
 	}
 
@@ -469,14 +440,10 @@ public class PeliculasController {
 		return "redirect:/peliculas?recuperar=true";
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/{id}/caratula")
 	public ResponseEntity<String> addCaratula(Principal principal, @PathVariable Integer id,
 			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException {
-
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
 		Optional<Source> sourceObj = sourceService.findById(dto.getSource());
@@ -503,15 +470,12 @@ public class PeliculasController {
 	 * ------------------------------------------------- AÑADIR UN HIJO AL PACK POST
 	 * /peliculas/{padreId}/hijo -------------------------------------------------
 	 */
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/{padreId}/hijo")
 	public String addChild(Principal principal, @PathVariable Integer padreId, HttpSession session,
 			@Valid @ModelAttribute("nuevoHijo") PeliculaChildDto dto, BindingResult br, Model model)
 			throws PermisoException, IOException {
 
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		if (br.hasErrors()) {
 			// Si hay errores, volvemos al detalle mostrando los mensajes
@@ -527,12 +491,9 @@ public class PeliculasController {
 	 * (opcional) DELETE /peliculas/{id}
 	 * -------------------------------------------------
 	 */
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/{id}/eliminar") // usando POST para evitar problemas con browsers
 	public String delete(Principal principal, @PathVariable Integer id) throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		service.delete(id);
 		return "redirect:/peliculas";

@@ -1,10 +1,8 @@
 package lugus.controller;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.user.Usuario;
 import lugus.service.films.PeliculaService;
 import lugus.service.series.SeriesService;
-import lugus.service.user.UsuarioService;
 
 import java.security.Principal;
 
@@ -20,7 +18,6 @@ public class HomeController {
 
 	private final PeliculaService peliculaService;
 	private final SeriesService serieService;
-	private final UsuarioService usuarioService;
 	
 	@GetMapping("/home")
 	public String home(Model model, Principal principal, HttpSession session) {
@@ -29,9 +26,6 @@ public class HomeController {
 
 		model.addAttribute("pageSeries", serieService.findForHome());
 		
-		// admin
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		model.addAttribute("admin", usuario.isAdmin());
 
 		return "home";
 	}

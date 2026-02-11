@@ -18,17 +18,13 @@ import lugus.dto.core.FiltrosDto;
 import lugus.exception.PermisoException;
 import lugus.model.groups.Group;
 import lugus.model.groups.GroupFilms;
-import lugus.model.user.Usuario;
 import lugus.service.groups.GroupFilmsService;
 import lugus.service.groups.GroupsService;
-import lugus.service.user.UsuarioService;
 
 @Controller
 @RequestMapping("/group")
 @RequiredArgsConstructor
 public class GroupController {
-
-	private final UsuarioService usuarioService;
 
 	private final GroupsService groupsService;
 	
@@ -44,10 +40,6 @@ public class GroupController {
 		List<GroupFilms> films = groupFilmsService.findByGroup(id);
 		model.addAttribute("films", films);
 		
-		// admin rigth
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		model.addAttribute("admin", usuario.isAdmin());
-		
 		return "groups/detail";
 	}
 
@@ -57,10 +49,6 @@ public class GroupController {
 
 		model.addAttribute("orden", filtro.getOrden().orElse("tituloGest"));
 		model.addAttribute("direccion", filtro.getDireccion().orElse("ASC"));
-
-		// admin rigth
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		model.addAttribute("admin", usuario.isAdmin());
 
 		// set filter to view
 		model.addAttribute("filtro", filtro);

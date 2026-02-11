@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,11 +26,9 @@ import lugus.exception.LugusNotFoundException;
 import lugus.exception.PermisoException;
 import lugus.mapper.core.LocationMapper;
 import lugus.model.core.Location;
-import lugus.model.user.Usuario;
 import lugus.service.core.LocationService;
 import lugus.service.core.LocationTypeService;
 import lugus.service.films.PeliculaService;
-import lugus.service.user.UsuarioService;
 
 @Controller
 @RequestMapping("/locations")
@@ -39,8 +38,6 @@ public class LocationController {
 	private final LocationService service;
 	
 	private final PeliculaService peliculaService;
-
-	private final UsuarioService usuarioService;
 
 	private final LocationTypeService locTypeService;
 
@@ -67,10 +64,6 @@ public class LocationController {
 		model.addAttribute("orden", filtro.getOrden().orElse("descripcion"));
 		model.addAttribute("direccion", filtro.getDireccion().orElse("ASC"));
 
-		// admin rigth
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		model.addAttribute("admin", usuario.isAdmin());
-
 		// set filter to view
 		model.addAttribute("filtro", filtro);
 		session.setAttribute("filtro", filtro);
@@ -84,27 +77,20 @@ public class LocationController {
 		return "management/locations";
 	}
 	
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/migrate")
 	public ModelAndView migrate(Principal principal, Model model, @RequestParam String oldLoc, @RequestParam String newLoc) throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tienes permiso para hacer esto");
-		}
 		
 		int count = peliculaService.updateLocationForAll(oldLoc, newLoc);
 		
 		model.addAttribute("updatedRows", count);
-		model.addAttribute("admin", usuario.isAdmin());
 		
 		return new ModelAndView("redirect:/locations/list");
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/deleteLoc/{id}")
 	public ModelAndView delete(Principal principal, @PathVariable String id, Model model) throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tienes permiso para hacer esto");
-		}
 
 		Optional<Location> loc = service.findById(id);
 		if (loc.isEmpty()) {
@@ -116,17 +102,12 @@ public class LocationController {
 		}
 
 		service.deleteById(id);
-		model.addAttribute("admin", usuario.isAdmin());
 		return new ModelAndView("redirect:/locations/list");
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/editLoc/{id}")
 	public String edit(Principal principal, @PathVariable String id, Model model) throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tienes permiso para hacer esto");
-		}
-
 		Optional<Location> loc = service.findById(id);
 		if (loc.isEmpty()) {
 			throw new LugusNotFoundException(id);
@@ -140,7 +121,6 @@ public class LocationController {
 		}
 		model.addAttribute("otherLocs", dtos);
 
-		model.addAttribute("admin", usuario.isAdmin());
 		return "management/editLocations";
 	}
 }

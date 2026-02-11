@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,7 +33,6 @@ import lugus.model.core.Source;
 import lugus.model.core.Location;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
-import lugus.model.user.Usuario;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.service.core.SourceService;
@@ -40,7 +40,6 @@ import lugus.service.core.LocationService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
 import lugus.service.series.SeriesService;
-import lugus.service.user.UsuarioService;
 
 @Controller
 @RequestMapping("/series")
@@ -50,8 +49,6 @@ public class SeriesController {
 	private final SeriesService service;
 
 	private final LocationService locService;
-
-	private final UsuarioService usuarioService;
 
 	private final SourceService sourceService;
 	
@@ -88,10 +85,6 @@ public class SeriesController {
 		List<Location> locations = locService.findAllOrderByDescripcion();
 		model.addAttribute("locations", locations);
 
-		// admin rigth
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		model.addAttribute("admin", usuario.isAdmin());
-
 		return "series/list";
 	}
 
@@ -99,12 +92,9 @@ public class SeriesController {
 	 * ------------------------------------------------- FORMULARIO DE CREACIÓN GET
 	 * /series/nuevo -------------------------------------------------
 	 */
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/nuevo")
 	public String createForm(Principal principal, Model model) throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		List<Location> locations = locService.findAllOrderByDescripcion();
 		model.addAttribute("locations", locations);
@@ -114,19 +104,13 @@ public class SeriesController {
 
 		model.addAttribute("serie", new SerieCreateDto());
 		
-		model.addAttribute("admin", usuario.isAdmin());
-		
 		return "series/new"; 
 	}
 
-
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping
 	public String create(Principal principal, @Valid @ModelAttribute("serie") SerieCreateDto dto,
 			BindingResult br, Model model, HttpSession session) throws PermisoException, IOException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		if (br.hasErrors()) {
 			// Si hay errores de validación, volvemos al mismo formulario
@@ -137,6 +121,7 @@ public class SeriesController {
 		return "redirect:/series/" + creada.getId();
 	}
 	
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/{id}")
 	public String detail(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
 			throws PermisoException {
@@ -148,9 +133,6 @@ public class SeriesController {
 		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro");
 		model.addAttribute("filtro", filtro);
 
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		model.addAttribute("admin", usuario.isAdmin());
-		
 		return "series/detail";
 	}
 	
@@ -177,13 +159,10 @@ public class SeriesController {
 		return "redirect:/series?recuperar=true";
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/editar/{id}")
 	public String edit(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
 			throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		Serie p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Serie no encontrada"));
 		model.addAttribute("serie", p);
@@ -218,13 +197,10 @@ public class SeriesController {
 		return "series/edit";
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/actualizar/{id}")
 	public String actualizar(Principal principal, HttpSession session, @PathVariable Integer id, RedirectAttributes ra,
 			@Valid @ModelAttribute SerieCreateDto nuevo) throws PermisoException {
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		Optional<Serie> opt = service.findById(id);
 
@@ -259,14 +235,11 @@ public class SeriesController {
 		return "redirect:/series?recuperar=true";
 	}
 	
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/{id}/caratula")
 	public ResponseEntity<String> addCaratula(Principal principal, @PathVariable Integer id,
 			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException {
 
-		Usuario usuario = usuarioService.findByLogin(principal.getName()).get();
-		if (!usuario.isAdmin()) {
-			throw new PermisoException("No tiene permisos");
-		}
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
 		Optional<Source> sourceObj = sourceService.findById(dto.getSource());
