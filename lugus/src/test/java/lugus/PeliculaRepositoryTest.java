@@ -12,7 +12,10 @@ import lugus.repository.films.PeliculaRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create-drop")   // usa H2 en memoria y configura solo JPA
+@DataJpaTest(properties = {
+    "spring.jpa.hibernate.ddl-auto=create-drop",
+    "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect"
+})   // usa H2 en memoria y configura solo JPA
 class PeliculaRepositoryTest {
 
     @Autowired PeliculaRepository repo;
