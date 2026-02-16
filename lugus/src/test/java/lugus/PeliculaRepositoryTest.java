@@ -1,5 +1,7 @@
 package lugus;
 
+import java.time.Instant;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,7 @@ class PeliculaRepositoryTest {
         padre.setAnyo(2020);
         padre.setFormato(Formato.BLURAY);
         padre.setGenero(Genero.AVENTURA);
+        padre.setTsAlta(Instant.now());
         padre.calcularCodigo();
         repo.save(padre);
 
@@ -39,6 +42,7 @@ class PeliculaRepositoryTest {
         child.setAnyo(2008);
         child.setFormato(Formato.BLURAY);
         child.setGenero(Genero.AVENTURA);
+        child.setTsAlta(Instant.now());
         child.calcularCodigo();
         repo.save(child);
         
