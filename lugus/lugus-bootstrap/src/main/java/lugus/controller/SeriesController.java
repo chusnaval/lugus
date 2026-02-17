@@ -116,7 +116,7 @@ public class SeriesController {
 			// Si hay errores de validación, volvemos al mismo formulario
 			return "series/form";
 		}
-		Serie creada = service.crear(dto, session);
+		Serie creada = service.crear(dto);
 		// Redirigimos al detalle de la serie  recién creada
 		return "redirect:/series/" + creada.getId();
 	}
