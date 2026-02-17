@@ -6,100 +6,32 @@
   <groupId>chusnaval.org</groupId>
   <artifactId>lugus</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+  <packaging>pom</packaging>
 
-    <name>Lugus</name>
-    <description>Guardar mi filmoteca.</description>
+  <name>Lugus</name>
+  <description>Guardar mi filmoteca.</description>
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.12</version> 
-        <relativePath/> 
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.12</version>
+    <relativePath/>
     </parent>
 
     <properties>
-        <java.version>21</java.version>
+    <java.version>21</java.version>
+    <active.profile>dev</active.profile>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies>
-		<!-- Spring MVC / REST -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-		<!-- pom.xml -->
-		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
-		<!-- Spring Data JPA -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
+    <modules>
+    <module>lugus-domain</module>
+    <module>lugus-application</module>
+    <module>lugus-infrastructure</module>
+    <module>lugus-bootstrap</module>
+    </modules>
 
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-           <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-        
-	
-	    <!-- Thymeleaf template engine -->
-	    <dependency>
-	        <groupId>org.springframework.boot</groupId>
-	        <artifactId>spring-boot-starter-thymeleaf</artifactId>
-	    </dependency>
-	    
-		<!-- ... other dependency elements ... -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-
-		<dependency>
-		    <groupId>org.thymeleaf.extras</groupId>
-		    <artifactId>thymeleaf-extras-springsecurity6</artifactId>
-		</dependency>
-		
-	    <dependency>
-	        <groupId>org.webjars</groupId>
-	        <artifactId>bootstrap</artifactId>
-	        <version>5.3.3</version>
-	    </dependency>
-
-		<!-- PostgreSQL JDBC driver -->
-	    <dependency>
-	        <groupId>org.postgresql</groupId>
-	        <artifactId>postgresql</artifactId>
-	        </dependency>
-
-		<!-- Test (JUnit 5 + Spring Test) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
-		</dependency>
-        <dependency>
-        	<groupId>org.springframework.boot</groupId>
-        	<artifactId>spring-boot-configuration-processor</artifactId>
-        	<optional>true</optional>
-        </dependency>
-    </dependencies>
-
- <profiles>
+    <profiles>
 
     <!-- Development profile -->
     <profile>
@@ -130,36 +62,19 @@
     </profile>
 
   </profiles>
-    <build>
-     	<finalName>lugus</finalName>
-     	 <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>   <!-- permite @...@ -->
-            </resource>
-        </resources>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            
-             <plugin>
-		        <artifactId>maven-resources-plugin</artifactId>
-		        <configuration>
-		          <encoding>UTF-8</encoding>
-		          <useDefaultDelimiters>true</useDefaultDelimiters>
-		        </configuration>
-		      </plugin>
-        </plugins>
-    </build>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <configuration>
+            <encoding>UTF-8</encoding>
+            <useDefaultDelimiters>true</useDefaultDelimiters>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>
