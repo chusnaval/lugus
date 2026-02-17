@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Iniciar sesión</title>
+ <link th:href="@{/css/login.css}" rel="stylesheet">
+</head>
+<body>
+	<div class="login-container">
+		<h2 style="color:white;">Iniciar sesión</h2>
+
+		<form th:action="@{/perform_login}" method="post" class="login-form" id="loginForm">
+			<div class="form-group">
+				<div class="input-wrapper">
+					<label>Usuario</label> <input type="text" name="username" required />
+					<span class="input-line"></span>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="input-wrapper password-wrapper">
+					<label>Contraseña</label> <input type="password" name="password"
+						required /> <span class="input-line"></span>
+				</div>
+			</div>
+			<div>
+				<button type="submit" class="login-btn btn">
+					Entrar <span class="btn-loader"></span> <span class="btn-glow"></span>
+				</button>
+			</div>
+
+			<div class="recover-link-wrapper">
+				<a href="#" id="toggleRecovery" class="forgot-password">Olvidé mi contraseña</a>
+			</div>
+
+			<div th:if="${param.error}">
+				<p style="color: red;">Usuario o contraseña incorrectos.</p>
+			</div>
+			<div th:if="${param.logout}">
+				<p style="color: green;">Has cerrado sesión correctamente.</p>
+			</div>
+		</form>
+
+		<div id="passwordRecoveryPanel" class="password-recovery-panel hidden">
+			<h3>Recuperar contraseña</h3>
+
+			<div class="form-group">
+				<div class="input-wrapper">
+					<label>Usuario</label>
+					<input type="text" id="recoveryLogin" required />
+					<span class="input-line"></span>
+				</div>
+			</div>
+
+			<button type="button" id="requestRecoveryToken" class="login-btn btn recovery-btn">Iniciar recuperación</button>
+
+			<div class="form-group">
+				<div class="input-wrapper">
+					<label>Token</label>
+					<input type="text" id="recoveryToken" required />
+					<span class="input-line"></span>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="input-wrapper">
+					<label>Nueva contraseña</label>
+					<input type="password" id="recoveryPassword" minlength="8" required />
+					<span class="input-line"></span>
+				</div>
+			</div>
+
+			<button type="button" id="confirmPasswordReset" class="login-btn btn recovery-btn">Actualizar contraseña</button>
+
+			<p id="recoveryMessage" class="recovery-message"></p>
+		</div>
+		<div class="success-message" id="successMessage">
+			<div class="success-icon">✓</div>
+			<h3>Encantado de volver a verte!</h3>
+			<p>Espera un segundo por favor...</p>
+		</div>
+		<div class="background-effects">
+			<div class="glow-orb glow-orb-1"></div>
+			<div class="glow-orb glow-orb-2"></div>
+			<div class="glow-orb glow-orb-3"></div>
+		</div>
+	</div>
+	 <script src="/js/login.js"></script>
+	 <script>
+	 	(function() {
+	 		const toggleRecovery = document.getElementById('toggleRecovery');
+	 		const recoveryPanel = document.getElementById('passwordRecoveryPanel');
+	 		const requestButton = document.getElementById('requestRecoveryToken');
+	 		const confirmButton = document.getElementById('confirmPasswordReset');
+	 		const loginInput = document.querySelector('input[name="username"]');
+	 		const recoveryLogin = document.getElementById('recoveryLogin');
+	 		const recoveryToken = document.getElementById('recoveryToken');
+	 		const recoveryPassword = document.getElementById('recoveryPassword');
+	 		const recoveryMessage = document.getElementById('recoveryMessage');
+
+	 		function setMessage(text, isError) {
+	 			recoveryMessage.textContent = text;
+	 			recoveryMessage.classList.remove('error', 'success');
+	 			recoveryMessage.classList.add(isError ? 'error' : 'success');
+	 		}
+
+	 		async function postJson(url, payload) {
+	 			const response = await fetch(url, {
+	 				method: 'POST',
+	 				headers: {
+	 					'Content-Type': 'application/json'
+	 				},
+	 				body: JSON.stringify(payload)
+	 			});
+
+	 			const data = await response.json();
+	 			return { ok: response.ok, data };
+	 		}
+
+	 		toggleRecovery.addEventListener('click', function(e) {
+	 			e.preventDefault();
+	 			recoveryPanel.classList.toggle('hidden');
+	 			if (!recoveryLogin.value && loginInput && loginInput.value) {
+	 				recoveryLogin.value = loginInput.value;
+	 			}
+	 		});
+
+	 		requestButton.addEventListener('click', async function() {
+	 			const login = recoveryLogin.value ? recoveryLogin.value.trim() : '';
+	 			if (!login) {
+	 				setMessage('Debes indicar un usuario.', true);
+	 				return;
+	 			}
+
+	 			try {
+	 				const result = await postJson('/api/auth/password-recovery/request', { login });
+	 				if (!result.ok) {
+	 					setMessage(result.data && result.data.message ? result.data.message : 'No se pudo solicitar el token.', true);
+	 					return;
+	 				}
+
+					setMessage(result.data && result.data.message
+						? result.data.message + ' Introduce el token recibido por canal seguro.'
+						: 'Solicitud procesada. Introduce el token recibido por canal seguro.', false);
+	 			} catch (error) {
+	 				setMessage('Error de comunicación con el servidor.', true);
+	 			}
+	 		});
+
+	 		confirmButton.addEventListener('click', async function() {
+	 			const login = recoveryLogin.value ? recoveryLogin.value.trim() : '';
+	 			const token = recoveryToken.value ? recoveryToken.value.trim() : '';
+	 			const newPassword = recoveryPassword.value ? recoveryPassword.value.trim() : '';
+
+	 			if (!login || !token || !newPassword) {
+	 				setMessage('Debes informar usuario, token y nueva contraseña.', true);
+	 				return;
+	 			}
+
+	 			if (newPassword.length < 8) {
+	 				setMessage('La nueva contraseña debe tener al menos 8 caracteres.', true);
+	 				return;
+	 			}
+
+	 			try {
+	 				const result = await postJson('/api/auth/password-recovery/reset', { login, token, newPassword });
+	 				if (!result.ok) {
+	 					setMessage(result.data && result.data.message ? result.data.message : 'No se pudo actualizar la contraseña.', true);
+	 					return;
+	 				}
+
+	 				setMessage(result.data && result.data.message ? result.data.message : 'Contraseña actualizada.', false);
+	 				recoveryPassword.value = '';
+	 			} catch (error) {
+	 				setMessage('Error de comunicación con el servidor.', true);
+	 			}
+	 		});
+	 	})();
+	 </script>
+</body>
+</html>
