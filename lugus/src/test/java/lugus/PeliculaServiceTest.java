@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import jakarta.servlet.http.HttpSession;
+
 import lugus.dto.films.PeliculaChildDto;
 import lugus.model.films.Pelicula;
 import lugus.model.values.Formato;
@@ -30,6 +32,8 @@ class PeliculaServiceTest {
     @BeforeEach
     void setUp() {
         repo = mock(PeliculaRepository.class);
+        locService = mock(LocationService.class);
+        sourceService = mock(SourceService.class);
         service = new PeliculaService(repo, locService, sourceService);
     }
 
@@ -44,6 +48,7 @@ class PeliculaServiceTest {
 
         Pelicula child = new Pelicula();
         child.setTitulo("Parte 1");
+        child.setTituloGest("Parte 1");
         child.setPadre(padre);
         child.setFormato(Formato.BLURAY);
         child.setGenero(Genero.ACCION);
@@ -80,9 +85,11 @@ class PeliculaServiceTest {
 
         when(repo.findById(10)).thenReturn(Optional.of(padre));
         when(repo.save(any(Pelicula.class))).thenAnswer(i -> i.getArgument(0));
+        HttpSession session = mock(HttpSession.class);
+        when(session.getAttribute("usuarioConectado")).thenReturn("test-user");
 
         // --- Act -------------------------------------------------------------
-        Pelicula result = service.addChild(10, child, null);
+        Pelicula result = service.addChild(10, child, session);
 
         // --- Assert ----------------------------------------------------------
         assertThat(result.getPadre()).isSameAs(padre);

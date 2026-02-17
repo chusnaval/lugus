@@ -1,5 +1,7 @@
 package lugus;
 
+import java.time.Instant;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,10 @@ import lugus.repository.films.PeliculaRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest   // usa H2 en memoria y configura solo JPA
+@DataJpaTest(properties = {
+    "spring.jpa.hibernate.ddl-auto=create-drop",
+    "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect"
+})   // usa H2 en memoria y configura solo JPA
 class PeliculaRepositoryTest {
 
     @Autowired PeliculaRepository repo;
@@ -23,17 +28,21 @@ class PeliculaRepositoryTest {
         // --- Arrange ---------------------------------------------------------
         Pelicula padre = new Pelicula();
         padre.setTitulo("Colección Marvel");
+        padre.setTituloGest("Colección Marvel");
         padre.setAnyo(2020);
         padre.setFormato(Formato.BLURAY);
         padre.setGenero(Genero.AVENTURA);
+        padre.setTsAlta(Instant.now());
         padre.calcularCodigo();
         repo.save(padre);
 
         Pelicula child = new Pelicula();
         child.setTitulo("Iron Man");
+        child.setTituloGest("Iron Man");
         child.setAnyo(2008);
         child.setFormato(Formato.BLURAY);
         child.setGenero(Genero.AVENTURA);
+        child.setTsAlta(Instant.now());
         child.calcularCodigo();
         repo.save(child);
         

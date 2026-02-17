@@ -53,7 +53,6 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/data/spring-data-commons/3.2.12/spring-data-commons-3.2.12.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-orm/6.1.15/spring-orm-6.1.15.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-tx/6.1.15/spring-tx-6.1.15.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/org/slf4j/slf4j-api/2.0.16/slf4j-api-2.0.16.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-aspects/6.1.15/spring-aspects-6.1.15.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/boot/spring-boot-starter-thymeleaf/3.2.12/spring-boot-starter-thymeleaf-3.2.12.jar" enabled="true" runInBatchMode="false"/>
@@ -67,6 +66,8 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-core/6.2.8/spring-security-core-6.2.8.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-crypto/6.2.8/spring-security-crypto-6.2.8.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-web/6.2.8/spring-security-web-6.2.8.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/thymeleaf/extras/thymeleaf-extras-springsecurity6/3.1.2.RELEASE/thymeleaf-extras-springsecurity6-3.1.2.RELEASE.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/slf4j/slf4j-api/2.0.16/slf4j-api-2.0.16.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/webjars/bootstrap/5.3.3/bootstrap-5.3.3.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/postgresql/postgresql/42.6.2/postgresql-42.6.2.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/checkerframework/checker-qual/3.31.0/checker-qual-3.31.0.jar" enabled="true" runInBatchMode="false"/>
@@ -79,5 +80,4 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/tomcat/embed/tomcat-embed-core/10.1.33/tomcat-embed-core-10.1.33.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.33/tomcat-embed-websocket-10.1.33.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/boot/spring-boot-configuration-processor/3.2.12/spring-boot-configuration-processor-3.2.12.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="PLUGIN" id="org.eclipse.jst.ws.annotations.core" enabled="false" runInBatchMode="false"/>
 </factorypath>
