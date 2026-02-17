@@ -15,6 +15,7 @@ import lugus.repository.films.PeliculaRepository;
 import lugus.repository.films.PeliculaSpecification;
 import lugus.service.core.SourceService;
 import lugus.service.core.LocationService;
+import lugus.service.user.CurrentUserProvider;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
@@ -44,6 +44,7 @@ public class PeliculaService {
 	private final PeliculaRepository peliculaRepo;
 	private final LocationService locService;
 	private final SourceService sourceService;
+	private final CurrentUserProvider currentUserProvider;
 
 	public List<Pelicula> findAll() {
 		return peliculaRepo.findAll();
@@ -62,17 +63,16 @@ public class PeliculaService {
 	}
 
 	@Transactional
-	public Pelicula crear(PeliculaCreateDto dto, HttpSession session) throws IOException {
+	public Pelicula crear(PeliculaCreateDto dto) throws IOException {
 		Location loc = findLocation(dto);
-
-		String user = (String) session.getAttribute("usuarioConectado");
+		String username = currentUserProvider.currentUsername();
 
 		Formato formato = Formato.getById(dto.getFormatoCodigo());
 		Genero genero = Genero.getById(dto.getGeneroCodigo());
 
 		Pelicula p = Pelicula.builder().titulo(dto.getTitulo()).tituloGest(dto.getTituloGest()).anyo(dto.getAnyo())
 				.formato(formato).genero(genero).pack(dto.isPack()).steelbook(dto.isSteelbook()).funda(dto.isFunda())
-				.comprado(dto.isComprado()).notas(dto.getNotas()).location(loc).usrAlta(user).tsAlta(Instant.now())
+				.comprado(dto.isComprado()).notas(dto.getNotas()).location(loc).usrAlta(username).tsAlta(Instant.now())
 				.build();
 		p.calcularCodigo();
 		Pelicula saved = peliculaRepo.save(p);
@@ -108,26 +108,25 @@ public class PeliculaService {
 	}
 
 	@Transactional
-	public Pelicula addChild(Integer padreId, @Valid PeliculaChildDto dto, HttpSession session) throws IOException {
+	public Pelicula addChild(Integer padreId, @Valid PeliculaChildDto dto) throws IOException {
 		Pelicula padre = peliculaRepo.findById(padreId)
 				.orElseThrow(() -> new IllegalArgumentException("Padre no encontrado"));
-		Pelicula hijo = add(padre, dto, session);
+		String username = currentUserProvider.currentUsername();
+		Pelicula hijo = add(padre, dto, username);
 		hijo.setPadre(padre);
 		padre.getPeliculasPack().add(hijo);
 		peliculaRepo.save(padre);
 		return hijo;
 	}
 
-	private Pelicula add(Pelicula padre, PeliculaChildDto dto, HttpSession session) {
+	private Pelicula add(Pelicula padre, PeliculaChildDto dto, String username) {
 
 		Formato formato = Formato.getById(dto.getFormatoCodigo());
 		Genero genero = Genero.getById(dto.getGeneroCodigo());
-		String user = (String) session.getAttribute("usuarioConectado");
-
 		Pelicula p = Pelicula.builder().titulo(dto.getTitulo()).tituloGest(dto.getTitulo()).anyo(dto.getAnyo())
 				.formato(formato).genero(genero).pack(false).steelbook(padre.isSteelbook()).funda(padre.isFunda())
 				.comprado(padre.isComprado()).notas(padre.getNotas()).location(padre.getLocation())
-				.usrAlta(user).tsAlta(Instant.now()).build();
+				.usrAlta(username).tsAlta(Instant.now()).build();
 		p.calcularCodigo();
 		Pelicula saved = peliculaRepo.save(p);
 

@@ -5,8 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import jakarta.servlet.http.HttpSession;
-
 import lugus.dto.films.PeliculaChildDto;
 import lugus.model.films.Pelicula;
 import lugus.model.values.Formato;
@@ -15,6 +13,7 @@ import lugus.repository.films.PeliculaRepository;
 import lugus.service.core.SourceService;
 import lugus.service.core.LocationService;
 import lugus.service.films.PeliculaService;
+import lugus.service.user.CurrentUserProvider;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -27,6 +26,7 @@ class PeliculaServiceTest {
     private PeliculaRepository repo;
 	private LocationService locService;
 	private SourceService sourceService;
+    private CurrentUserProvider currentUserProvider;
     private PeliculaService service;
 
     @BeforeEach
@@ -34,7 +34,9 @@ class PeliculaServiceTest {
         repo = mock(PeliculaRepository.class);
         locService = mock(LocationService.class);
         sourceService = mock(SourceService.class);
-        service = new PeliculaService(repo, locService, sourceService);
+		currentUserProvider = mock(CurrentUserProvider.class);
+		when(currentUserProvider.currentUsername()).thenReturn("test-user");
+        service = new PeliculaService(repo, locService, sourceService, currentUserProvider);
     }
 
     @Test
@@ -85,11 +87,9 @@ class PeliculaServiceTest {
 
         when(repo.findById(10)).thenReturn(Optional.of(padre));
         when(repo.save(any(Pelicula.class))).thenAnswer(i -> i.getArgument(0));
-        HttpSession session = mock(HttpSession.class);
-        when(session.getAttribute("usuarioConectado")).thenReturn("test-user");
 
         // --- Act -------------------------------------------------------------
-        Pelicula result = service.addChild(10, child, session);
+		Pelicula result = service.addChild(10, child);
 
         // --- Assert ----------------------------------------------------------
         assertThat(result.getPadre()).isSameAs(padre);

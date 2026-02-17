@@ -15,7 +15,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
@@ -33,6 +32,7 @@ import lugus.service.core.SourceService;
 import lugus.service.core.LocationService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
+import lugus.service.user.CurrentUserProvider;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +43,7 @@ public class SeriesService {
 	private final SerieRepository serieRepo;
 	private final LocationService locService;
 	private final SourceService sourceService;
+	private final CurrentUserProvider currentUserProvider;
 
 	public List<Serie> findAll() {
 		return serieRepo.findAll();
@@ -140,17 +141,16 @@ public class SeriesService {
 	}
 
 	@Transactional
-	public Serie crear(@Valid SerieCreateDto dto, HttpSession session) throws IOException {
+	public Serie crear(@Valid SerieCreateDto dto) throws IOException {
 		Location loc = findLocation(dto);
-
-		String user = (String) session.getAttribute("usuarioConectado");
+		String username = currentUserProvider.currentUsername();
 
 		Formato formato = Formato.getById(dto.getFormatoCodigo());
 		Genero genero = Genero.getById(dto.getGeneroCodigo());
 
 		Serie p = Serie.builder().titulo(dto.getTitulo()).tituloGest(dto.getTituloGest())
 				.anyoInicio(dto.getAnyoInicio()).anyoFin(dto.getAnyoFin()).formato(formato).genero(genero)
-				.comprado(dto.isComprado()).completa(dto.isCompleta()).notas(dto.getNotas()).location(loc).usrAlta(user).tsAlta(Instant.now())
+				.comprado(dto.isComprado()).completa(dto.isCompleta()).notas(dto.getNotas()).location(loc).usrAlta(username).tsAlta(Instant.now())
 				.build();
 		p.calcularCodigo();
 		Serie saved = serieRepo.save(p);

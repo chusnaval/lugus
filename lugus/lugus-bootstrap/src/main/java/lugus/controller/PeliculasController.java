@@ -212,7 +212,7 @@ public class PeliculasController {
 			// Si hay errores de validación, volvemos al mismo formulario
 			return "peliculas/new";
 		}
-		Pelicula creada = service.crear(dto, session);
+		Pelicula creada = service.crear(dto);
 
 		if (dto.getImdbCodigo() != null && !dto.getImdbCodigo().isBlank()) {
 			insertImdbService.insert(creada.getId(), dto.getImdbCodigo());
@@ -481,7 +481,7 @@ public class PeliculasController {
 			// Si hay errores, volvemos al detalle mostrando los mensajes
 			return detail(principal, padreId, session, model);
 		}
-		service.addChild(padreId, dto, session);
+		service.addChild(padreId, dto);
 		// Después de añadir el hijo, recargamos el detalle del padre
 		return "redirect:/peliculas/" + padreId;
 	}
