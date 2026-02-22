@@ -1,6 +1,7 @@
 package lugus.service.series;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -141,7 +142,7 @@ public class SeriesService {
 	}
 
 	@Transactional
-	public Serie crear(@Valid SerieCreateDto dto) throws IOException {
+	public Serie crear(@Valid SerieCreateDto dto) throws IOException, URISyntaxException {
 		Location loc = findLocation(dto);
 		String username = currentUserProvider.currentUsername();
 

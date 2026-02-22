@@ -3,13 +3,14 @@ package lugus.service.films;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 
 public class DwFotoService implements DwFotoServiceI {
 
 	@Override
 	public byte[] descargar(Integer source, String url) throws IOException {
-		URL imgUrl = new URL(url);
+		URL imgUrl = URI.create(url).toURL();
 		try (InputStream in = imgUrl.openStream(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
 			byte[] buffer = new byte[4096];

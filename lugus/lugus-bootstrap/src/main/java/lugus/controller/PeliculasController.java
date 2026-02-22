@@ -445,7 +445,7 @@ public class PeliculasController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/{id}/caratula")
 	public ResponseEntity<String> addCaratula(Principal principal, @PathVariable Integer id,
-			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException {
+			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException, URISyntaxException {
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
 		Optional<Source> sourceObj = sourceService.findById(dto.getSource());

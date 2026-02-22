@@ -1,6 +1,7 @@
 package lugus.controller;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -110,7 +111,7 @@ public class SeriesController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping
 	public String create(Principal principal, @Valid @ModelAttribute("serie") SerieCreateDto dto,
-			BindingResult br, Model model, HttpSession session) throws PermisoException, IOException {
+			BindingResult br, Model model, HttpSession session) throws PermisoException, IOException, URISyntaxException {
 
 		if (br.hasErrors()) {
 			// Si hay errores de validación, volvemos al mismo formulario
@@ -238,7 +239,7 @@ public class SeriesController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/{id}/caratula")
 	public ResponseEntity<String> addCaratula(Principal principal, @PathVariable Integer id,
-			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException {
+			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException, URISyntaxException {
 
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
