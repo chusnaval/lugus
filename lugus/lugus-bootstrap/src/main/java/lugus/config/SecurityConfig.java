@@ -23,13 +23,13 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain filterChain(HttpSecurity http, LoginFailureHandler loginFailureHandler) throws Exception {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/css/**", "/js/**", "/public/**",
 						"/api/auth/password-recovery/**")
 						.permitAll().anyRequest().authenticated())
 				.formLogin(form -> form.loginPage("/login").loginProcessingUrl("/perform_login")
-						.defaultSuccessUrl("/guardarUsuario", true).failureUrl("/login?error=true").permitAll())
+						.defaultSuccessUrl("/guardarUsuario", true).failureHandler(loginFailureHandler).permitAll())
 				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout=true")
 						.invalidateHttpSession(true) // invalida la sesión HTTP
 						.deleteCookies("JSESSIONID") // elimina la cookie de sesión

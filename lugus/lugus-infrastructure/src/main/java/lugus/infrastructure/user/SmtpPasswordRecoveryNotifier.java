@@ -2,6 +2,7 @@ package lugus.infrastructure.user;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,7 +17,7 @@ public class SmtpPasswordRecoveryNotifier implements PasswordRecoveryNotifier {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SmtpPasswordRecoveryNotifier.class);
 
-	private final JavaMailSender mailSender;
+	private final ObjectProvider<JavaMailSender> mailSenderProvider;
 
 	@Value("${lugus.recovery.mail.enabled:false}")
 	private boolean mailEnabled;
@@ -31,6 +32,12 @@ public class SmtpPasswordRecoveryNotifier implements PasswordRecoveryNotifier {
 	public void sendRecoveryToken(String login, String email, String token, long expiresInSeconds) {
 		if (!mailEnabled) {
 			LOGGER.info("Password recovery email disabled. login={}", login);
+			return;
+		}
+
+		JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
+		if (mailSender == null) {
+			LOGGER.warn("Password recovery email enabled but JavaMailSender is not configured. login={}", login);
 			return;
 		}
 

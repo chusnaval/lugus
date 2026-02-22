@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -201,7 +202,8 @@ public class PeliculasController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping
 	public String create(Principal principal, @Valid @ModelAttribute("pelicula") PeliculaCreateDto dto,
-			BindingResult br, Model model, HttpSession session) throws PermisoException, IOException {
+			BindingResult br, Model model, HttpSession session)
+			throws PermisoException, IOException, URISyntaxException {
 
 		if (br.hasErrors()) {
 			List<Location> locations = locService.findAllOrderByDescripcion();
@@ -443,7 +445,7 @@ public class PeliculasController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/{id}/caratula")
 	public ResponseEntity<String> addCaratula(Principal principal, @PathVariable Integer id,
-			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException {
+			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException, URISyntaxException {
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
 		Optional<Source> sourceObj = sourceService.findById(dto.getSource());

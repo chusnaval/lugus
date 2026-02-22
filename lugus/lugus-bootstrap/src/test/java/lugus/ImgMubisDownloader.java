@@ -3,6 +3,7 @@ package lugus;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -125,7 +126,7 @@ public class ImgMubisDownloader {
 		try (PreparedStatement pst = con.prepareStatement(
 				"INSERT INTO public.peliculas_fotos ( pelicula_id, url, fuente_id, foto) VALUES ( ?, ?, ?, ?)")) {
 
-			URL imgUrl = new URL(caratula.getUrl());
+			URL imgUrl = URI.create(caratula.getUrl()).toURL();
 			InputStream in = imgUrl.openStream();
 			pst.setInt(1, caratula.getPelicula_id());
 			pst.setString(2, caratula.getUrl());

@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class PeliculaService {
 	}
 
 	@Transactional
-	public Pelicula crear(PeliculaCreateDto dto) throws IOException {
+	public Pelicula crear(PeliculaCreateDto dto) throws IOException, URISyntaxException {
 		Location loc = findLocation(dto);
 		String username = currentUserProvider.currentUsername();
 
