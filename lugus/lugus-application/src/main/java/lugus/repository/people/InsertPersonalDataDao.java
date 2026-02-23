@@ -4,14 +4,16 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 
 @Component
 public class InsertPersonalDataDao implements InsertPersonalDataRepository {
-	@Autowired
-	private DataSource dataSource;
+	private final DataSource dataSource;
+
+	public InsertPersonalDataDao(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
 
 	@Override
 	public void insert(int peliculaId, String imdb) {

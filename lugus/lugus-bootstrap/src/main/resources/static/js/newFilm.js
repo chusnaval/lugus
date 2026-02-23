@@ -5,24 +5,53 @@ const btnCancelar = document.getElementById('cancelBtn');
 const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
 
 const formulario = document.getElementById('formulario');
+let isSubmitting = false;
+
+const disableActionButtons = () => {
+	btnSave.disabled = true;
+	btnAceptar.disabled = true;
+	btnCancelar.disabled = true;
+};
+
+const enableActionButtons = () => {
+	btnSave.disabled = false;
+	btnAceptar.disabled = false;
+	btnCancelar.disabled = false;
+};
+
+const submitOnce = () => {
+	if (isSubmitting) {
+		return;
+	}
+	isSubmitting = true;
+	disableActionButtons();
+	formulario.submit();
+};
 
 btnSave.addEventListener('click', async (e) => {
 	try {
 		e.preventDefault();
+		if (isSubmitting) {
+			return;
+		}
+		btnSave.disabled = true;
 		const result = await validateTitleAndYear();
 
 		if (result.titulo == null) {
-			formulario.submit();
+			submitOnce();
 		} else {
 
 			modal.show();
+			btnAceptar.disabled = false;
+			btnCancelar.disabled = false;
 
 			const onAceptar = () => {
-				formulario.submit();
+				submitOnce();
 				modal.hide();
 			};
 			const onCancelar = () => {
 				modal.hide();
+				enableActionButtons();
 			};
 
 			btnAceptar.addEventListener('click', onAceptar, { once: true });
@@ -32,6 +61,7 @@ btnSave.addEventListener('click', async (e) => {
 
 	} catch (err) {
 		console.error(err);
+		enableActionButtons();
 		alert('Error al comprobar la condición: ' + err.message);
 	}
 });

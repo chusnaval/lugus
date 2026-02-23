@@ -2,7 +2,6 @@ package lugus.infrastructure.repository.core;
 
 import java.sql.Types;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -11,8 +10,11 @@ import lugus.repository.core.GetAnteriorRepository;
 @Component
 public class GetAnterioDao implements GetAnteriorRepository {
 
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private final JdbcTemplate jdbcTemplate;
+
+	public GetAnterioDao(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 
 	@Override
 	public String getAnterior(String codigo) {
