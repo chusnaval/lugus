@@ -26,7 +26,7 @@ public class SecurityConfig {
 	SecurityFilterChain filterChain(HttpSecurity http, LoginFailureHandler loginFailureHandler) throws Exception {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/css/**", "/js/**", "/public/**",
-						"/api/auth/password-recovery/**")
+						"/api/auth/password-recovery/**", "/actuator/health", "/actuator/health/**", "/actuator/info")
 						.permitAll().anyRequest().authenticated())
 				.formLogin(form -> form.loginPage("/login").loginProcessingUrl("/perform_login")
 						.defaultSuccessUrl("/guardarUsuario", true).failureHandler(loginFailureHandler).permitAll())
