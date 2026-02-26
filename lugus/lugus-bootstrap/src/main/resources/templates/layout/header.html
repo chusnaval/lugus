@@ -1,6 +1,6 @@
 <!-- src/main/resources/templates/layout/fragments.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xml:lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="head(title)">
 <meta charset="UTF-8" />
 <title th:text="${title}">Lugus</title>
@@ -12,7 +12,7 @@
 	<div class="row">
 		<div class="col-2">
 			<a th:href="@{'/home'}" id="logo_link"> <img
-				th:src="@{/image/logo.png}" class="lugus_logo" />
+				th:src="@{/image/logo.png}" class="lugus_logo" alt="Lugus" />
 			</a>
 		</div>
 		<div class="col-8">
@@ -90,6 +90,9 @@
 				</ul>
 
 			</nav>
+		</div>
+		<div class="col-2 d-flex align-items-center justify-content-end">
+			<span class="text-light small" th:text="'v' + ${appVersion}">v0.0.2</span>
 		</div>
 	</div>
 </body>
