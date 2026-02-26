@@ -9,8 +9,8 @@
 				pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level [%X{correlationId:-N/A}] %logger{36} - %msg%n" />
 		</Console>
 		<RollingFile name="FileAppender"
-			fileName="${log-path}/app.log"
-			filePattern="${log-path}/app-%d{yyyy-MM-dd}-%i.log">
+			fileName="${log-path}/lugus.log"
+			filePattern="${log-path}/lugus-%d{yyyy-MM-dd}-%i.log">
 			<PatternLayout
 				pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level [%X{correlationId:-N/A}] %logger{36} - %msg%n" />
 			<Policies>
@@ -21,6 +21,11 @@
 		</RollingFile>
 	</Appenders>
 	<Loggers>
+		<Logger name="lugus" level="info" additivity="false">
+			<AppenderRef ref="ConsoleAppender" />
+			<AppenderRef ref="FileAppender" />
+		</Logger>
+
 		<Root level="warn">
 			<AppenderRef ref="ConsoleAppender" />
 			<AppenderRef ref="FileAppender" />
