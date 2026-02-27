@@ -147,6 +147,7 @@ public class PeliculasController {
 			.formatoCodigo(p.getCodigo())
 			.generoCodigo(p.getGenero().getCodigo())
 			.favorita(favoritasIds.contains(p.getId()))
+			.tieneCaratula(p.tieneCaratula())
 			.build()
 		);
 		model.addAttribute("pagePeliculas", resultadoDto);
