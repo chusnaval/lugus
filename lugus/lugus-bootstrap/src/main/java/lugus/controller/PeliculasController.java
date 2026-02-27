@@ -9,6 +9,7 @@ import lugus.config.StorageProperties;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.PeliculaChildDto;
 import lugus.dto.films.PeliculaCreateDto;
+import lugus.dto.films.PeliculaFavoritaDto;
 import lugus.dto.media.NewCaratulaDTO;
 import lugus.exception.PermisoException;
 import lugus.model.core.Source;
@@ -21,6 +22,7 @@ import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.people.Actor;
 import lugus.model.people.Director;
+import lugus.model.user.FavoritosUsuario;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.service.core.SourceService;
@@ -35,6 +37,8 @@ import lugus.service.imdb.ImdbTitleBasicsService;
 import lugus.service.people.ActorService;
 import lugus.service.people.DirectorService;
 import lugus.service.people.InsertPersonalDataService;
+import lugus.service.user.FavoritosUsuarioService;
+import lugus.service.user.UsuarioService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -60,11 +64,15 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/peliculas")
 @RequiredArgsConstructor
 public class PeliculasController {
+
+	private static final String PELICULA_NO_ENCONTRADA = "Película no encontrada";
 
 	private final PeliculaService service;
 
@@ -87,6 +95,11 @@ public class PeliculasController {
 	private final ImdbTitleAkasService imdbTitleAkasService;
 
 	private final GroupFilmsService groupFilmsService;
+
+	private final FavoritosUsuarioService favoritosUsuarioService;
+
+	private final UsuarioService usuarioService;
+
 	/*
 	 * ------------------------------------------------- LISTADO DE PELÍCULAS GET
 	 * /peliculas -------------------------------------------------
@@ -114,7 +127,29 @@ public class PeliculasController {
 
 		// obtain the film by the filter
 		Page<Pelicula> resultado = service.findAllBy(filtro);
-		model.addAttribute("pagePeliculas", resultado);
+		final Set<Integer> favoritasIds;
+		if (principal != null) {
+			String login = principal.getName();
+			var usuarioOpt = usuarioService.findByLogin(login);
+			if (usuarioOpt.isPresent()) {
+				List<FavoritosUsuario> favoritas = favoritosUsuarioService.findByUsuario(usuarioOpt.get());
+				favoritasIds = favoritas.stream().map(f -> f.getPelicula().getId()).collect(Collectors.toSet());
+			} else {
+				favoritasIds = Set.of();
+			}
+		} else {
+			favoritasIds = Set.of();
+		}
+		Page<PeliculaFavoritaDto> resultadoDto = resultado.map(p -> PeliculaFavoritaDto.builder()
+			.id(p.getId())
+			.titulo(p.getTitulo())
+			.anyo(p.getAnyo())
+			.formatoCodigo(p.getCodigo())
+			.generoCodigo(p.getGenero().getCodigo())
+			.favorita(favoritasIds.contains(p.getId()))
+			.build()
+		);
+		model.addAttribute("pagePeliculas", resultadoDto);
 		model.addAttribute("numResultado", "Resultados encontrados: " + resultado.getTotalElements());
 
 		// select for filter
@@ -152,7 +187,7 @@ public class PeliculasController {
 	 */
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/nuevo")
-	public String createForm(Principal principal, Model model) throws PermisoException {
+	public String createForm(Principal principal, Model model) {
 
 		List<Location> locations = locService.findAllOrderByDescripcion();
 		model.addAttribute("locations", locations);
@@ -167,7 +202,7 @@ public class PeliculasController {
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/petition/{id}")
-	public String createPeticion(Principal principal, Model model, @PathVariable String id) throws PermisoException {
+	public String createPeticion(Principal principal, Model model, @PathVariable String id)  {
 
 		List<Source> sources = sourceService.findAll();
 		model.addAttribute("sourcesList", sources);
@@ -203,7 +238,7 @@ public class PeliculasController {
 	@PostMapping
 	public String create(Principal principal, @Valid @ModelAttribute("pelicula") PeliculaCreateDto dto,
 			BindingResult br, Model model, HttpSession session)
-			throws PermisoException, IOException, URISyntaxException {
+			throws IOException, URISyntaxException {
 
 		if (br.hasErrors()) {
 			List<Location> locations = locService.findAllOrderByDescripcion();
@@ -231,9 +266,9 @@ public class PeliculasController {
 	 */
 	@GetMapping("/{id}")
 	public String detail(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
-			throws PermisoException {
+			{
 
-		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
+		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException(PELICULA_NO_ENCONTRADA));
 
 		model.addAttribute("pelicula", p);
 
@@ -263,9 +298,9 @@ public class PeliculasController {
 	}
 
 	@GetMapping("/{id}/image")
-	public ResponseEntity<byte[]> image(Principal principal, @PathVariable Integer id) throws PermisoException {
+	public ResponseEntity<byte[]> image(Principal principal, @PathVariable Integer id) {
 
-		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
+		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException(PELICULA_NO_ENCONTRADA));
 
 		if (p.getPeliculaFotos() != null && !p.getPeliculaFotos().isEmpty()) {
 			PeliculaFoto pf = p.getPeliculaFotos().iterator().next();
@@ -281,9 +316,9 @@ public class PeliculasController {
 
 	@GetMapping("/trailer/{id}")
 	public void trailer(Principal principal, @PathVariable Integer id, HttpServletRequest request,
-			HttpServletResponse response) throws PermisoException, IOException {
+			HttpServletResponse response) throws IOException {
 
-		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
+		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException(PELICULA_NO_ENCONTRADA));
 
 		File file = new File(storageProperties.getNfsRoot(), +p.getId() + "_trailer.mkv");
 		if (!file.exists()) {
@@ -337,7 +372,7 @@ public class PeliculasController {
 	public String edit(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
 			throws PermisoException {
 
-		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Película no encontrada"));
+		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException(PELICULA_NO_ENCONTRADA));
 		model.addAttribute("pelicula", p);
 
 		List<Source> sources = sourceService.findAll();
@@ -392,14 +427,14 @@ public class PeliculasController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/actualizar/{id}")
 	public String actualizar(Principal principal, HttpSession session, @PathVariable Integer id, RedirectAttributes ra,
-			@Valid @ModelAttribute PeliculaCreateDto nuevo) throws PermisoException {
+			@Valid @ModelAttribute PeliculaCreateDto nuevo) {
 
 		Optional<Pelicula> opt = service.findById(id);
 
 		Pelicula existing = opt.get();
 
 		if (existing == null) {
-			new IllegalArgumentException("Pelicula no encontrada");
+			new IllegalArgumentException(PELICULA_NO_ENCONTRADA);
 		}
 
 		Formato formato = Formato.getById(nuevo.getFormatoCodigo());
@@ -445,7 +480,7 @@ public class PeliculasController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/{id}/caratula")
 	public ResponseEntity<String> addCaratula(Principal principal, @PathVariable Integer id,
-			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException, URISyntaxException {
+			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, URISyntaxException {
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
 		Optional<Source> sourceObj = sourceService.findById(dto.getSource());
@@ -465,7 +500,7 @@ public class PeliculasController {
 			return ResponseEntity.ok("Descargado");
 		}
 
-		return new ResponseEntity<String>("Id no encontrado", HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>("Id no encontrado", HttpStatus.NO_CONTENT);
 	}
 
 	/*
@@ -475,8 +510,7 @@ public class PeliculasController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/{padreId}/hijo")
 	public String addChild(Principal principal, @PathVariable Integer padreId, HttpSession session,
-			@Valid @ModelAttribute("nuevoHijo") PeliculaChildDto dto, BindingResult br, Model model)
-			throws PermisoException, IOException {
+			@Valid @ModelAttribute("nuevoHijo") PeliculaChildDto dto, BindingResult br, Model model) {
 
 
 		if (br.hasErrors()) {
@@ -495,7 +529,7 @@ public class PeliculasController {
 	 */
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/{id}/eliminar") // usando POST para evitar problemas con browsers
-	public String delete(Principal principal, @PathVariable Integer id) throws PermisoException {
+	public String delete(Principal principal, @PathVariable Integer id) {
 
 		service.delete(id);
 		return "redirect:/peliculas";

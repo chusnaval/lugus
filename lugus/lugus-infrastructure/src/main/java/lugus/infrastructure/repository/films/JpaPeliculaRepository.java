@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import lugus.model.films.Pelicula;
 import lugus.repository.films.PeliculaRepository;
 
+
 public interface JpaPeliculaRepository extends PeliculaRepository, JpaRepository<Pelicula, Integer>, JpaSpecificationExecutor<Pelicula> {
 
 	@Override

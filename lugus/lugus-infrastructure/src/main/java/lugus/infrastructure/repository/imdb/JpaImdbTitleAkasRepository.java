@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import lugus.model.imdb.ImdbTitleAkas;
 import lugus.repository.imdb.ImdbTitleAkasRepository;
 
+
 public interface JpaImdbTitleAkasRepository extends ImdbTitleAkasRepository, JpaRepository<ImdbTitleAkas, String> {
 
 	@Override

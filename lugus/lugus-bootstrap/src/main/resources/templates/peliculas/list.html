@@ -34,7 +34,7 @@
 					th:href="@{/peliculas/{id}(id=${p.id})}"
 					class="text-decoration-none d-block custom-card-link fixed-height">
 					<div class="card fixed-height border-0 card-bg">
-						<div class="card-body card-bg">
+						<div class="card-body card-bg position-relative">
 
 							<span class="cover image-wrapper ms-2"><img
 								th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
@@ -60,6 +60,12 @@
 									th:text="${p.location==null?'':p.location.descripcion}"></span>
 
 							</div>
+							<!-- Estrella de favorito -->
+							<span sec:authorize="isAuthenticated()" class="position-absolute top-0 end-0 p-2">
+								<a href="#" th:attr="data-pelicula-id=${p.id}" class="favorite-toggle" th:classappend="${p.favorita} ? 'text-warning' : 'text-secondary'">
+									<i class="fa-star fa-lg fa" th:classappend="${p.favorita} ? 'fas' : 'far'"></i>
+								</a>
+							</span>
 						</div>
 					</div>
 				</a>
@@ -116,3 +122,38 @@
 
 </body>
 </html>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.favorite-toggle').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const peliculaId = btn.getAttribute('data-pelicula-id');
+            const icon = btn.querySelector('i');
+            const isFavorite = icon.classList.contains('fas');
+            const url = '/api/favoritos/pelicula/' + peliculaId;
+            btn.classList.add('disabled');
+            fetch(url, {
+                method: isFavorite ? 'DELETE' : 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (response.ok) {
+                    icon.classList.toggle('fas');
+                    icon.classList.toggle('far');
+                    btn.classList.toggle('text-warning');
+                    btn.classList.toggle('text-secondary');
+                } else {
+                    alert('Error al actualizar favorito');
+                }
+            })
+            .catch(() => alert('Error de red'))
+            .finally(() => btn.classList.remove('disabled'));
+        });
+    });
+});
+</script>

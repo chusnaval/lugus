@@ -28,8 +28,9 @@
 
     <modules>
     <module>lugus-domain</module>
-    <module>lugus-application</module>
+    <module>lugus-repository</module>
     <module>lugus-infrastructure</module>
+    <module>lugus-services</module>
     <module>lugus-bootstrap</module>
     </modules>
 

@@ -130,12 +130,12 @@ public class Pelicula {
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
-	private final Set<Director> directores = new HashSet<Director>();
+	private final Set<Director> directores = new HashSet<>();
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
-	private final Set<Actor> actores = new HashSet<Actor>();
+	private final Set<Actor> actores = new HashSet<>();
 	
 	@JsonIgnore
 	@OneToOne(mappedBy = "pelicula", cascade = CascadeType.ALL)
@@ -145,7 +145,7 @@ public class Pelicula {
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
-	private final Set<GroupFilms> groups = new HashSet<GroupFilms>();
+	private final Set<GroupFilms> groups = new HashSet<>();
 
 	public String getDescLocation() {
 		if (location == null) {
@@ -155,7 +155,7 @@ public class Pelicula {
 	}
 
 	public boolean tieneCaratula() {
-		return this.peliculaFotos != null && !peliculaFotos.isEmpty();
+		return !peliculaFotos.isEmpty();
 	}
 
 	public void calcularCodigo() {

@@ -18,12 +18,7 @@
   <dependencies>
     <dependency>
       <groupId>chusnaval.org</groupId>
-      <artifactId>lugus-domain</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>chusnaval.org</groupId>
-      <artifactId>lugus-application</artifactId>
+      <artifactId>lugus-repository</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -73,9 +73,13 @@ public class FilmographyApiController {
 		Optional<ImdbTitleAkas> ita = imdbTitleAkasService.findByTitleId(itp.getId().getTconst());
 		boolean isFilmRegister = peliculasOtrosService.isFilmRegistered(itp.getId().getTconst());
 		
+
+		if (itb.isEmpty() || itb.get().getStartyear() == null) {
+		    throw new IllegalArgumentException("No se puede construir Filmography: itb vacío o startyear nulo");
+		}
 		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
-				.category(itp.getId().getCategory()).tconst(itp.getId().getTconst())
-				.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
+			.category(itp.getId().getCategory()).tconst(itp.getId().getTconst())
+			.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
 
 		if (isFilmRegister) {
 			film.setPeliculaId(peliculasOtrosService.getIdFilm(itp.getId().getTconst()));

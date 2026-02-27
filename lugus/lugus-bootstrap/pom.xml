@@ -17,21 +17,13 @@
   <description>Entrada Spring Boot (web/API/templates)</description>
 
   <dependencies>
+
     <dependency>
       <groupId>chusnaval.org</groupId>
-      <artifactId>lugus-domain</artifactId>
+      <artifactId>lugus-services</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>chusnaval.org</groupId>
-      <artifactId>lugus-application</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>chusnaval.org</groupId>
-      <artifactId>lugus-infrastructure</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+
 
     <dependency>
       <groupId>org.springframework.boot</groupId>

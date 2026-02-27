@@ -1249,6 +1249,38 @@ TABLESPACE tb_lugus;
 
 ALTER TABLE IF EXISTS lugus.seasons
     OWNER to lugus_admin;
+
+-- Table: lugus.schema_version
+
+-- DROP TABLE IF EXISTS lugus.schema_version;
+
+CREATE TABLE IF NOT EXISTS lugus.schema_version
+(
+    id integer GENERATED ALWAYS AS IDENTITY,
+    version character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    applied_at timestamp without time zone NOT NULL DEFAULT now(),
+    notes character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT schema_version_pkey PRIMARY KEY (id),
+    CONSTRAINT schema_version_version_key UNIQUE (version)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE tb_lugus;
+
+ALTER TABLE IF EXISTS lugus.schema_version
+    OWNER to lugus_admin;
+
+REVOKE ALL ON TABLE lugus.schema_version FROM lugus_readonly;
+REVOKE ALL ON TABLE lugus.schema_version FROM lugus_role;
+
+GRANT ALL ON TABLE lugus.schema_version TO lugus_admin;
+GRANT SELECT ON TABLE lugus.schema_version TO lugus_readonly;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE lugus.schema_version TO lugus_role;
+
+INSERT INTO lugus.schema_version (version, notes)
+VALUES ('1.0.0', 'Version inicial del esquema')
+ON CONFLICT (version) DO NOTHING;
 	
 -- views
 -- View: lugus.actores
@@ -1397,4 +1429,70 @@ GRANT EXECUTE ON PROCEDURE lugus.insertar_datos_personales(integer, character va
 GRANT EXECUTE ON PROCEDURE lugus.insertar_datos_personales(integer, character varying) TO lugus_role;
 
 REVOKE ALL ON PROCEDURE lugus.insertar_datos_personales(integer, character varying) FROM PUBLIC;
+
+
+
+-- Secuencia para peliculas_usuario
+CREATE SEQUENCE IF NOT EXISTS lugus.peliculas_usuario_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    NO CYCLE;
+
+CREATE TABLE IF NOT EXISTS lugus.peliculas_usuario
+(
+    id integer NOT NULL DEFAULT nextval('lugus.peliculas_usuario_id_seq'::regclass),
+    usuario_login character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    pelicula_id integer NOT NULL,
+    fecha_agregado timestamp without time zone,
+    CONSTRAINT peliculas_usuario_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_peliculas_usuario_usuario FOREIGN KEY (usuario_login)
+        REFERENCES lugus.usuarios (login) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION,
+    CONSTRAINT fk_peliculas_usuario_pelicula FOREIGN KEY (pelicula_id)
+        REFERENCES lugus.peliculas (id) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+TABLESPACE tb_lugus;
+
+ALTER TABLE IF EXISTS lugus.peliculas_usuario OWNER TO lugus_admin;
+REVOKE ALL ON TABLE lugus.peliculas_usuario FROM lugus_readonly;
+REVOKE ALL ON TABLE lugus.peliculas_usuario FROM lugus_role;
+GRANT ALL ON TABLE lugus.peliculas_usuario TO lugus_admin;
+GRANT SELECT ON TABLE lugus.peliculas_usuario TO lugus_readonly;
+GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.peliculas_usuario TO lugus_role;
+
+-- Secuencia para favoritos_usuario
+CREATE SEQUENCE IF NOT EXISTS lugus.favoritos_usuario_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    NO CYCLE;
+
+CREATE TABLE IF NOT EXISTS lugus.favoritos_usuario
+(
+    id integer NOT NULL DEFAULT nextval('lugus.favoritos_usuario_id_seq'::regclass),
+    usuario_login character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    pelicula_id integer,
+    serie_id integer,
+    fecha_agregado timestamp without time zone,
+    CONSTRAINT favoritos_usuario_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_favoritos_usuario_usuario FOREIGN KEY (usuario_login)
+        REFERENCES lugus.usuarios (login) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION,
+    CONSTRAINT fk_favoritos_usuario_pelicula FOREIGN KEY (pelicula_id)
+        REFERENCES lugus.peliculas (id) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION,
+    CONSTRAINT fk_favoritos_usuario_serie FOREIGN KEY (serie_id)
+        REFERENCES lugus.series (id) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+TABLESPACE tb_lugus;
+
+ALTER TABLE IF EXISTS lugus.favoritos_usuario OWNER TO lugus_admin;
+REVOKE ALL ON TABLE lugus.favoritos_usuario FROM lugus_readonly;
+REVOKE ALL ON TABLE lugus.favoritos_usuario FROM lugus_role;
+GRANT ALL ON TABLE lugus.favoritos_usuario TO lugus_admin;
+GRANT SELECT ON TABLE lugus.favoritos_usuario TO lugus_readonly;
+GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.favoritos_usuario TO lugus_role;
 

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import lugus.repository.core.GetPosteriorRepository;
 
+
+
 @Component
 public class GetPosteriorDao implements GetPosteriorRepository {
 

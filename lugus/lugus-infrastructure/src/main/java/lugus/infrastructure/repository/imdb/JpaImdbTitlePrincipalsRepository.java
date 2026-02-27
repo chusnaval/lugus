@@ -10,6 +10,7 @@ import lugus.model.imdb.ImdbTitlePrincipals;
 import lugus.model.imdb.ImdbTitlePrincipalsId;
 import lugus.repository.imdb.ImdbTitlePrincipalsRepository;
 
+
 public interface JpaImdbTitlePrincipalsRepository extends ImdbTitlePrincipalsRepository, JpaRepository<ImdbTitlePrincipals, ImdbTitlePrincipalsId> {
 
 	@Override

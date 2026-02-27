@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import lugus.repository.core.GetAnteriorRepository;
 
+
+
 @Component
 public class GetAnterioDao implements GetAnteriorRepository {
 
