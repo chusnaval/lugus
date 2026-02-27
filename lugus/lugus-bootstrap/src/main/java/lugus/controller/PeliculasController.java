@@ -152,6 +152,8 @@ public class PeliculasController {
 			.notas(p.getNotas())
 			.ratingFormatted(p.getOtros() != null ? p.getOtros().getRatingFormatted() : null)
 			.location(p.getLocation() != null ? p.getLocation().getDescripcion() : null)
+			.comprado(p.isComprado())
+			.funda(p.isFunda())
 			.build()
 		);
 		model.addAttribute("pagePeliculas", resultadoDto);

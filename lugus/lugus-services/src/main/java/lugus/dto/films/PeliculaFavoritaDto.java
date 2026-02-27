@@ -15,5 +15,7 @@ public class PeliculaFavoritaDto {
     private String notas;
     private String ratingFormatted;
     private String location;
+    private boolean comprado;
+    private boolean funda;
 
 }
