@@ -19,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -104,6 +105,7 @@ public class Serie {
 	private final Set<SerieFoto> serieFotos = new HashSet<>();
 	
 	@JsonIgnore
+	@OrderBy("order ASC")
 	@OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private final Set<Season> seasons = new HashSet<>();
