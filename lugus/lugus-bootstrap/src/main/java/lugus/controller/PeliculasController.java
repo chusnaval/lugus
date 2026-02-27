@@ -145,9 +145,13 @@ public class PeliculasController {
 			.titulo(p.getTitulo())
 			.anyo(p.getAnyo())
 			.formatoCodigo(p.getCodigo())
+			.formato(p.getFormato().name())
 			.generoCodigo(p.getGenero().getCodigo())
 			.favorita(favoritasIds.contains(p.getId()))
 			.tieneCaratula(p.tieneCaratula())
+			.notas(p.getNotas())
+			.ratingFormatted(p.getOtros() != null ? p.getOtros().getRatingFormatted() : null)
+			.location(p.getLocation() != null ? p.getLocation().getDescripcion() : null)
 			.build()
 		);
 		model.addAttribute("pagePeliculas", resultadoDto);

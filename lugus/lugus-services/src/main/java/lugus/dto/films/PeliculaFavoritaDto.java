@@ -8,8 +8,12 @@ public class PeliculaFavoritaDto {
     private String titulo;
     private Integer anyo;
     private String formatoCodigo;
+    private String formato;
     private String generoCodigo;
     private boolean favorita;
     private boolean tieneCaratula;
-    // Puedes añadir más campos según lo que muestres en la vista
+    private String notas;
+    private String ratingFormatted;
+    private String location;
+
 }
