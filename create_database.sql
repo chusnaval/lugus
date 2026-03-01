@@ -1496,3 +1496,23 @@ GRANT ALL ON TABLE lugus.favoritos_usuario TO lugus_admin;
 GRANT SELECT ON TABLE lugus.favoritos_usuario TO lugus_readonly;
 GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.favoritos_usuario TO lugus_role;
 
+-- View: lugus.ser_wanted
+
+-- DROP VIEW lugus.ser_wanted;
+
+CREATE OR REPLACE VIEW lugus.ser_wanted
+ AS
+ SELECT ser.titulo,
+        ser.anyo_inicio,
+    sea."order" || COALESCE(' - '::text || sea."desc"::text, ''::text) AS season_desc
+     FROM lugus.series ser
+         JOIN lugus.seasons sea ON ser.id = sea.serie_id
+    WHERE sea.wanted = true;
+
+ALTER TABLE lugus.ser_wanted
+        OWNER TO lugus_admin;
+
+GRANT ALL ON TABLE lugus.ser_wanted TO lugus_admin;
+GRANT SELECT ON TABLE lugus.ser_wanted TO lugus_readonly;
+GRANT SELECT ON TABLE lugus.ser_wanted TO lugus_role;
+

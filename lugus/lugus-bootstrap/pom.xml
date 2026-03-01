@@ -18,6 +18,20 @@
 
   <dependencies>
 
+      <!-- Apache ODF Toolkit para ODS -->
+      <dependency>
+        <groupId>org.odftoolkit</groupId>
+        <artifactId>odfdom-java</artifactId>
+        <version>0.8.7</version>
+      </dependency>
+
+      <!-- Apache PDFBox para PDF -->
+      <dependency>
+        <groupId>org.apache.pdfbox</groupId>
+        <artifactId>pdfbox</artifactId>
+        <version>2.0.29</version>
+      </dependency>
+
     <dependency>
       <groupId>chusnaval.org</groupId>
       <artifactId>lugus-services</artifactId>

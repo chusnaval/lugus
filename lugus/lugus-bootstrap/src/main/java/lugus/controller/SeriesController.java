@@ -26,20 +26,23 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lugus.export.SeriesWantedExportService;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.media.NewCaratulaDTO;
 import lugus.dto.series.SerieCreateDto;
 import lugus.exception.PermisoException;
-import lugus.model.core.Source;
 import lugus.model.core.Location;
+import lugus.model.core.Source;
+import lugus.model.series.SerWanted;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
-import lugus.service.core.SourceService;
 import lugus.service.core.LocationService;
+import lugus.service.core.SourceService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
+import lugus.service.series.SerWantedService;
 import lugus.service.series.SeriesService;
 
 @Controller
@@ -52,7 +55,9 @@ public class SeriesController {
 	private final LocationService locService;
 
 	private final SourceService sourceService;
-	
+	private final SerWantedService serWantedService;
+	private final SeriesWantedExportService seriesWantedExportService;
+
 	@GetMapping
 	public String listPaginado(Model model, Principal principal, HttpSession session,
 			@RequestParam(required = false) Boolean resetFilter, @RequestParam(required = false) Boolean recuperar,
@@ -89,6 +94,53 @@ public class SeriesController {
 		return "series/list";
 	}
 
+	@GetMapping("/wanted")
+	public String wanted(Model model) {
+		model.addAttribute("wantedList", serWantedService.findAllOrdered());
+		return "series/wanted";
+	}
+
+	@GetMapping("/wanted/export")
+	public ResponseEntity<?> exportWanted(@RequestParam String format) {
+		List<SerWanted> list = serWantedService.findAllOrdered();
+
+		if ("md".equalsIgnoreCase(format)) {
+			String body = seriesWantedExportService.toMarkdown(list);
+			return ResponseEntity.ok()
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=series_buscadas.md")
+					.contentType(MediaType.parseMediaType("text/markdown; charset=UTF-8"))
+					.body(body);
+		}
+
+		if ("ods".equalsIgnoreCase(format)) {
+			try {
+				byte[] body = seriesWantedExportService.toOds(list);
+				return ResponseEntity.ok()
+						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=series_buscadas.ods")
+						.contentType(MediaType.parseMediaType("application/vnd.oasis.opendocument.spreadsheet"))
+						.body(body);
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("Error generando ODS");
+			}
+		}
+
+		if ("pdf".equalsIgnoreCase(format)) {
+			try {
+				byte[] body = seriesWantedExportService.toPdf(list);
+				return ResponseEntity.ok()
+						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=series_buscadas.pdf")
+						.contentType(MediaType.APPLICATION_PDF)
+						.body(body);
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("Error generando PDF");
+			}
+		}
+
+		return ResponseEntity.badRequest().body("Formato no soportado");
+	}
+
 	/*
 	 * ------------------------------------------------- FORMULARIO DE CREACIÓN GET
 	 * /series/nuevo -------------------------------------------------
@@ -96,7 +148,6 @@ public class SeriesController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/nuevo")
 	public String createForm(Principal principal, Model model) throws PermisoException {
-
 		List<Location> locations = locService.findAllOrderByDescripcion();
 		model.addAttribute("locations", locations);
 
@@ -164,7 +215,6 @@ public class SeriesController {
 	@GetMapping("/editar/{id}")
 	public String edit(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
 			throws PermisoException {
-
 		Serie p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Serie no encontrada"));
 		model.addAttribute("serie", p);
 
