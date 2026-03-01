@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.config.StorageProperties;
+import lugus.export.FilmWantedExportService;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.PeliculaChildDto;
 import lugus.dto.films.PeliculaCreateDto;
@@ -15,6 +16,7 @@ import lugus.exception.PermisoException;
 import lugus.model.core.Source;
 import lugus.model.core.Location;
 import lugus.model.core.LocationType;
+import lugus.model.films.FilmWanted;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
 import lugus.model.groups.GroupFilms;
@@ -36,6 +38,7 @@ import lugus.service.imdb.ImdbTitleAkasService;
 import lugus.service.imdb.ImdbTitleBasicsService;
 import lugus.service.people.ActorService;
 import lugus.service.people.DirectorService;
+import lugus.service.people.FilmWantedService;
 import lugus.service.people.InsertPersonalDataService;
 import lugus.service.user.FavoritosUsuarioService;
 import lugus.service.user.UsuarioService;
@@ -83,6 +86,10 @@ public class PeliculasController {
 	private final LocationService locService;
 
 	private final SourceService sourceService;
+
+	private final FilmWantedService filmWantedService;
+
+	private final FilmWantedExportService filmWantedExportService;
 
 	private final DirectorService directorService;
 
@@ -168,6 +175,53 @@ public class PeliculasController {
 		model.addAttribute(LOCATIONS_STRING, locations);
 
 		return "peliculas/list";
+	}
+
+	@GetMapping("/wanted")
+	public String wanted(Model model) {
+		model.addAttribute("wantedList", filmWantedService.findAllOrdered());
+		return "peliculas/wanted";
+	}
+
+	@GetMapping("/wanted/export")
+	public ResponseEntity<?> exportWanted(@RequestParam String format) {
+		List<FilmWanted> list = filmWantedService.findAllOrdered();
+
+		if ("md".equalsIgnoreCase(format)) {
+			String body = filmWantedExportService.toMarkdown(list);
+			return ResponseEntity.ok()
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas_buscadas.md")
+					.contentType(MediaType.parseMediaType("text/markdown; charset=UTF-8"))
+					.body(body);
+		}
+
+		if ("ods".equalsIgnoreCase(format)) {
+			try {
+				byte[] body = filmWantedExportService.toOds(list);
+				return ResponseEntity.ok()
+						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas_buscadas.ods")
+						.contentType(MediaType.parseMediaType("application/vnd.oasis.opendocument.spreadsheet"))
+						.body(body);
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("Error generando ODS");
+			}
+		}
+
+		if ("pdf".equalsIgnoreCase(format)) {
+			try {
+				byte[] body = filmWantedExportService.toPdf(list);
+				return ResponseEntity.ok()
+						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas_buscadas.pdf")
+						.contentType(MediaType.APPLICATION_PDF)
+						.body(body);
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("Error generando PDF");
+			}
+		}
+
+		return ResponseEntity.badRequest().body("Formato no soportado");
 	}
 
 	private FiltrosDto resetearFiltro() {
