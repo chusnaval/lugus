@@ -23,7 +23,8 @@ import lugus.service.series.SeriesService;
 
 class SeriesWantedExportControllerTest {
 
-	private MockMvc mockMvc;
+	private static final String FORMAT = "format";
+    private MockMvc mockMvc;
 	private SerWantedService serWantedService;
 
 	@BeforeEach
@@ -44,7 +45,7 @@ class SeriesWantedExportControllerTest {
 	void shouldExportMarkdown() throws Exception {
 		mockWanted();
 
-		mockMvc.perform(get("/series/wanted/export").param("format", "md"))
+		mockMvc.perform(get("/series/wanted/export").param(FORMAT, "md"))
 				.andExpect(status().isOk())
 				.andExpect(header().string("Content-Disposition", "attachment; filename=series_buscadas.md"))
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("# Series buscadas")));
@@ -54,7 +55,7 @@ class SeriesWantedExportControllerTest {
 	void shouldExportOds() throws Exception {
 		mockWanted();
 
-		mockMvc.perform(get("/series/wanted/export").param("format", "ods"))
+		mockMvc.perform(get("/series/wanted/export").param(FORMAT, "ods"))
 				.andExpect(status().isOk())
 				.andExpect(header().string("Content-Disposition", "attachment; filename=series_buscadas.ods"));
 	}
@@ -63,7 +64,7 @@ class SeriesWantedExportControllerTest {
 	void shouldExportPdf() throws Exception {
 		mockWanted();
 
-		mockMvc.perform(get("/series/wanted/export").param("format", "pdf"))
+		mockMvc.perform(get("/series/wanted/export").param(FORMAT, "pdf"))
 				.andExpect(status().isOk())
 				.andExpect(header().string("Content-Disposition", "attachment; filename=series_buscadas.pdf"));
 	}
@@ -72,7 +73,7 @@ class SeriesWantedExportControllerTest {
 	void shouldReturnBadRequestForUnknownFormat() throws Exception {
 		mockWanted();
 
-		mockMvc.perform(get("/series/wanted/export").param("format", "csv"))
+		mockMvc.perform(get("/series/wanted/export").param(FORMAT, "csv"))
 				.andExpect(status().isBadRequest())
 				.andExpect(content().string("Formato no soportado"));
 	}

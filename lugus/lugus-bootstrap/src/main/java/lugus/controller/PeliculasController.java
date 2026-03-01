@@ -72,6 +72,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PeliculasController {
 
+	private static final String LOCATIONS_STRING = "locations";
+
+	private static final String FILTRO_STRING = "filtro";
+
 	private static final String PELICULA_NO_ENCONTRADA = "Película no encontrada";
 
 	private final PeliculaService service;
@@ -122,8 +126,8 @@ public class PeliculasController {
 		model.addAttribute("orden", filtro.getOrden().orElse("tituloGest"));
 		model.addAttribute("direccion", filtro.getDireccion().orElse("ASC"));
 		// set filter to view
-		model.addAttribute("filtro", filtro);
-		session.setAttribute("filtro", filtro);
+		model.addAttribute(FILTRO_STRING, filtro);
+		session.setAttribute(FILTRO_STRING, filtro);
 
 		// obtain the film by the filter
 		Page<Pelicula> resultado = service.findAllBy(filtro);
@@ -161,7 +165,7 @@ public class PeliculasController {
 
 		// select for filter
 		List<Location> locations = locService.findAllOrderByDescripcion();
-		model.addAttribute("locations", locations);
+		model.addAttribute(LOCATIONS_STRING, locations);
 
 		return "peliculas/list";
 	}
@@ -175,12 +179,12 @@ public class PeliculasController {
 
 	private FiltrosDto recuperarFiltro(HttpSession session, FiltrosDto filtro) {
 		FiltrosDto aux = filtro;
-		if (session.getAttribute("filtro") != null) {
+		if (session.getAttribute(FILTRO_STRING) != null) {
 			int paginaSolicitada = 0;
 			if (aux.getPagina().isPresent()) {
 				paginaSolicitada = aux.getPagina().get();
 			}
-			aux = (FiltrosDto) session.getAttribute("filtro");
+			aux = (FiltrosDto) session.getAttribute(FILTRO_STRING);
 			if (aux.getPagina().isPresent() && aux.getPagina().get() != paginaSolicitada) {
 				aux.setPagina(Optional.of(paginaSolicitada));
 			}
@@ -197,7 +201,7 @@ public class PeliculasController {
 	public String createForm(Principal principal, Model model) {
 
 		List<Location> locations = locService.findAllOrderByDescripcion();
-		model.addAttribute("locations", locations);
+		model.addAttribute(LOCATIONS_STRING, locations);
 
 		List<Source> sources = sourceService.findAll();
 		model.addAttribute("sourcesList", sources);
@@ -249,7 +253,7 @@ public class PeliculasController {
 
 		if (br.hasErrors()) {
 			List<Location> locations = locService.findAllOrderByDescripcion();
-			model.addAttribute("locations", locations);
+			model.addAttribute(LOCATIONS_STRING, locations);
 
 			List<Source> sources = sourceService.findAll();
 			model.addAttribute("sourcesList", sources);
@@ -279,8 +283,8 @@ public class PeliculasController {
 
 		model.addAttribute("pelicula", p);
 
-		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro");
-		model.addAttribute("filtro", filtro);
+		FiltrosDto filtro = (FiltrosDto) session.getAttribute(FILTRO_STRING);
+		model.addAttribute(FILTRO_STRING, filtro);
 
 		List<Director> directores = directorService.findByPeliculaId(p.getId());
 		model.addAttribute("directores", directores);
@@ -387,7 +391,7 @@ public class PeliculasController {
 
 		Optional<LocationType> locationType = locationTypeService.findById(p.getFormato().getIdParaUbicaciones());
 		List<Location> locations = locService.findAllOrderByDescripcion(locationType.get());
-		model.addAttribute("locations", locations);
+		model.addAttribute(LOCATIONS_STRING, locations);
 
 		model.addAttribute("caratula", new NewCaratulaDTO());
 		// DTO vacío para el formulario “añadir hijo al pack”
@@ -426,8 +430,8 @@ public class PeliculasController {
 		List<Actor> actores = actorService.findByPeliculaIdOrderByOrdenAsc(p.getId());
 		model.addAttribute("actores", actores);
 
-		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro");
-		model.addAttribute("filtro", filtro);
+		FiltrosDto filtro = (FiltrosDto) session.getAttribute(FILTRO_STRING);
+		model.addAttribute(FILTRO_STRING, filtro);
 		return "peliculas/edit"; // → templates/peliculas/detail.html
 	}
 

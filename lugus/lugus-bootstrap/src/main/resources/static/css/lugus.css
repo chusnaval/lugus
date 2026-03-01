@@ -253,6 +253,32 @@ h5 {
 	--bs-dropdown-link-color: #fff;
 	--bs-dropdown-link-hover-bg: #333;
 	--bs-dropdown-link-active-bg: #444;
+	overflow: visible;
+}
+
+.dropdown-submenu {
+	position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+	display: none;
+	top: 0;
+	left: 100%;
+	margin-top: -0.35rem;
+	margin-left: 0.15rem;
+	min-width: 12rem;
+}
+
+.dropdown-submenu.submenu-open-left>.dropdown-menu {
+	left: auto;
+	right: 100%;
+	margin-left: 0;
+	margin-right: 0.15rem;
+}
+
+.dropdown-submenu:hover>.dropdown-menu,
+.dropdown-submenu:focus-within>.dropdown-menu {
+	display: block;
 }
 
 .fixed-dropdown .dropdown-menu {
