@@ -44,7 +44,7 @@ public class PeliculasUsuario {
     
     private java.time.LocalDateTime fechaAgregado;
 
-    @Column(name = "lbRating")
+    @Column(name = "lbrating")
     private Float lbRating;
 
     private boolean vista;
