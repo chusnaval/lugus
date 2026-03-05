@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,7 @@ public class ValidateSeriesController {
 	@GetMapping("/titlesInYear")
 	public ResponseEntity<Serie> validateTitlesInYear(@RequestParam final String title,
 			@RequestParam final String titleGest, final Integer year) {
-		List<Serie> similars = service.findByTitlesInYear(title, titleGest, year);
+		List<Serie> similars = service.findByTitlesInYear(title, year);
 		if (similars != null && !similars.isEmpty()) {
 			return ResponseEntity.ok(similars.get(0));
 		} else {
@@ -49,7 +48,7 @@ public class ValidateSeriesController {
 
 			// Recopilamos todos los mensajes de violación
 			List<String> errors = ex.getConstraintViolations().stream()
-					.map(cv -> cv.getPropertyPath() + ": " + cv.getMessage()).collect(Collectors.toList());
+					.map(cv -> cv.getPropertyPath() + ": " + cv.getMessage()).toList();
 			body.put("errors", errors);
 			return ResponseEntity.badRequest().body(body);
 		}

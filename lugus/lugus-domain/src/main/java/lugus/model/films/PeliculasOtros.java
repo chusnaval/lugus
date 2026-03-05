@@ -38,15 +38,6 @@ public class PeliculasOtros {
 	@OneToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "pelicula_id", nullable = true) // FK → locations.code
 	private Pelicula pelicula;
-
-	@Column(name = "idmb_id")
-	private String imdbId;
-
-	@Column
-	private Double rating;
-
-	@Column
-	private Integer votes;
 	
 	@Column(name="lbrating")
 	private Float lbRating;
@@ -54,13 +45,5 @@ public class PeliculasOtros {
 	@Column(name="vista")
 	private Boolean vista;
 
-	public String getRatingFormatted() {
-		if (rating == null) {
-			return "";
-		} else {
-			NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
-			nf.setMinimumFractionDigits(1);
-			return nf.format(rating);
-		}
-	}
+	
 }

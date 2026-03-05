@@ -12,7 +12,6 @@ import lugus.dto.films.PeliculaChildDto;
 import lugus.dto.films.PeliculaCreateDto;
 import lugus.dto.films.PeliculaFavoritaDto;
 import lugus.dto.media.NewCaratulaDTO;
-import lugus.exception.PermisoException;
 import lugus.model.core.Source;
 import lugus.model.core.Location;
 import lugus.model.core.LocationType;
@@ -74,6 +73,10 @@ import java.util.stream.Collectors;
 @RequestMapping("/peliculas")
 @RequiredArgsConstructor
 public class PeliculasController {
+
+	private static final String SOURCES_LIST = "sourcesList";
+
+	private static final String PELICULA = "pelicula";
 
 	private static final String LOCATIONS_STRING = "locations";
 
@@ -161,7 +164,7 @@ public class PeliculasController {
 			.favorita(favoritasIds.contains(p.getId()))
 			.tieneCaratula(p.tieneCaratula())
 			.notas(p.getNotas())
-			.ratingFormatted(p.getOtros() != null ? p.getOtros().getRatingFormatted() : null)
+			.ratingFormatted(p.getRatingFormatted())
 			.location(p.getLocation() != null ? p.getLocation().getDescripcion() : null)
 			.comprado(p.isComprado())
 			.funda(p.isFunda())
@@ -213,7 +216,7 @@ public class PeliculasController {
 				byte[] body = filmWantedExportService.toPdf(list);
 				return ResponseEntity.ok()
 						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas_buscadas.pdf")
-						.contentType(MediaType.APPLICATION_PDF)
+						.contentType(MediaType.parseMediaType("application/pdf; charset=UTF-8"))
 						.body(body);
 			} catch (IOException e) {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -258,9 +261,9 @@ public class PeliculasController {
 		model.addAttribute(LOCATIONS_STRING, locations);
 
 		List<Source> sources = sourceService.findAll();
-		model.addAttribute("sourcesList", sources);
+		model.addAttribute(SOURCES_LIST, sources);
 
-		model.addAttribute("pelicula", new PeliculaCreateDto());
+		model.addAttribute(PELICULA, new PeliculaCreateDto());
 
 		return "peliculas/new"; // → templates/peliculas/form.html
 	}
@@ -270,7 +273,7 @@ public class PeliculasController {
 	public String createPeticion(Principal principal, Model model, @PathVariable String id)  {
 
 		List<Source> sources = sourceService.findAll();
-		model.addAttribute("sourcesList", sources);
+		model.addAttribute(SOURCES_LIST, sources);
 		PeliculaCreateDto dto = new PeliculaCreateDto();
 		dto.setImdbCodigo(id);
 
@@ -290,7 +293,7 @@ public class PeliculasController {
 			dto.setNotas(String.join(",", itb.get().getGenres()));
 		}
 
-		model.addAttribute("pelicula", dto);
+		model.addAttribute(PELICULA, dto);
 
 		return "peliculas/petition";
 	}
@@ -301,7 +304,7 @@ public class PeliculasController {
 	 */
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping
-	public String create(Principal principal, @Valid @ModelAttribute("pelicula") PeliculaCreateDto dto,
+	public String create(Principal principal, @Valid @ModelAttribute(PELICULA) PeliculaCreateDto dto,
 			BindingResult br, Model model, HttpSession session)
 			throws IOException, URISyntaxException {
 
@@ -310,7 +313,7 @@ public class PeliculasController {
 			model.addAttribute(LOCATIONS_STRING, locations);
 
 			List<Source> sources = sourceService.findAll();
-			model.addAttribute("sourcesList", sources);
+			model.addAttribute(SOURCES_LIST, sources);
 			// Si hay errores de validación, volvemos al mismo formulario
 			return "peliculas/new";
 		}
@@ -335,7 +338,7 @@ public class PeliculasController {
 
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException(PELICULA_NO_ENCONTRADA));
 
-		model.addAttribute("pelicula", p);
+		model.addAttribute(PELICULA, p);
 
 		FiltrosDto filtro = (FiltrosDto) session.getAttribute(FILTRO_STRING);
 		model.addAttribute(FILTRO_STRING, filtro);
@@ -434,14 +437,13 @@ public class PeliculasController {
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/editar/{id}")
-	public String edit(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
-			throws PermisoException {
+	public String edit(Principal principal, @PathVariable Integer id, HttpSession session, Model model) {
 
 		Pelicula p = service.findById(id).orElseThrow(() -> new IllegalArgumentException(PELICULA_NO_ENCONTRADA));
-		model.addAttribute("pelicula", p);
+		model.addAttribute(PELICULA, p);
 
 		List<Source> sources = sourceService.findAll();
-		model.addAttribute("sourcesList", sources);
+		model.addAttribute(SOURCES_LIST, sources);
 
 		Optional<LocationType> locationType = locationTypeService.findById(p.getFormato().getIdParaUbicaciones());
 		List<Location> locations = locService.findAllOrderByDescripcion(locationType.get());
@@ -499,7 +501,7 @@ public class PeliculasController {
 		Pelicula existing = opt.get();
 
 		if (existing == null) {
-			new IllegalArgumentException(PELICULA_NO_ENCONTRADA);
+			throw new IllegalArgumentException(PELICULA_NO_ENCONTRADA);
 		}
 
 		Formato formato = Formato.getById(nuevo.getFormatoCodigo());
@@ -523,6 +525,7 @@ public class PeliculasController {
 		existing.setFunda(nuevo.isFunda());
 		existing.setComprado(nuevo.isComprado());
 		existing.calcularCodigo();
+		existing.setImdbId(nuevo.getImdbCodigo());
 		service.save(existing);
 
 		if (nuevo.getImdbCodigo() != null && !nuevo.getImdbCodigo().isBlank()) {
@@ -551,7 +554,9 @@ public class PeliculasController {
 		Optional<Source> sourceObj = sourceService.findById(dto.getSource());
 		PeliculaFoto pf = new PeliculaFoto();
 		pf.setUrl(dto.getUrl());
-		pf.setSource(sourceObj.get());
+		if(sourceObj.isPresent()) {
+			pf.setSource(sourceObj.get());
+		}
 		pf.setFoto(dwFotoService.descargar(dto.getSource(), dto.getUrl()));
 		pf.setCaratula(true);
 

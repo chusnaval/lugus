@@ -1,7 +1,9 @@
 package lugus.model.films;
 
+import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -147,6 +149,15 @@ public class Pelicula {
 	@ToString.Exclude
 	private final Set<GroupFilms> groups = new HashSet<>();
 
+	@Column(name = "imdb_id")
+	private String imdbId;
+
+	@Column
+	private Double rating;
+
+	@Column
+	private Integer votes;
+
 	public String getDescLocation() {
 		if (location == null) {
 			return "";
@@ -172,6 +183,16 @@ public class Pelicula {
 
 	}
 
+	public String getRatingFormatted() {
+		if (rating == null) {
+			return "";
+		} else {
+			NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+			nf.setMinimumFractionDigits(1);
+			return nf.format(rating);
+		}
+	}
+	
 	/**
 	 * Vincula las peliculas
 	 * 

@@ -30,7 +30,6 @@ import lugus.export.SeriesWantedExportService;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.media.NewCaratulaDTO;
 import lugus.dto.series.SerieCreateDto;
-import lugus.exception.PermisoException;
 import lugus.model.core.Location;
 import lugus.model.core.Source;
 import lugus.model.series.SerWanted;
@@ -49,6 +48,14 @@ import lugus.service.series.SeriesService;
 @RequestMapping("/series")
 @RequiredArgsConstructor
 public class SeriesController {
+
+	private static final String SERIE = "serie";
+
+	private static final String FILTRO = "filtro";
+
+	private static final String LOCATIONS = "locations";
+
+	private static final String SERIE_NO_ENCONTRADA = "Serie no encontrada";
 
 	private final SeriesService service;
 
@@ -69,18 +76,15 @@ public class SeriesController {
 			filtro.setOrden(Optional.of("tituloGest"));
 			filtro.setPack(false);
 
-		} else if ((recuperar != null && recuperar)) {
-
-			if (session.getAttribute("filtro") != null) {
-				filtro = (FiltrosDto) session.getAttribute("filtro");
-			}
+		} else if ((recuperar != null && recuperar) && session.getAttribute(FILTRO) != null) {
+				filtro = (FiltrosDto) session.getAttribute(FILTRO);
 		}
 
 		model.addAttribute("orden", filtro.getOrden().orElse("tituloGest"));
 		model.addAttribute("direccion", filtro.getDireccion().orElse("ASC"));
 		// set filter to view
-		model.addAttribute("filtro", filtro);
-		session.setAttribute("filtro", filtro);
+		model.addAttribute(FILTRO, filtro);
+		session.setAttribute(FILTRO, filtro);
 
 		// obtain the film by the filter
 		Page<Serie> resultado = service.findAllBy(filtro);
@@ -89,7 +93,7 @@ public class SeriesController {
 
 		// select for filter
 		List<Location> locations = locService.findAllOrderByDescripcion();
-		model.addAttribute("locations", locations);
+		model.addAttribute(LOCATIONS, locations);
 
 		return "series/list";
 	}
@@ -130,7 +134,7 @@ public class SeriesController {
 				byte[] body = seriesWantedExportService.toPdf(list);
 				return ResponseEntity.ok()
 						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=series_buscadas.pdf")
-						.contentType(MediaType.APPLICATION_PDF)
+						.contentType(MediaType.parseMediaType("application/pdf"))
 						.body(body);
 			} catch (IOException e) {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -147,22 +151,22 @@ public class SeriesController {
 	 */
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/nuevo")
-	public String createForm(Principal principal, Model model) throws PermisoException {
+	public String createForm(Principal principal, Model model) {
 		List<Location> locations = locService.findAllOrderByDescripcion();
-		model.addAttribute("locations", locations);
+		model.addAttribute(LOCATIONS, locations);
 
 		List<Source> sources = sourceService.findAll();
 		model.addAttribute("sourcesList", sources);
 
-		model.addAttribute("serie", new SerieCreateDto());
+		model.addAttribute(SERIE, new SerieCreateDto());
 		
 		return "series/new"; 
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping
-	public String create(Principal principal, @Valid @ModelAttribute("serie") SerieCreateDto dto,
-			BindingResult br, Model model, HttpSession session) throws PermisoException, IOException, URISyntaxException {
+	public String create(Principal principal, @Valid @ModelAttribute(SERIE) SerieCreateDto dto,
+			BindingResult br, Model model, HttpSession session) throws IOException, URISyntaxException {
 
 		if (br.hasErrors()) {
 			// Si hay errores de validación, volvemos al mismo formulario
@@ -175,23 +179,22 @@ public class SeriesController {
 	
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/{id}")
-	public String detail(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
-			throws PermisoException {
+	public String detail(Principal principal, @PathVariable Integer id, HttpSession session, Model model) {
 
-		Serie p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Serie no encontrada"));
+		Serie p = service.findById(id).orElseThrow(() -> new IllegalArgumentException(SERIE_NO_ENCONTRADA));
 
-		model.addAttribute("serie", p);
+		model.addAttribute(SERIE, p);
 
-		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro");
-		model.addAttribute("filtro", filtro);
+		FiltrosDto filtro = (FiltrosDto) session.getAttribute(FILTRO);
+		model.addAttribute(FILTRO, filtro);
 
 		return "series/detail";
 	}
 	
 	@GetMapping("/{id}/image")
-	public ResponseEntity<byte[]> image(Principal principal, @PathVariable Integer id) throws PermisoException {
+	public ResponseEntity<byte[]> image(Principal principal, @PathVariable Integer id) {
 
-		Serie p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Serie no encontrada"));
+		Serie p = service.findById(id).orElseThrow(() -> new IllegalArgumentException(SERIE_NO_ENCONTRADA));
 
 		if (p.getSerieFotos() != null && !p.getSerieFotos().isEmpty()) {
 			SerieFoto pf = p.getSerieFotos().iterator().next();
@@ -213,16 +216,15 @@ public class SeriesController {
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/editar/{id}")
-	public String edit(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
-			throws PermisoException {
-		Serie p = service.findById(id).orElseThrow(() -> new IllegalArgumentException("Serie no encontrada"));
-		model.addAttribute("serie", p);
+	public String edit(Principal principal, @PathVariable Integer id, HttpSession session, Model model) {
+		Serie p = service.findById(id).orElseThrow(() -> new IllegalArgumentException(SERIE_NO_ENCONTRADA));
+		model.addAttribute(SERIE, p);
 
 		List<Source> sources = sourceService.findAll();
 		model.addAttribute("sourcesList", sources);
 
 		List<Location> locations = locService.findAll();
-		model.addAttribute("locations", locations);
+		model.addAttribute(LOCATIONS, locations);
 
 		model.addAttribute("caratula", new NewCaratulaDTO());
 
@@ -243,33 +245,32 @@ public class SeriesController {
 		model.addAttribute("nuevo", nuevo);
 
 
-		FiltrosDto filtro = (FiltrosDto) session.getAttribute("filtro");
-		model.addAttribute("filtro", filtro);
+		FiltrosDto filtro = (FiltrosDto) session.getAttribute(FILTRO);
+		model.addAttribute(FILTRO, filtro);
 		return "series/edit";
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/actualizar/{id}")
 	public String actualizar(Principal principal, HttpSession session, @PathVariable Integer id, RedirectAttributes ra,
-			@Valid @ModelAttribute SerieCreateDto nuevo) throws PermisoException {
+			@Valid @ModelAttribute SerieCreateDto nuevo)  {
 
 		Optional<Serie> opt = service.findById(id);
-
-		Serie existing = opt.get();
-
-		if (existing == null) {
-			new IllegalArgumentException("Serie no encontrada");
+		
+		if (opt.isEmpty()) {
+			throw new IllegalArgumentException(SERIE_NO_ENCONTRADA);
 		}
-
+		
 		Formato formato = Formato.getById(nuevo.getFormatoCodigo());
 		Genero genero = Genero.getById(nuevo.getGeneroCodigo());
-
+		
 		Location loc = null;
 		if (nuevo.getLocationCode() != null && !nuevo.getLocationCode().isBlank()) {
 			loc = locService.findById(nuevo.getLocationCode())
-					.orElseThrow(() -> new IllegalArgumentException("Localización no encontrada"));
+			.orElseThrow(() -> new IllegalArgumentException("Localización no encontrada"));
 		}
-
+		
+		Serie existing = opt.get();
 		existing.setTitulo(nuevo.getTitulo());
 		existing.setTituloGest(nuevo.getTituloGest());
 		existing.setFormato(formato);
@@ -289,14 +290,16 @@ public class SeriesController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/{id}/caratula")
 	public ResponseEntity<String> addCaratula(Principal principal, @PathVariable Integer id,
-			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, PermisoException, URISyntaxException {
+			@Valid @ModelAttribute("caratula") NewCaratulaDTO dto) throws IOException, URISyntaxException {
 
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
 		Optional<Source> sourceObj = sourceService.findById(dto.getSource());
 		SerieFoto pf = new SerieFoto();
+		if(sourceObj.isPresent()) {
+			pf.setSource(sourceObj.get());
+		}
 		pf.setUrl(dto.getUrl());
-		pf.setSource(sourceObj.get());
 		pf.setFoto(dwFotoService.descargar(dto.getSource(), dto.getUrl()));
 		pf.setCaratula(true);
 
@@ -310,7 +313,7 @@ public class SeriesController {
 			return ResponseEntity.ok("Descargado");
 		}
 
-		return new ResponseEntity<String>("Id no encontrado", HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>("Id no encontrado", HttpStatus.NO_CONTENT);
 	}
 
 }

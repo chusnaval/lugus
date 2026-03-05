@@ -84,7 +84,9 @@ public class PeliculaService {
 			Optional<Source> sourceObj = sourceService.findById(dto.getSource());
 			PeliculaFoto pf = new PeliculaFoto();
 			pf.setUrl(dto.getUrl());
-			pf.setSource(sourceObj.get());
+			if(sourceObj.isPresent()) {
+				pf.setSource(sourceObj.get());
+			}
 			pf.setFoto(dwFotoService.descargar(dto.getSource(), dto.getUrl()));
 			pf.setCaratula(true);
 
@@ -168,8 +170,8 @@ public class PeliculaService {
 	 */
 	public Page<Pelicula> findAllBy(FiltrosDto filter) {
 		Sort sort = buildSort(filter.getOrden(), filter.getDireccion());
-
-		Pageable pageable = PageRequest.of(filter.getPagina().get(), NUM_ELEMENTS_PER_PAGE, sort);
+		int pageNum = filter.getPagina().orElse(0);
+		Pageable pageable = PageRequest.of(pageNum, NUM_ELEMENTS_PER_PAGE, sort);
 
 		Specification<Pelicula> spec = Specification.where(null);
 
@@ -250,8 +252,8 @@ public class PeliculaService {
 		return sort;
 	}
 
-	public List<Pelicula> findByTitlesInYear(String title, String titleGest, int year) {
-		List<Pelicula> result = new ArrayList<Pelicula>();
+	public List<Pelicula> findByTitlesInYear(String title, int year) {
+		List<Pelicula> result = new ArrayList<>();
 		result.addAll(peliculaRepo.findByTituloAndAnyo(title, year));
 		result.addAll(peliculaRepo.findByTituloGestAndAnyo(title, year));
 		

@@ -162,7 +162,9 @@ public class SeriesService {
 			Optional<Source> sourceObj = sourceService.findById(dto.getSource());
 			SerieFoto pf = new SerieFoto();
 			pf.setUrl(dto.getUrl());
-			pf.setSource(sourceObj.get());
+			if(sourceObj.isPresent()) {
+				pf.setSource(sourceObj.get());
+			}
 			pf.setFoto(dwFotoService.descargar(dto.getSource(), dto.getUrl()));
 			pf.setCaratula(true);
 
@@ -182,8 +184,8 @@ public class SeriesService {
 		return loc;
 	}
 
-	public List<Serie> findByTitlesInYear(String title, String titleGest, Integer year) {
-		List<Serie> result = new ArrayList<Serie>();
+	public List<Serie> findByTitlesInYear(String title, Integer year) {
+		List<Serie> result = new ArrayList<>();
 		result.addAll(serieRepo.findByTituloAndAnyoInicio(title, year));
 		result.addAll(serieRepo.findByTituloGestAndAnyoInicio(title, year));
 		

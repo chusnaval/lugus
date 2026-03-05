@@ -62,8 +62,8 @@
 			<li class="list-group-item row"><strong class="col-3"><img
 					th:src="@{/image/IMDb_Logo.png}" class="imdb_logo_detail"
 					alt="IMDb Rating"></strong><span class="col-3"
-				th:if="${pelicula.otros}"
-				th:text="${pelicula.otros.ratingFormatted}"></span> <strong
+				th:if="${pelicula.ratingFormatted != null}"
+				th:text="${pelicula.ratingFormatted}"></span> <strong
 				class="col-3">Letterboxd</strong><span class="col-3"
 				th:if="${pelicula.otros}" th:text="${pelicula.otros.lbRating}"></span>
 

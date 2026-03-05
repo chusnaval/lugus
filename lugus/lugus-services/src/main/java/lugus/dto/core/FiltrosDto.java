@@ -1,8 +1,11 @@
 package lugus.dto.core;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.util.StringUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +16,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FiltrosDto {
+public class FiltrosDto implements Serializable{
+
+	/**
+	 * Serial version UID
+	 */
+	private static final long serialVersionUID = 1L;
 
 	private String texto;
 
@@ -56,26 +64,26 @@ public class FiltrosDto {
 	public Map<String, Object> toMap() {
 		Map<String, Object> map = new HashMap<>();
 
-		if (titulo != null && !texto.isBlank())
+		if (StringUtils.hasLength(texto))
 			map.put("texto", texto);
 
-		if (titulo != null && !titulo.isBlank())
+		if (StringUtils.hasLength(titulo))
 			map.put("titulo", titulo);
-		if (genero != null && !genero.isBlank())
+		if (StringUtils.hasLength(genero))
 			map.put("genero", genero);
-		if (location != null && !location.isBlank())
+		if (StringUtils.hasLength(location))
 			map.put("location", location);
-		if (notas != null && !notas.isBlank())
+		if (StringUtils.hasLength(notas))
 			map.put("notas", notas);
-		if (orden.isPresent() && !orden.get().isBlank())
+		if (orden.isPresent() && StringUtils.hasLength(orden.get()))
 			map.put("orden", orden);
-		if (direccion.isPresent() && !direccion.get().isBlank())
+		if (direccion.isPresent() && StringUtils.hasLength(direccion.get()))
 			map.put("direccion", direccion);
 
-		if (director != null && !director.isBlank())
+		if (StringUtils.hasLength(director))
 			map.put("director", director);
 
-		if (actor != null && !actor.isBlank())
+		if (StringUtils.hasLength(actor))
 			map.put("actor", actor);
 
 		if (fromAnyo != null)
