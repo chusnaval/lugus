@@ -60,8 +60,8 @@
 						Código:</strong> <input type="text" class="form-control"
 					th:field="*{imdbCodigo}" /></li>
 
-				<li class="list-group-item row" th:if="${pelicula.otros != null}"><strong class="col-3">Letterboxd
-						Rating:</strong> <input type="text" th:value="${pelicula.otros.lbRating}"
+				<li class="list-group-item row"><strong class="col-3">Letterboxd
+						Rating:</strong> <input type="text" th:value="${pelicula.getUsuarioRating(${#authentication.name})}"
 					th:field="*{lbRating}" maxlength="3"></li>
 
 				<li class="list-group-item row"><strong class="col-3">Pack:</strong>
@@ -74,8 +74,8 @@
 					<input type="checkbox" th:value="${pelicula.funda}"
 					th:field="*{funda}"> <strong class="col-3">Comprado:</strong>
 					<input type="checkbox" th:value="${pelicula.comprado}"
-					th:field="*{comprado}"> <strong class="col-3" th:if="${pelicula.otros != null}">Visto:</strong>
-					<input type="checkbox" th:if="${pelicula.otros != null}" th:value="${pelicula.otros.vista}"
+					th:field="*{comprado}"> <strong class="col-3">Visto:</strong>
+					<input type="checkbox" th:value="${pelicula.getUsuarioVista(${#authentication.name})}"
 					th:field="*{vista}"></li>
 				<li class="list-group-item row"><strong class="col-3">Localización:</strong>
 					<select class="form-select" th:field="*{locationCode}">

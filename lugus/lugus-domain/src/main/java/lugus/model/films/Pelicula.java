@@ -140,9 +140,9 @@ public class Pelicula {
 	private final Set<Actor> actores = new HashSet<>();
 	
 	@JsonIgnore
-	@OneToOne(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
-	private PeliculasOtros otros;
+	private final Set<PeliculasUsuario> peliculasUsuario = new HashSet<>();
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
@@ -208,5 +208,79 @@ public class Pelicula {
 		this.peliculaFotos.add(pf);
 		pf.setPelicula(this);
 
+	}
+
+	public void addDirector(Director d) {
+		this.directores.add(d);
+		d.setPelicula(this);
+
+	}
+
+	public void addActor(Actor a) {
+		this.actores.add(a);
+		a.setPelicula(this);
+
+	}
+
+	public void addPeliculasUsuario(PeliculasUsuario pu) {
+		this.peliculasUsuario.add(pu);
+		pu.setPelicula(this);
+
+	}
+
+	public void addGroup(GroupFilms gf) {
+		this.groups.add(gf);
+		gf.setPelicula(this);
+
+	}
+
+	public void removeGroup(GroupFilms gf) {
+		this.groups.remove(gf);
+		gf.setPelicula(null);
+
+	}
+
+	public void removePeliculasUsuario(PeliculasUsuario pu) {
+		this.peliculasUsuario.remove(pu);
+		pu.setPelicula(null);
+
+	}
+
+	public void removeActor(Actor a) {
+		this.actores.remove(a);
+		a.setPelicula(null);
+
+	}
+
+	public void removeDirector(Director d) {
+		this.directores.remove(d);
+		d.setPelicula(null);
+
+	}
+
+	public void removeCaratula(PeliculaFoto pf) {
+		this.peliculaFotos.remove(pf);
+		pf.setPelicula(null);	
+	}
+
+	public void removeHijo(Pelicula hijo) {
+		this.peliculasPack.remove(hijo);
+		hijo.setPadre(null);
+	}
+
+	public boolean getUsuarioVista(String usuarioLogin) {
+		return peliculasUsuario.stream()
+				.filter(pu -> pu.getUsuario().getLogin().equals(usuarioLogin))
+				.map(PeliculasUsuario::isVista)
+				.findFirst()
+				.orElse(false);
+	}
+
+	public String getUsuarioRating(String usuarioLogin) {
+		return peliculasUsuario.stream()
+				.filter(pu -> pu.getUsuario().getLogin().equals(usuarioLogin))
+				.map(pu -> pu.getLbRating() != null ? pu.getLbRating().toString() : "")
+				.findFirst()
+				.orElse("");
 	}
 }

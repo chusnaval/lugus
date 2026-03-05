@@ -465,9 +465,14 @@ public class PeliculasController {
 		nuevo.setPack(p.isPack());
 		nuevo.setNotas(p.getNotas());
 
-		if (p.getOtros() != null) {
-			nuevo.setVista(p.getOtros().getVista());
-			nuevo.setLbRating(p.getOtros().getLbRating());
+		if(p.getPeliculasUsuario() != null) {
+			p.getPeliculasUsuario().stream()
+				.filter(pu -> pu.getUsuario().getLogin().equals(principal.getName()))
+				.findFirst()
+				.ifPresent(pu -> {
+					nuevo.setVista(pu.isVista());
+					nuevo.setLbRating(pu.getLbRating());
+				});
 		} else {
 			nuevo.setVista(false);
 		}
@@ -532,8 +537,12 @@ public class PeliculasController {
 			insertImdbService.insert(existing.getId(), nuevo.getImdbCodigo());
 		}
 
-		existing.getOtros().setLbRating(nuevo.getLbRating());
-		existing.getOtros().setVista(nuevo.isVista());
+		existing.getPeliculasUsuario().forEach(pu -> {
+			if (pu.getUsuario().getLogin().equals(principal.getName())) {
+				pu.setVista(nuevo.isVista());
+				pu.setLbRating(nuevo.getLbRating());
+			}
+		});
 		service.save(existing);
 
 		return "redirect:/peliculas?recuperar=true";

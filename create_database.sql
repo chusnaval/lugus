@@ -230,23 +230,7 @@ GRANT ALL ON SEQUENCE lugus.operaciones_id_seq TO lugus_admin;
 
 GRANT ALL ON SEQUENCE lugus.operaciones_id_seq TO lugus_role;
 
--- SEQUENCE: lugus.otros_id_seq
 
--- DROP SEQUENCE IF EXISTS lugus.otros_id_seq;
-
-CREATE SEQUENCE IF NOT EXISTS lugus.otros_id_seq
-    INCREMENT 1
-    START 1
-    MINVALUE 1
-    MAXVALUE 9223372036854775807
-    CACHE 1;
-
-ALTER SEQUENCE lugus.otros_id_seq
-    OWNER TO lugus_admin;
-
-GRANT ALL ON SEQUENCE lugus.otros_id_seq TO lugus_admin;
-
-GRANT ALL ON SEQUENCE lugus.otros_id_seq TO lugus_role;
 
 -- SEQUENCE: lugus.peliculas_id_seq
 
@@ -994,35 +978,6 @@ GRANT SELECT ON TABLE lugus.peliculas_fotos TO lugus_readonly;
 
 GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.peliculas_fotos TO lugus_role;
 	
--- Table: lugus.peliculas_otros
-
--- DROP TABLE IF EXISTS lugus.peliculas_otros;
-
-CREATE TABLE IF NOT EXISTS lugus.peliculas_otros
-(
-    id integer NOT NULL DEFAULT nextval('lugus.otros_id_seq'::regclass),
-    pelicula_id integer NOT NULL,
-    idmb_id character varying(20) COLLATE pg_catalog."default",
-    CONSTRAINT otros_fk1 FOREIGN KEY (pelicula_id)
-        REFERENCES lugus.peliculas (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-)
-
-TABLESPACE tb_lugus;
-
-ALTER TABLE IF EXISTS lugus.peliculas_otros
-    OWNER to lugus_admin;
-
-REVOKE ALL ON TABLE lugus.peliculas_otros FROM lugus_readonly;
-REVOKE ALL ON TABLE lugus.peliculas_otros FROM lugus_role;
-
-GRANT ALL ON TABLE lugus.peliculas_otros TO lugus_admin;
-
-GRANT SELECT ON TABLE lugus.peliculas_otros TO lugus_readonly;
-
-GRANT INSERT, DELETE, SELECT, UPDATE ON TABLE lugus.peliculas_otros TO lugus_role;
-
 -- Table: lugus.peliculas_personal
 
 -- DROP TABLE IF EXISTS lugus.peliculas_personal;
@@ -1376,6 +1331,7 @@ ALTER TABLE lugus."imdbDirectors"
 GRANT SELECT ON TABLE lugus."imdbDirectors" TO lugus_readonly;
 GRANT SELECT ON TABLE lugus."imdbDirectors" TO lugus_role;
 GRANT ALL ON TABLE lugus."imdbDirectors" TO postgres;
+
 -- PROCEDURE: lugus.insertar_datos_personales(integer, character varying)
 
 -- DROP PROCEDURE IF EXISTS lugus.insertar_datos_personales(integer, character varying);
@@ -1386,12 +1342,38 @@ CREATE OR REPLACE PROCEDURE lugus.insertar_datos_personales(
 LANGUAGE 'plpgsql'
 AS $BODY$
 BEGIN
-	delete from lugus.PELICULAS_PERSONAL where pelicula_id = p_id;
-	delete from lugus.peliculas_otros where pelicula_id = p_id;
-	
-	INSERT INTO lugus.peliculas_otros(
-	 pelicula_id, idmb_id)
-	VALUES ( p_id, p_imdb);
+DELETE FROM LUGUS.PELICULAS_PERSONAL
+WHERE
+	PELICULA_ID = P_ID;
+
+
+
+
+UPDATE LUGUS.PELICULAS PO
+SET
+	VOTES = (
+		SELECT
+			NUMVOTES
+		FROM
+			IMDB.IMDB_TITLE_RATINGS ITR
+		WHERE
+			ITR.TCONST = P_IMDB
+	)
+WHERE
+	PO.ID = P_ID;
+
+UPDATE LUGUS.PELICULAS PO
+SET
+	RATING = (
+		SELECT
+			AVERAGERATING
+		FROM
+			IMDB.IMDB_TITLE_RATINGS ITR
+		WHERE
+			ITR.TCONST = P_IMDB
+	)
+WHERE
+	PO.ID = P_ID;
 
 INSERT INTO
 	LUGUS.PELICULAS_PERSONAL (
@@ -1404,21 +1386,27 @@ INSERT INTO
 SELECT
 	PELICULA_ID,
 	PER.ID,
-	ITP.characters,
-	itp.ordering,
-	coalesce (itp.category, itp.job)
+	ITP.CHARACTERS,
+	ITP.ORDERING,
+	COALESCE(ITP.CATEGORY, ITP.JOB)
 FROM
-	LUGUS.PELICULAS_OTROS PO
-	JOIN IMDB.IMDB_TITLE_PRINCIPALS ITP ON (PO.IDMB_ID = ITP.TCONST)
+	LUGUS.PELICULAS PO
+	JOIN IMDB.IMDB_TITLE_PRINCIPALS ITP ON (PO.IMDB_ID = ITP.TCONST)
 	JOIN LUGUS.PERSONAS PER ON (PER.NCONST = ITP.NCONST)
-	where PELICULA_ID not in (select PELICULA_ID FROM LUGUS.PELICULAS_PERSONAL );
+WHERE
+	PELICULA_ID NOT IN (
+		SELECT
+			PELICULA_ID
+		FROM
+			LUGUS.PELICULAS_PERSONAL
+	);
 
-  --  COMMIT;            
-EXCEPTION
-    WHEN OTHERS THEN
-      
-        ROLLBACK;
-        RAISE;           
+--  COMMIT;            
+EXCEPTION WHEN OTHERS THEN
+ROLLBACK;
+
+RAISE;
+
 END;
 $BODY$;
 ALTER PROCEDURE lugus.insertar_datos_personales(integer, character varying)
@@ -1429,6 +1417,7 @@ GRANT EXECUTE ON PROCEDURE lugus.insertar_datos_personales(integer, character va
 GRANT EXECUTE ON PROCEDURE lugus.insertar_datos_personales(integer, character varying) TO lugus_role;
 
 REVOKE ALL ON PROCEDURE lugus.insertar_datos_personales(integer, character varying) FROM PUBLIC;
+
 
 
 
