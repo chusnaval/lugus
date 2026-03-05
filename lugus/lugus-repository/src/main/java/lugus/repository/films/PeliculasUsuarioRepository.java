@@ -1,10 +1,10 @@
 
-package lugus.repository.user;
+package lugus.repository.films;
 
 import java.util.List;
 
 import lugus.model.films.Pelicula;
-import lugus.model.user.PeliculasUsuario;
+import lugus.model.films.PeliculasUsuario;
 import lugus.model.user.Usuario;
 
 public interface PeliculasUsuarioRepository {

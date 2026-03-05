@@ -1,10 +1,10 @@
 package lugus.service.user;
 
-import lugus.model.user.PeliculasUsuario;
-import lugus.model.user.Usuario;
-import lugus.repository.user.PeliculasUsuarioRepository;
-import lugus.model.films.Pelicula;
 
+import lugus.model.user.Usuario;
+import lugus.repository.films.PeliculasUsuarioRepository;
+import lugus.model.films.Pelicula;
+import lugus.model.films.PeliculasUsuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
