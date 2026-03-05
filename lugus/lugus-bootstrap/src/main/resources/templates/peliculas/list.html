@@ -29,46 +29,49 @@
 		<div class="row justify-content-center g-4">
 			<div th:each="p, iStat : ${pagePeliculas.content}"
 				id="tabla-peliculas"
-				class="film col-12 col-sm-6 col-md-3 col-lg-2 card-bg card-borde ms-1">
-				<a
-					th:href="@{/peliculas/{id}(id=${p.id})}"
-					class="text-decoration-none d-block custom-card-link fixed-height">
-					<div class="card fixed-height border-0 card-bg">
-						<div class="card-body card-bg position-relative">
+				 class="film col-12 col-sm-6 col-md-3 col-lg-2 card-borde ms-1">
 
-							<span class="cover image-wrapper ms-2"><img
-								th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
-								class="card-img-top fixed" th:alt="${p.notas}" /> <img
-								th:if="${p.tieneCaratula == true}"
-								th:src="@{/peliculas/{id}/image(id=${p.id})}"
-								class="card-img-top fixed" th:alt="${p.notas}" /> </span>
-							<div th:class="${p.comprado ? 'overlay' : 'overlay unavailable'}">No
-								Disponible</div>
-							<h5 class="title fw-bold mb-2" th:text="${p.titulo}"></h5>
-							<div class="row info-line">
-								<div class="col-5 text-left" th:text="${p.anyo}"></div>
-								<div class="col-7 text-left" th:text="${p.formato}"></div>
-							</div>
-							<div class="row info-line" th:if="${p.ratingFormatted!=null}">
-								<div class="col-6 text-left"><img th:src="@{/image/IMDb_Logo.png}" class="imdb_logo_list" alt="IMDb Rating"><span  th:text="${p.ratingFormatted}"></span></div>
-							</div>
-							
-							
-							<div class="row info-line">
+				<div class="card card-bg h-100 position-relative">
 
-								<span class="text-left"
-									th:text="${p.location==null?'':p.location}"></span>
+				<a th:href="@{/peliculas/{id}(id=${p.id})}"	class="stretched-link"></a>
 
-							</div>
-							<!-- Estrella de favorito -->
-							<span sec:authorize="isAuthenticated()" class="position-absolute top-0 end-0 p-2">
-								<a href="#" th:attr="data-pelicula-id=${p.id}" class="favorite-toggle" th:classappend="${p.favorita} ? 'text-warning' : 'text-secondary'">
-									<i class="fa-star fa-lg fa" th:classappend="${p.favorita} ? 'fas' : 'far'"></i>
-								</a>
-							</span>
-						</div>
+				<div class="card-body p-2">
+
+					<div class="image-wrapper mb-2">
+						<img th:if="${p.tieneCaratula == false}" src="image/placeholder.png"
+							class="card-img-top fixed" th:alt="${p.notas}" /> 
+						<img th:if="${p.tieneCaratula == true}"
+							th:src="@{/peliculas/{id}/image(id=${p.id})}"
+							class="card-img-top fixed" th:alt="${p.notas}" />
+
+						<div th:class="${p.comprado ? 'overlay' : 'overlay unavailable'}">No
+							Disponible</div>
+					</div>			
+						
+					<h5 class="title fw-bold mb-1" th:text="${p.titulo}"></h5>
+
+					<div class="info-line d-flex justify-content-between">
+						<span th:text="${p.anyo}"></span>
+						<span th:text="${p.formato}"></span>
 					</div>
-				</a>
+							
+					<div class="info-line">
+						<img th:src="@{/image/IMDb_Logo.png}" class="imdb_logo_list" alt="IMDb Rating">
+						<span  th:text="${p.ratingFormatted}"></span>
+					</div>
+							
+							
+					<div class="info-line">
+						<span th:text="${p.location==null?'':p.location}"></span>
+					</div>
+
+					<!-- Estrella de favorito -->
+					<button sec:authorize="isAuthenticated()" class="favorite-toggle position-absolute top-0 end-0 p-2" data-pelicula-id="${p.id}">	
+						<i class="fa-star fa-lg fa" th:classappend="${p.favorita} ? 'fas' : 'far'"></i>
+					</button>
+
+				</div>
+				
 				<div class="card-footer bg-transparent border-0 p-2">
 					<a
 						th:href="@{/peliculas/editar/{id}(id=${p.id})}"
