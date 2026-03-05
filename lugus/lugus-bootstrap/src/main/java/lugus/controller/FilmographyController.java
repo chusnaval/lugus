@@ -15,14 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lugus.model.people.Filmography;
-import lugus.exception.PermisoException;
 import lugus.model.films.Pelicula;
 import lugus.model.people.Persona;
 import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.imdb.ImdbTitlePrincipals;
 import lugus.service.films.PeliculaService;
-import lugus.service.films.PeliculasOtrosService;
+
 import lugus.service.imdb.ImdbTitleAkasService;
 import lugus.service.imdb.ImdbTitleBasicsService;
 import lugus.service.imdb.ImdbTitlePrincipalsService;
@@ -39,15 +38,12 @@ public class FilmographyController {
 
 	private final ImdbTitleBasicsService imdbTitleBasicsService;
 
-	private final PeliculasOtrosService peliculasOtrosService;
-
 	private final ImdbTitleAkasService imdbTitleAkasService;
 
 	private final PeliculaService peliculaService;
 
 	@GetMapping("/{id}")
-	public String detail(Principal principal, @PathVariable Integer id, HttpSession session, Model model)
-			throws PermisoException {
+	public String detail(Principal principal, @PathVariable Integer id, HttpSession session, Model model) {
 
 		Persona person = personaService.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("Persona no encontrada"));
@@ -79,14 +75,14 @@ public class FilmographyController {
 	private Filmography buildNewFilmography(Persona person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb) {
 		
 		Optional<ImdbTitleAkas> ita = imdbTitleAkasService.findByTitleId(itp.getId().getTconst());
-		boolean isFilmRegister = peliculasOtrosService.isFilmRegistered(itp.getId().getTconst());
+		boolean isFilmRegister = peliculaService.isFilmRegistered(itp.getId().getTconst());
 		
 		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
 				.category(itp.getId().getCategory()).tconst(itp.getId().getTconst())
 				.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
 
 		if (isFilmRegister) {
-			film.setPeliculaId(peliculasOtrosService.getIdFilm(itp.getId().getTconst()));
+			film.setPeliculaId(peliculaService.findByImdbId(itp.getId().getTconst()).getId());
 			Optional<Pelicula> pel = peliculaService.findById(film.getPeliculaId());
 			film.setComprado(pel.isPresent() && pel.get().isComprado());
 			film.setBuscado(!film.isComprado());

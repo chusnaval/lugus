@@ -265,5 +265,11 @@ public class PeliculaService {
 		
 	}
 	
-	
+	public boolean isFilmRegistered(String tconst) {
+		return peliculaRepo.findByImdbId(tconst) != null;
+	}
+
+	public Pelicula findByImdbId(String tconst) {
+		return peliculaRepo.findByImdbId(tconst);
+	}
 }
