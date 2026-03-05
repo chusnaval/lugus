@@ -3,6 +3,7 @@ package lugus.model.films;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,6 +44,7 @@ public class PeliculasUsuario {
     
     private java.time.LocalDateTime fechaAgregado;
 
+    @Column(name = "lbRating")
     private Float lbRating;
 
     private boolean vista;
