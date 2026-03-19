@@ -34,6 +34,6 @@ public interface PeliculaRepository {
 
 	int updateLocationByCode(String oldCode, String newCode);
 
-	Pelicula findByImdbId(String tconst);
+	List<Pelicula> findByImdbId(String tconst);
 
 }

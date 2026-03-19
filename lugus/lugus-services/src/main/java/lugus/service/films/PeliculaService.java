@@ -269,7 +269,7 @@ public class PeliculaService {
 		return peliculaRepo.findByImdbId(tconst) != null;
 	}
 
-	public Pelicula findByImdbId(String tconst) {
+	public List<Pelicula> findByImdbId(String tconst) {
 		return peliculaRepo.findByImdbId(tconst);
 	}
 }

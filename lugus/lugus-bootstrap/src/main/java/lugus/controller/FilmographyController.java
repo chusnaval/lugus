@@ -82,10 +82,16 @@ public class FilmographyController {
 				.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
 
 		if (isFilmRegister) {
-			film.setPeliculaId(peliculaService.findByImdbId(itp.getId().getTconst()).getId());
-			Optional<Pelicula> pel = peliculaService.findById(film.getPeliculaId());
-			film.setComprado(pel.isPresent() && pel.get().isComprado());
-			film.setBuscado(!film.isComprado());
+			List<Pelicula> pelis = peliculaService.findByImdbId(itp.getId().getTconst());
+			if (!pelis.isEmpty()) {
+				// queremos marcar como comprado o buscado el registro de filmografia, asi que si cualquiera de los registros de pelicula con ese tconst esta comprado, se marca como comprado, sino se marca como buscado
+				boolean comprado = pelis.stream().anyMatch(Pelicula::isComprado);
+				film.setComprado(comprado);
+				film.setBuscado(!comprado);
+			} else {
+				film.setBuscado(true);
+				film.setComprado(false);
+			}
 		}
 
 
