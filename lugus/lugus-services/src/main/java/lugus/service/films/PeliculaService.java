@@ -266,10 +266,12 @@ public class PeliculaService {
 	}
 	
 	public boolean isFilmRegistered(String tconst) {
+		System.out.println("Comprobando si la película está registrada para imdbId = [" + tconst + "]");
 		return !peliculaRepo.findByImdbId(tconst).isEmpty();
 	}
 
 	public List<Pelicula> findByImdbId(String tconst) {
+		System.out.println("Buscando imdbId = [" + tconst + "]");
 		return peliculaRepo.findByImdbId(tconst);
 	}
 }
