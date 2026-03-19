@@ -266,7 +266,7 @@ public class PeliculaService {
 	}
 	
 	public boolean isFilmRegistered(String tconst) {
-		return peliculaRepo.findByImdbId(tconst) != null;
+		return !peliculaRepo.findByImdbId(tconst).isEmpty();
 	}
 
 	public List<Pelicula> findByImdbId(String tconst) {
