@@ -84,10 +84,13 @@ public class FilmographyController {
 		if (isFilmRegister) {
 			List<Pelicula> pelis = peliculaService.findByImdbId(itp.getId().getTconst());
 			if (!pelis.isEmpty()) {
-				System.out.println("Existen pelis para [" + itp.getId().getTconst() + "]");
+				// necesitamos poner peliculaId en filmography para que se sepa que pelicula de una forma u otra
+				// la tenemos registrada, asi que si hay varias peliculas con ese tconst, se pone el id de la edicion con mayor fecha de modificacion, asi que se asume que es la edicion mas actualizada
+				Pelicula pelicula = pelis.stream().max((p1, p2) -> p1.getTsModif().compareTo(p2.getTsModif())).get();
+				film.setPeliculaId(pelicula.getId());
+				
 				// queremos marcar como comprado o buscado el registro de filmografia, asi que si cualquiera de los registros de pelicula con ese tconst esta comprado, se marca como comprado, sino se marca como buscado
 				boolean comprado = pelis.stream().anyMatch(Pelicula::isComprado);
-				System.out.println("Existen pelis para [" + itp.getId().getTconst() + "], comprado = [" + comprado + "]");
 				film.setComprado(comprado);
 				film.setBuscado(!comprado);
 			} else {
