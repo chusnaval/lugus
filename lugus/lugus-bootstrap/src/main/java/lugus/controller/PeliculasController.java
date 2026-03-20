@@ -13,6 +13,7 @@ import lugus.dto.films.PeliculaCreateDto;
 import lugus.dto.films.PeliculaFavoritaDto;
 import lugus.dto.media.NewCaratulaDTO;
 import lugus.model.core.Source;
+import lugus.model.core.Estado;
 import lugus.model.core.Location;
 import lugus.model.core.LocationType;
 import lugus.model.films.FilmWanted;
@@ -27,6 +28,7 @@ import lugus.model.user.FavoritosUsuario;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.service.core.SourceService;
+import lugus.service.core.EstadoService;
 import lugus.service.core.LocationService;
 import lugus.service.core.LocationTypeService;
 import lugus.service.films.DwFotoService;
@@ -87,6 +89,8 @@ public class PeliculasController {
 	private final PeliculaService service;
 
 	private final LocationService locService;
+	
+	private final EstadoService estadoService;
 
 	private final SourceService sourceService;
 
@@ -465,6 +469,7 @@ public class PeliculasController {
 		nuevo.setPack(p.isPack());
 		nuevo.setNotas(p.getNotas());
 		nuevo.setImdbCodigo(p.getImdbId());
+		nuevo.setEstadoCodigo(p.getEstado() != null ? p.getEstado().getId() : null);
 
 		if(p.getPeliculasUsuario() != null) {
 			p.getPeliculasUsuario().stream()
@@ -518,6 +523,14 @@ public class PeliculasController {
 			loc = locService.findById(nuevo.getLocationCode())
 					.orElseThrow(() -> new IllegalArgumentException("Localización no encontrada"));
 		}
+		Optional<Estado> estado = null;
+		if(nuevo.getEstadoCodigo() != null) {
+			estado = estadoService.findEstadoById(nuevo.getEstadoCodigo());
+			if(estado.isPresent()) {
+				existing.setEstado(estado.get());
+			}
+		}
+		
 
 		existing.setTitulo(nuevo.getTitulo());
 		existing.setTituloGest(nuevo.getTituloGest());

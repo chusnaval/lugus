@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import lugus.config.StorageProperties;
 import lugus.export.FilmWantedExportService;
 import lugus.model.films.FilmWanted;
+import lugus.service.core.EstadoService;
 import lugus.service.core.LocationService;
 import lugus.service.core.LocationTypeService;
 import lugus.service.core.SourceService;
@@ -54,10 +55,12 @@ class FilmWantedExportControllerTest {
 		GroupFilmsService groupFilmsService = Mockito.mock(GroupFilmsService.class);
 		FavoritosUsuarioService favoritosUsuarioService = Mockito.mock(FavoritosUsuarioService.class);
 		UsuarioService usuarioService = Mockito.mock(UsuarioService.class);
+		EstadoService estadoService = Mockito.mock(EstadoService.class);
 
 		PeliculasController controller = new PeliculasController(
 				peliculaService,
 				locationService,
+				estadoService,
 				sourceService,
 				filmWantedService,
 				exportService,

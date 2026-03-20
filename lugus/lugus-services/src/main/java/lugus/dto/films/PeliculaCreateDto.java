@@ -46,4 +46,6 @@ public class PeliculaCreateDto {
 	private Float lbRating;
 	
 	private boolean vista;
+	
+	private Integer estadoCodigo;
 }

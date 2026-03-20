@@ -74,6 +74,7 @@
 			<li class="list-group-item row"><strong class="col-3">Localización:</strong>
 				<span class="col-9" th:if="${pelicula.location}"
 				th:text="${pelicula.location.descripcion}"></span></li>
+			<li class="list-group-item row"><strong class="col-3">Estado:</strong> <span class="col-9" th:text="${pelicula.estado!=null? pelicula.estado.name : ''}"></span></li>
 		</ul>
 	</div>
 

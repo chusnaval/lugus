@@ -21,7 +21,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -32,6 +31,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lugus.converter.FormatoConverter;
 import lugus.converter.GeneroConverter;
+import lugus.model.core.Estado;
 import lugus.model.core.Location;
 import lugus.model.groups.GroupFilms;
 import lugus.model.people.Actor;
@@ -118,6 +118,10 @@ public class Pelicula {
 
 	@Column(name = "ts_baja", columnDefinition = "TIMESTAMP")
 	private Instant tsBaja;
+	
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "estado_id", nullable = true) // FK → estado.id
+	private Estado estado;
 
 	@ManyToOne
 	@JoinColumn(name = "padre_id")
