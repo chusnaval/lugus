@@ -79,18 +79,28 @@ public class FilmographyApiController {
 			.category(itp.getId().getCategory()).tconst(itp.getId().getTconst())
 			.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
 
-		if (isFilmRegister) {
-			List<Pelicula> pelis = peliculaService.findByImdbId(itp.getId().getTconst());
-			if (!pelis.isEmpty()) {
-				// queremos marcar como comprado o buscado el registro de filmografia, asi que si cualquiera de los registros de pelicula con ese tconst esta comprado, se marca como comprado, sino se marca como buscado
-				boolean comprado = pelis.stream().anyMatch(Pelicula::isComprado);
-				film.setComprado(comprado);
-				film.setBuscado(!comprado);
-			} else {
-				film.setBuscado(true);
-				film.setComprado(false);
+			if (isFilmRegister) {
+				List<Pelicula> pelis = peliculaService.findByImdbId(itp.getId().getTconst());
+				if (!pelis.isEmpty()) {
+					// necesitamos poner peliculaId en filmography para que se sepa que pelicula de una forma u otra
+					// la tenemos registrada, asi que si hay varias peliculas con ese tconst, se pone el id de la edicion con mayor fecha de modificacion, asi que se asume que es la edicion mas actualizada
+					// pero tsmodif puede ser nulo, asi que se asume que si es nulo, es la edicion mas antigua, y si no es nulo, se compara con las fechas de modificacion de las otras ediciones para determinar cual es la mas actualizada
+					Pelicula pelicula = pelis.stream().max((p1, p2) -> {
+						if (p1.getTsModif() == null) return -1;
+						if (p2.getTsModif() == null) return 1;
+						return p1.getTsModif().compareTo(p2.getTsModif());
+					}).get();
+					film.setPeliculaId(pelicula.getId());
+					
+					// queremos marcar como comprado o buscado el registro de filmografia, asi que si cualquiera de los registros de pelicula con ese tconst esta comprado, se marca como comprado, sino se marca como buscado
+					boolean comprado = pelis.stream().anyMatch(Pelicula::isComprado);
+					film.setComprado(comprado);
+					film.setBuscado(!comprado);
+				} else {
+					film.setBuscado(true);
+					film.setComprado(false);
+				}
 			}
-		}
 
 
 		return film;

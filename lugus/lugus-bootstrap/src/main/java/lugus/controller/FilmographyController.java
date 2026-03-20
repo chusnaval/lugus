@@ -86,7 +86,12 @@ public class FilmographyController {
 			if (!pelis.isEmpty()) {
 				// necesitamos poner peliculaId en filmography para que se sepa que pelicula de una forma u otra
 				// la tenemos registrada, asi que si hay varias peliculas con ese tconst, se pone el id de la edicion con mayor fecha de modificacion, asi que se asume que es la edicion mas actualizada
-				Pelicula pelicula = pelis.stream().max((p1, p2) -> p1.getTsModif().compareTo(p2.getTsModif())).get();
+				// pero tsmodif puede ser nulo, asi que se asume que si es nulo, es la edicion mas antigua, y si no es nulo, se compara con las fechas de modificacion de las otras ediciones para determinar cual es la mas actualizada
+				Pelicula pelicula = pelis.stream().max((p1, p2) -> {
+					if (p1.getTsModif() == null) return -1;
+					if (p2.getTsModif() == null) return 1;
+					return p1.getTsModif().compareTo(p2.getTsModif());
+				}).get();
 				film.setPeliculaId(pelicula.getId());
 				
 				// queremos marcar como comprado o buscado el registro de filmografia, asi que si cualquiera de los registros de pelicula con ese tconst esta comprado, se marca como comprado, sino se marca como buscado

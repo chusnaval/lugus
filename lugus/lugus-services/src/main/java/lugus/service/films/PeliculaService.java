@@ -74,6 +74,7 @@ public class PeliculaService {
 
 		Pelicula p = Pelicula.builder().titulo(dto.getTitulo()).tituloGest(dto.getTituloGest()).anyo(dto.getAnyo())
 				.formato(formato).genero(genero).pack(dto.isPack()).steelbook(dto.isSteelbook()).funda(dto.isFunda())
+				.imdbId(dto.getImdbCodigo())
 				.comprado(dto.isComprado()).notas(dto.getNotas()).location(loc).usrAlta(username).tsAlta(Instant.now())
 				.build();
 		p.calcularCodigo();

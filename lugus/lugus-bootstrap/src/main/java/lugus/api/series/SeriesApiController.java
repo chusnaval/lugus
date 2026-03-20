@@ -35,7 +35,7 @@ public class SeriesApiController {
 	@GetMapping("/wanted")
 	List<SerieCreateDto> wanted() throws LugusNotFoundException {
 		Page<Serie> page = service.wanted();
-		List<SerieCreateDto> result = new ArrayList<SerieCreateDto>();
+		List<SerieCreateDto> result = new ArrayList<>();
 		for (Serie p : page.getContent()) {
 			result.add(mapper.mapToDTO(p));
 		}
