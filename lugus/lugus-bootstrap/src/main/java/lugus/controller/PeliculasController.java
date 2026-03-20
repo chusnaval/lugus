@@ -464,6 +464,7 @@ public class PeliculasController {
 		nuevo.setSteelbook(p.isSteelbook());
 		nuevo.setPack(p.isPack());
 		nuevo.setNotas(p.getNotas());
+		nuevo.setImdbCodigo(p.getImdbId());
 
 		if(p.getPeliculasUsuario() != null) {
 			p.getPeliculasUsuario().stream()
@@ -529,8 +530,8 @@ public class PeliculasController {
 		existing.setSteelbook(nuevo.isSteelbook());
 		existing.setFunda(nuevo.isFunda());
 		existing.setComprado(nuevo.isComprado());
-		existing.calcularCodigo();
 		existing.setImdbId(nuevo.getImdbCodigo());
+		existing.calcularCodigo();
 		service.save(existing);
 
 		if (nuevo.getImdbCodigo() != null && !nuevo.getImdbCodigo().isBlank()) {

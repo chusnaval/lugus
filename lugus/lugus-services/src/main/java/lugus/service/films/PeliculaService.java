@@ -76,6 +76,7 @@ public class PeliculaService {
 				.formato(formato).genero(genero).pack(dto.isPack()).steelbook(dto.isSteelbook()).funda(dto.isFunda())
 				.imdbId(dto.getImdbCodigo())
 				.comprado(dto.isComprado()).notas(dto.getNotas()).location(loc).usrAlta(username).tsAlta(Instant.now())
+				.tsModif(Instant.now())
 				.build();
 		p.calcularCodigo();
 		Pelicula saved = peliculaRepo.save(p);
