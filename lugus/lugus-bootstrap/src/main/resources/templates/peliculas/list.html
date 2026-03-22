@@ -65,17 +65,17 @@
 						<span th:text="${p.location==null?'':p.location}"></span>
 					</div>
 
-					<!-- Estrella de favorito -->
-					<button sec:authorize="isAuthenticated()" class="favorite-toggle position-absolute top-0 end-0 p-2" data-pelicula-id="${p.id}">	
-						<i class="fa-star fa-lg fa" th:classappend="${p.favorita} ? 'fas' : 'far'"></i>
-					</button>
-
 				</div>
 				
 				<div class="card-footer bg-transparent border-0 p-2">
 					<a
 						th:href="@{/peliculas/editar/{id}(id=${p.id})}"
 						 sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-sm btn-lumo">Editar</a>
+						 
+										<!-- Estrella de favorito -->
+					<a sec:authorize="isAuthenticated()" class="favorite-toggle position-absolute p-2 " data-pelicula-id="${p.id}">	
+						<i class="fa-star fa-lg fa" th:classappend="${p.favorita} ? 'fas' : 'far'"></i>
+					</a>	 
 				</div>
 			</div>
 		</div>

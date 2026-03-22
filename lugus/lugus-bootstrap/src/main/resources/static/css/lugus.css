@@ -177,6 +177,7 @@ ul li, .list-group-item {
 
 .favorite-toggle,
 .card-footer a.btn {
+	background-color: transparent;
     position: relative;
     z-index: 5;
 }
