@@ -13,6 +13,8 @@
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 	crossorigin="anonymous" referrerpolicy="no-referrer" />
+	
+	
 <link th:href="@{/css/lugus.css}" rel="stylesheet">
 <link th:href="@{/css/botones.css}" rel="stylesheet">
 
@@ -21,8 +23,7 @@
 <body class="container mt-4">
 	<div th:replace="~{layout/header :: header}"></div>
 
-	<form
-		th:action="@{/series/actualizar/{id}(id=${serie.id})}"
+	<form th:action="@{/series/actualizar/{id}(id=${serie.id})}"
 		th:object="${nuevo}" method="post">
 		<h2 th:text="${serie.titulo}">Título</h2>
 		<input type="hidden" id="idSerie" th:value="${serie.id}">
@@ -37,23 +38,25 @@
 						para Gestión:</strong> <input type="text" th:value="${serie.tituloGest}"
 					th:field="*{tituloGest}"></li>
 
-				<li class="list-group-item row"><strong class="col-3">Año Inicio:</strong>
-					<input type="text" th:value="${serie.anyoInicio}" th:field="*{anyoInicio}"
-					maxlength="4"></li>
+				<li class="list-group-item row"><strong class="col-3">Año
+						Inicio:</strong> <input type="text" th:value="${serie.anyoInicio}"
+					th:field="*{anyoInicio}" maxlength="4"></li>
 
-				<li class="list-group-item row"><strong class="col-3">Año Fin:</strong>
-					<input type="text" th:value="${serie.anyoFin}" th:field="*{anyoFin}"
-					maxlength="4"></li>
-					
+				<li class="list-group-item row"><strong class="col-3">Año
+						Fin:</strong> <input type="text" th:value="${serie.anyoFin}"
+					th:field="*{anyoFin}" maxlength="4"></li>
+
 				<li class="list-group-item row"><strong class="col-3">Formato:</strong>
 					<select class="form-select" th:field="*{formatoCodigo}">
-						<option th:each="f : ${T(lugus.model.values.Formato).valoresOrdenados()}"
+						<option
+							th:each="f : ${T(lugus.model.values.Formato).valoresOrdenados()}"
 							th:value="${f.id}" th:text="${f}"
 							th:selected="${serie.formato.id == f.id}"></option>
 				</select></li>
 				<li class="list-group-item row"><strong class="col-3">Género:</strong>
 					<select class="form-select" th:field="*{generoCodigo}">
-						<option th:each="g : ${T(lugus.model.values.Genero).valoresOrdenados()}"
+						<option
+							th:each="g : ${T(lugus.model.values.Genero).valoresOrdenados()}"
 							th:value="${g.codigo}" th:text="${g.displayName}"
 							th:selected="${serie.genero.codigo == g.codigo}"></option>
 				</select></li>
@@ -61,7 +64,7 @@
 				<li class="list-group-item row"><strong class="col-3">Comprado:</strong>
 					<input type="checkbox" th:value="${serie.comprado}"
 					th:field="*{comprado}"></li>
-					<li class="list-group-item row"><strong class="col-3">Completa:</strong>
+				<li class="list-group-item row"><strong class="col-3">Completa:</strong>
 					<input type="checkbox" th:value="${serie.completa}"
 					th:field="*{completa}"></li>
 				<li class="list-group-item row"><strong class="col-3">Localización:</strong>
@@ -81,9 +84,8 @@
 					<table id="tablaDirectores">
 						<tr th:each="d, iStat : ${directores}">
 
-							<td><input type="hidden" id="'key_"
-								th:value="${d.persona}" /> <input type="hidden"
-								id="nuevo_" th:value="false" /> <input
+							<td><input type="hidden" id="'key_" th:value="${d.persona}" />
+								<input type="hidden" id="nuevo_" th:value="false" /> <input
 								type="hidden" id="borrado_" th:value="false" /> <span
 								id="nombre_" th:text="${d.nombre}"></span></td>
 							<td><i id="del_"
@@ -116,7 +118,8 @@
 						interno:</strong> <input type="text" th:value="${serie.codigo}"
 					maxlength="4" readonly="readonly" disabled="disabled"></li>
 				<li class="list-group-item row"><strong class="col-3">Notas:</strong>
-					<textarea th:value="${serie.notas}" th:field="${serie.notas}" maxlength="400"></textarea></li>
+					<textarea th:value="${serie.notas}" th:field="${serie.notas}"
+						maxlength="400"></textarea></li>
 			</ul>
 
 
@@ -130,6 +133,43 @@
 					class="img-thumbnail" alt="Caratula" />
 			</div>
 		</div>
+		<div class="row">
+			<!-- fila con iconos de temporadas en verde cada una de las que tenemos-->
+			<!-- el icono debera estar rojo cuando no la tenemos y no la queremos, pero en amarillo cuando no la tenemos y la queremos -->
+			<div class="col-12">
+				<h4>Temporadas:</h4>
+				<div class="d-flex flex-column">
+					<div th:each="temporada, iter : *{seasons}"
+						class="border p-2 mb-2 rounded row">
+
+						<div class="col-4">
+							<!-- Número y descripción -->
+							<strong th:text="${temporada.ordinal}"></strong> <span
+								th:if="${temporada.desc != null}"
+								th:text="' - ' + ${temporada.desc}"></span>
+						</div>
+						<div class="col-8 mt-2">
+
+							<!-- Checkbox: la tengo comprada -->
+							<label class="me-3"> <input type="checkbox"  th:id="'purchased-' + ${iter.index}"
+								th:field="*{seasons[__${iter.index}__].purchased}" onchange="toggleExclusive(this)">
+								Comprada
+							</label>
+							
+							<!-- debemos mandar de vuelta el ordinal -->
+							<input type="hidden" th:field="*{seasons[__${iter.index}__].ordinal}" />
+
+							<!-- Checkbox: la quiero -->
+							<label> <input type="checkbox"  th:id="'wanted-' + ${iter.index}"
+								th:field="*{seasons[__${iter.index}__].wanted}" onchange="toggleExclusive(this)"> Buscada
+							</label>
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
 		<br />
 		<div class="col-md-2">
 			<button type="submit" class="btn btn-primary w-100">Guardar</button>
@@ -140,8 +180,8 @@
 
 	<h4>Añadir caratula</h4>
 	<form id="formCaratula"
-		th:action="@{'/series/' + ${serie.id} + '/caratula'}"
-		method="post" th:object="${caratula}">
+		th:action="@{'/series/' + ${serie.id} + '/caratula'}" method="post"
+		th:object="${caratula}">
 		<div class="row g-2">
 			<div class="col-md-4">
 				<input class="form-control" th:field="*{url}" placeholder="url" />
@@ -158,8 +198,7 @@
 		</div>
 	</form>
 
-	<form th:action="@{/series/volver}"
-		method="post">
+	<form th:action="@{/series/volver}" method="post">
 		<button type="submit" id="floatBtn" title="Volver">Volver</button>
 	</form>
 

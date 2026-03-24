@@ -1,5 +1,7 @@
 package lugus.model.series;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -24,7 +26,6 @@ import lugus.model.values.LangVersion;
 @Entity
 @Table(name = "seasons")
 @Data
-@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -33,19 +34,19 @@ public class Season {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "serie_id", nullable = true) // FK → serie.id
 	private Serie serie;
 	
-	@Column
+	@Column(name = "\"desc\"")
 	private String desc;
 	
 	@Column
 	private int year;
 	
-	@Column
+	@Column(name = "\"order\"")
 	private int order;
 	
 	@Column
@@ -61,4 +62,24 @@ public class Season {
 	@Column
 	@Convert(converter = LangVersionConverter.class)
 	private LangVersion purchasedVersion;
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Season other = (Season) obj;
+		return Objects.equals(id, other.id) && order == other.order && year == other.year;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, order, year);
+	}
+	
+	
+
 }

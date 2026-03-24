@@ -155,6 +155,7 @@ public class SeriesService {
 				.comprado(dto.isComprado()).completa(dto.isCompleta()).notas(dto.getNotas()).location(loc).usrAlta(username).tsAlta(Instant.now())
 				.build();
 		p.calcularCodigo();
+		p.createSeasons();
 		Serie saved = serieRepo.save(p);
 
 		if (dto.getUrl() != null && !dto.getUrl().isEmpty()) {

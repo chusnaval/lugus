@@ -1,5 +1,8 @@
 package lugus.dto.series;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -44,4 +47,6 @@ public class SerieCreateDto {
 	private String url;
 
 	private Integer source;
+	
+	private List<SeasonDto> seasons = new ArrayList<>();
 }

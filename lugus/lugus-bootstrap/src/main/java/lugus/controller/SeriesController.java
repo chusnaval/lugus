@@ -29,9 +29,11 @@ import lombok.RequiredArgsConstructor;
 import lugus.export.SeriesWantedExportService;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.media.NewCaratulaDTO;
+import lugus.dto.series.SeasonDto;
 import lugus.dto.series.SerieCreateDto;
 import lugus.model.core.Location;
 import lugus.model.core.Source;
+import lugus.model.series.Season;
 import lugus.model.series.SerWanted;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
@@ -238,6 +240,13 @@ public class SeriesController {
 		nuevo.setComprado(p.isComprado());
 		nuevo.setCompleta(p.isCompleta());
 
+		// asociamos las temporadas
+		for (Season season : p.getSeasons()) {
+			
+			nuevo.getSeasons().add(new SeasonDto(season.getDesc(),season.getOrder(),
+					season.isPurchased(), season.isWanted()));
+		}
+		
 		if (p.getLocation() != null) {
 			nuevo.setLocationCode(p.getLocation().getCodigo());
 		}
@@ -282,6 +291,20 @@ public class SeriesController {
 		existing.setComprado(nuevo.isComprado());
 		existing.setCompleta(nuevo.isCompleta());
 		existing.calcularCodigo();
+		existing.createSeasons();
+		
+		for(Season season : existing.getSeasons()) {
+			SeasonDto seasonDto = nuevo.getSeasons().stream()
+					.filter(s -> s.getOrdinal() == season.getOrder())
+					.findFirst()
+					.orElse(null);
+			if (seasonDto != null) {
+				season.setDesc(seasonDto.getDesc());
+				season.setPurchased(seasonDto.isPurchased());
+				season.setWanted(seasonDto.isWanted());
+			}
+		}
+		
 		service.save(existing);
 
 		return "redirect:/series?recuperar=true";

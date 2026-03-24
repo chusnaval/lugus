@@ -32,6 +32,7 @@ import lugus.converter.GeneroConverter;
 import lugus.model.core.Location;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
+import lugus.model.values.LangVersion;
 
 @Entity
 @Table(name = "series")
@@ -140,5 +141,23 @@ public class Serie {
 		this.serieFotos.add(pf);
 		pf.setSerie(this);
 
+	}
+
+	public void createSeasons() {
+		if(this.seasons == null || this.seasons.isEmpty()) {
+			int index = 1;
+			for(int from = anyoInicio; from <= (anyoFin != null ? anyoFin-1 : anyoInicio); from++) {
+				Season season = new Season();
+				season.setOrder(index++);
+				season.setYear(from);
+				season.setPurchased(false);
+				season.setWanted(true);
+				season.setPublishedVersion(LangVersion.VE);
+				season.setPurchasedVersion(LangVersion.VE);
+				season.setSerie(this);
+				this.seasons.add(season);
+			}
+		}
+		
 	}
 }

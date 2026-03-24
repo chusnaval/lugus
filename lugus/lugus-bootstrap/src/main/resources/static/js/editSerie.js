@@ -28,3 +28,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 });
+
+function toggleExclusive(checkbox) {
+       const id = checkbox.id;
+       const index = id.split('-')[1];
+
+       const purchased = document.getElementById('purchased-' + index);
+       const wanted = document.getElementById('wanted-' + index);
+
+       if (checkbox === purchased && purchased.checked) {
+           wanted.checked = false;
+       }
+       if (checkbox === wanted && wanted.checked) {
+           purchased.checked = false;
+       }
+   }
