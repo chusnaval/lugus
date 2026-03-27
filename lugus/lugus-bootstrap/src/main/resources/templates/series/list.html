@@ -50,6 +50,14 @@
 								<div class="col-7 text-left" th:text="${p.formato}"></div>
 							</div>
 							<div class="row info-line">
+							<!-- Necesitamos mostrar si esta completa o no -->
+							<!-- en verde el texto de completa e incompleta a roja -->
+							<div class="col-6 text-left"
+							    th:text="${p.completa ? 'Completa' : 'Incompleta'}"
+							    th:class="${p.completa ? 'text-success' :'text-danger'}"></div>
+							    
+                             </div>
+							<div class="row info-line">
 
 								<span class="text-left"
 									th:text="${p.location==null?'':p.location.descripcion}"></span>
