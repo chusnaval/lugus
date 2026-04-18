@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import lugus.config.StorageProperties;
+import lugus.export.FilmExportService;
 import lugus.export.FilmWantedExportService;
 import lugus.model.films.FilmWanted;
 import lugus.service.core.EstadoService;
@@ -34,17 +35,18 @@ import lugus.service.user.UsuarioService;
 
 class FilmWantedExportControllerTest {
 
+	private FilmWantedService filmWantedService;
 	private static final String FORMAT = "format";
 	private MockMvc mockMvc;
-	private FilmWantedService filmWantedService;
 
 	@BeforeEach
 	void setUp() {
 		PeliculaService peliculaService = Mockito.mock(PeliculaService.class);
 		LocationService locationService = Mockito.mock(LocationService.class);
 		SourceService sourceService = Mockito.mock(SourceService.class);
-		filmWantedService = Mockito.mock(FilmWantedService.class);
+		FilmWantedService filmWantedService = Mockito.mock(FilmWantedService.class);
 		FilmWantedExportService exportService = new FilmWantedExportService();
+		FilmExportService filmExportService = Mockito.mock(FilmExportService.class);
 		DirectorService directorService = Mockito.mock(DirectorService.class);
 		ActorService actorService = Mockito.mock(ActorService.class);
 		InsertPersonalDataService insertPersonalDataService = Mockito.mock(InsertPersonalDataService.class);
@@ -56,6 +58,7 @@ class FilmWantedExportControllerTest {
 		FavoritosUsuarioService favoritosUsuarioService = Mockito.mock(FavoritosUsuarioService.class);
 		UsuarioService usuarioService = Mockito.mock(UsuarioService.class);
 		EstadoService estadoService = Mockito.mock(EstadoService.class);
+		
 
 		PeliculasController controller = new PeliculasController(
 				peliculaService,
@@ -64,6 +67,7 @@ class FilmWantedExportControllerTest {
 				sourceService,
 				filmWantedService,
 				exportService,
+				filmExportService, 
 				directorService,
 				actorService,
 				insertPersonalDataService,

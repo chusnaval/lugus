@@ -36,4 +36,6 @@ public interface PeliculaRepository {
 
 	List<Pelicula> findByImdbId(String tconst);
 
+	List<Pelicula> findAllByOrderByTituloGestAscAnyoAsc();
+
 }

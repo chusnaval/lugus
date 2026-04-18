@@ -34,6 +34,7 @@ import lugus.converter.GeneroConverter;
 import lugus.model.core.Estado;
 import lugus.model.core.Location;
 import lugus.model.groups.GroupFilms;
+import lugus.model.orders.Order;
 import lugus.model.people.Actor;
 import lugus.model.people.Director;
 import lugus.model.people.PeliculasPersonal;
@@ -118,7 +119,7 @@ public class Pelicula {
 
 	@Column(name = "ts_baja", columnDefinition = "TIMESTAMP")
 	private Instant tsBaja;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "estado_id", nullable = true) // FK → estado.id
 	private Estado estado;
@@ -142,7 +143,7 @@ public class Pelicula {
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
 	private final Set<Actor> actores = new HashSet<>();
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
@@ -153,6 +154,11 @@ public class Pelicula {
 	@ToString.Exclude
 	private final Set<GroupFilms> groups = new HashSet<>();
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@ToString.Exclude
+	private final Set<Order> orders = new HashSet<>();
+
 	@Column(name = "imdb_id")
 	private String imdbId;
 
@@ -161,6 +167,8 @@ public class Pelicula {
 
 	@Column
 	private Integer votes;
+
+	private transient String situacion;
 
 	public String getDescLocation() {
 		if (location == null) {
@@ -196,7 +204,7 @@ public class Pelicula {
 			return nf.format(rating);
 		}
 	}
-	
+
 	/**
 	 * Vincula las peliculas
 	 * 
@@ -264,7 +272,7 @@ public class Pelicula {
 
 	public void removeCaratula(PeliculaFoto pf) {
 		this.peliculaFotos.remove(pf);
-		pf.setPelicula(null);	
+		pf.setPelicula(null);
 	}
 
 	public void removeHijo(Pelicula hijo) {
@@ -273,18 +281,31 @@ public class Pelicula {
 	}
 
 	public boolean getUsuarioVista(String usuarioLogin) {
-		return peliculasUsuario.stream()
-				.filter(pu -> pu.getUsuario().getLogin().equals(usuarioLogin))
-				.map(PeliculasUsuario::isVista)
-				.findFirst()
-				.orElse(false);
+		return peliculasUsuario.stream().filter(pu -> pu.getUsuario().getLogin().equals(usuarioLogin))
+				.map(PeliculasUsuario::isVista).findFirst().orElse(false);
 	}
 
 	public String getUsuarioRating(String usuarioLogin) {
-		return peliculasUsuario.stream()
-				.filter(pu -> pu.getUsuario().getLogin().equals(usuarioLogin))
-				.map(pu -> pu.getLbRating() != null ? pu.getLbRating().toString() : "")
-				.findFirst()
-				.orElse("");
+		return peliculasUsuario.stream().filter(pu -> pu.getUsuario().getLogin().equals(usuarioLogin))
+				.map(pu -> pu.getLbRating() != null ? pu.getLbRating().toString() : "").findFirst().orElse("");
+	}
+
+	public void calcularSituacion() {
+
+		if (comprado) {
+			this.situacion = "Comprado";
+		} else if (tieneOrdenPendiente()) {
+			this.situacion = "En pedido";
+		} else {
+			this.situacion = "No comprado";
+		}
+	}
+
+	private boolean tieneOrdenPendiente() {
+		boolean tieneOrdenPendiente = orders.stream().anyMatch(order -> !order.isRecibido());
+		if (tieneOrdenPendiente) {
+			return true;
+		}
+		return false;
 	}
 }

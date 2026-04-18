@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.config.StorageProperties;
+import lugus.export.FilmExportService;
 import lugus.export.FilmWantedExportService;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.PeliculaChildDto;
@@ -97,6 +98,8 @@ public class PeliculasController {
 	private final FilmWantedService filmWantedService;
 
 	private final FilmWantedExportService filmWantedExportService;
+	
+	private final FilmExportService filmExportService;
 
 	private final DirectorService directorService;
 
@@ -190,6 +193,16 @@ public class PeliculasController {
 		return "peliculas/wanted";
 	}
 
+	@GetMapping("/report")
+	public String report(Model model) {
+		
+		List<Pelicula> films = service.findAllOrdered();
+		films.forEach(f -> f.calcularSituacion());
+		
+		model.addAttribute("reportList", films);
+		return "peliculas/report";
+	}
+	
 	@GetMapping("/wanted/export")
 	public ResponseEntity<?> exportWanted(@RequestParam String format) {
 		List<FilmWanted> list = filmWantedService.findAllOrdered();
@@ -220,6 +233,47 @@ public class PeliculasController {
 				byte[] body = filmWantedExportService.toPdf(list);
 				return ResponseEntity.ok()
 						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas_buscadas.pdf")
+						.contentType(MediaType.parseMediaType("application/pdf; charset=UTF-8"))
+						.body(body);
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("Error generando PDF");
+			}
+		}
+
+		return ResponseEntity.badRequest().body("Formato no soportado");
+	}
+	
+	@GetMapping("/report/export")
+	public ResponseEntity<?> reportWanted(@RequestParam String format) {
+		List<Pelicula> list = service.findAllOrdered();
+
+		if ("md".equalsIgnoreCase(format)) {
+			String body = filmExportService.toMarkdown(list);
+			return ResponseEntity.ok()
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas.md")
+					.contentType(MediaType.parseMediaType("text/markdown; charset=UTF-8"))
+					.body(body);
+		}
+
+		if ("ods".equalsIgnoreCase(format)) {
+			try {
+				byte[] body = filmExportService.toOds(list);
+				return ResponseEntity.ok()
+						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas.ods")
+						.contentType(MediaType.parseMediaType("application/vnd.oasis.opendocument.spreadsheet"))
+						.body(body);
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("Error generando ODS");
+			}
+		}
+
+		if ("pdf".equalsIgnoreCase(format)) {
+			try {
+				byte[] body = filmExportService.toPdf(list);
+				return ResponseEntity.ok()
+						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas.pdf")
 						.contentType(MediaType.parseMediaType("application/pdf; charset=UTF-8"))
 						.body(body);
 			} catch (IOException e) {

@@ -18,6 +18,7 @@ import lugus.service.core.LocationService;
 import lugus.service.user.CurrentUserProvider;
 
 
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -275,5 +276,9 @@ public class PeliculaService {
 	public List<Pelicula> findByImdbId(String tconst) {
 		System.out.println("Buscando imdbId = [" + tconst + "]");
 		return peliculaRepo.findByImdbId(tconst);
+	}
+
+	public List<Pelicula> findAllOrdered() {
+		return peliculaRepo.findAllByOrderByTituloGestAscAnyoAsc();
 	}
 }

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="UTF-8" />
+<title>Informes</title>
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+<link th:href="@{/css/lugus.css}" rel="stylesheet">
+</head>
+<body class="container mt-4">
+	<div th:replace="~{layout/header :: header}"></div>
+	<h2>Informes</h2>
+	<div class="mb-3">
+		<a class="btn btn-outline-primary me-2" th:href="@{/peliculas/report/export?format=md}">Exportar a Markdown</a>
+		<a class="btn btn-outline-success me-2" th:href="@{/peliculas/report/export?format=ods}">Exportar a ODS</a>
+		<a class="btn btn-outline-danger" th:href="@{/peliculas/report/export?format=pdf}">Exportar a PDF</a>
+	</div>
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Título</th>
+				<th>Año</th>
+				<th>Formato</th>
+				<th>Situación</th>
+				<th>Notas</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="pel : ${reportList}">
+				<td th:text="${pel.titulo}"></td>
+				<td th:text="${pel.anyo}"></td>
+				<td th:text="${pel.formato}"></td>
+				<td th:text="${pel.calcularSituacion}"></td>
+				<td th:text="${pel.notas}"></td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+</html>

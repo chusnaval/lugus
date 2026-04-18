@@ -23,19 +23,20 @@ public enum Formato {
 
 	/**
 	 * Obtenemos el equivalente
+	 * 
 	 * @param i
 	 * @return
 	 */
 	public static Formato getById(short i) {
-		for(Formato aux : values()) {
-			if(aux.getId() == i) {
+		for (Formato aux : values()) {
+			if (aux.getId() == i) {
 				return aux;
 			}
 		}
-		
+
 		throw new IllegalArgumentException("No existe el formato");
 	}
-	
+
 	public static List<Formato> valoresOrdenados() {
 		List<Formato> lista = new ArrayList<>();
 		lista.add(DVD);
@@ -48,12 +49,25 @@ public enum Formato {
 
 	/**
 	 * Los DVDs van en carpetas y el resto juntos en estanterias
+	 * 
 	 * @return
 	 */
 	public int getIdParaUbicaciones() {
-		if(this.id>2) {
+		if(this.id == 0) {
 			return 2;
+		}else if (this.id == 1) {
+			return 1;
+		} else	if (this.id == 2) {
+			return 2;
+		}else if (this.id == 3) {
+			return 2;
+		} else if (this.id == 4) {
+			return 3;
 		}
 		return id;
 	}
+
+	/*
+	 * 1 "Carpetas" 2 "Estanterias" 3 "Otros" 4 "Cajas"
+	 */
 }
