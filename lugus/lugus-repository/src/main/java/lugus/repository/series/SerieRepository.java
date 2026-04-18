@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import lugus.model.films.Pelicula;
 import lugus.model.series.Serie;
 
 
@@ -29,4 +30,5 @@ public interface SerieRepository {
 
 	Collection<? extends Serie> findByTituloGestAndAnyoInicio(String title, Integer year);
 
+	List<Serie> findAllByOrderByTituloGestAscAnyoInicioAsc();
 }

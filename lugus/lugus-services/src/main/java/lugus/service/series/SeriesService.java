@@ -193,4 +193,8 @@ public class SeriesService {
 		return result;
 	}
 
+	public List<Serie> findAllOrdered() {
+		return serieRepo.findAllByOrderByTituloGestAscAnyoInicioAsc();
+	}
+
 }

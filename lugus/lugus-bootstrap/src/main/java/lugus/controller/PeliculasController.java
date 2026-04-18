@@ -187,12 +187,14 @@ public class PeliculasController {
 		return "peliculas/list";
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/wanted")
 	public String wanted(Model model) {
 		model.addAttribute("wantedList", filmWantedService.findAllOrdered());
 		return "peliculas/wanted";
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/report")
 	public String report(Model model) {
 		

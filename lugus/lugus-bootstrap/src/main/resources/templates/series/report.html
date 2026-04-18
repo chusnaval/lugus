@@ -12,15 +12,16 @@
 	<div th:replace="~{layout/header :: header}"></div>
 	<h2>Informes</h2>
 	<div class="mb-3">
-		<a class="btn btn-outline-primary me-2" th:href="@{/peliculas/report/export?format=md}">Exportar a Markdown</a>
-		<a class="btn btn-outline-success me-2" th:href="@{/peliculas/report/export?format=ods}">Exportar a ODS</a>
-		<a class="btn btn-outline-danger" th:href="@{/peliculas/report/export?format=pdf}">Exportar a PDF</a>
+		<a class="btn btn-outline-primary me-2" th:href="@{/series/report/export?format=md}">Exportar a Markdown</a>
+		<a class="btn btn-outline-success me-2" th:href="@{/series/report/export?format=ods}">Exportar a ODS</a>
+		<a class="btn btn-outline-danger" th:href="@{/series/report/export?format=pdf}">Exportar a PDF</a>
 	</div>
 	<table class="table table-striped">
 		<thead>
 			<tr>
 				<th>Título</th>
 				<th>Año</th>
+				<th>Temporada</th>
 				<th>Formato</th>
 				<th>Situación</th>
 				<th>Notas</th>
@@ -28,11 +29,12 @@
 		</thead>
 		<tbody>
 			<tr th:each="pel : ${reportList}">
-				<td th:text="${pel.titulo}"></td>
-				<td th:text="${pel.anyo}"></td>
-				<td th:text="${pel.formato}"></td>
+				<td th:text="${pel.serie.titulo}"></td>
+				<td th:text="${pel.year}"></td>
+				<td th:text="${pel.order}"></td>
+				<td th:text="${pel.serie.formato}"></td>
 				<td th:text="${pel.situacion}"></td>
-				<td th:text="${pel.notas}"></td>
+				<td th:text="${pel.serie.notas}"></td>
 			</tr>
 		</tbody>
 	</table>

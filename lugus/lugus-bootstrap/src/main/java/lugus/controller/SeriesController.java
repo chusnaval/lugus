@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lugus.export.SeriesExportService;
 import lugus.export.SeriesWantedExportService;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.media.NewCaratulaDTO;
@@ -65,6 +66,8 @@ public class SeriesController {
 
 	private final SourceService sourceService;
 	private final SerWantedService serWantedService;
+	
+	private final SeriesExportService seriesExportService;
 	private final SeriesWantedExportService seriesWantedExportService;
 
 	@GetMapping
@@ -100,6 +103,7 @@ public class SeriesController {
 		return "series/list";
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/wanted")
 	public String wanted(Model model) {
 		model.addAttribute("wantedList", serWantedService.findAllOrdered());
@@ -147,6 +151,62 @@ public class SeriesController {
 		return ResponseEntity.badRequest().body("Formato no soportado");
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@GetMapping("/report")
+	public String report(Model model) {
+		List<Serie> list = service.findAllOrdered();
+		List<Season> seasons = list.stream()
+				.flatMap(s -> s.getSeasons().stream())
+				.toList();
+		//calcular situacion de cada temporada
+		for (Season season : seasons) {
+			season.calcularSituacion();
+		}
+		model.addAttribute("reportList", seasons);
+		return "series/report";
+	}
+
+	@GetMapping("/report/export")
+	public ResponseEntity<?> reportWanted(@RequestParam String format) {
+		List<Serie> list = service.findAllOrdered();
+
+		if ("md".equalsIgnoreCase(format)) {
+			String body = seriesExportService.toMarkdown(list);
+			return ResponseEntity.ok()
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=series.md")
+					.contentType(MediaType.parseMediaType("text/markdown; charset=UTF-8"))
+					.body(body);
+		}
+
+		if ("ods".equalsIgnoreCase(format)) {
+			try {
+				byte[] body = seriesExportService.toOds(list);
+				return ResponseEntity.ok()
+						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=series.ods")
+						.contentType(MediaType.parseMediaType("application/vnd.oasis.opendocument.spreadsheet"))
+						.body(body);
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("Error generando ODS");
+			}
+		}
+
+		if ("pdf".equalsIgnoreCase(format)) {
+			try {
+				byte[] body = seriesExportService.toPdf(list);
+				return ResponseEntity.ok()
+						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=series.pdf")
+						.contentType(MediaType.parseMediaType("application/pdf"))
+						.body(body);
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("Error generando PDF");
+			}
+		}
+
+		return ResponseEntity.badRequest().body("Formato no soportado");
+	}
+	
 	/*
 	 * ------------------------------------------------- FORMULARIO DE CREACIÓN GET
 	 * /series/nuevo -------------------------------------------------

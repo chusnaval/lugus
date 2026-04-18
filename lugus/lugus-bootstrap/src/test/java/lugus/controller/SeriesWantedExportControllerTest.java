@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import lugus.export.SeriesExportService;
 import lugus.export.SeriesWantedExportService;
 import lugus.model.series.SerWanted;
 import lugus.service.core.LocationService;
@@ -33,10 +34,11 @@ class SeriesWantedExportControllerTest {
 		LocationService locationService = Mockito.mock(LocationService.class);
 		SourceService sourceService = Mockito.mock(SourceService.class);
 		serWantedService = Mockito.mock(SerWantedService.class);
-		SeriesWantedExportService exportService = new SeriesWantedExportService();
+		SeriesExportService exportService = Mockito.mock(SeriesExportService.class);
+		SeriesWantedExportService exportWantedService = new SeriesWantedExportService();
 
 		SeriesController controller = new SeriesController(seriesService, locationService, sourceService, serWantedService,
-				exportService);
+				exportService, exportWantedService);
 
 		mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 	}
