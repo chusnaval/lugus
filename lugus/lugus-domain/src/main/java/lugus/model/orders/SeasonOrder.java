@@ -40,7 +40,7 @@ public class SeasonOrder {
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "serie_id", nullable = true) // FK → estado.id
+	@JoinColumn(name = "season_id", nullable = true) // FK → estado.id
 	private Season season;
 	
 	@Column(name = "imdb_id")
