@@ -25,7 +25,8 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr th:each="ser : ${wantedList}">
+			<tr th:each="ser, iter : ${wantedList}">
+				<td th:text="${iter.count}"></td>  
 				<td th:text="${ser.titulo}"></td>
 				<td th:text="${ser.anyoInicio}"></td>
 				<td th:text="${ser.seasonDesc}"></td>

@@ -27,7 +27,8 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr th:each="pel : ${reportList}">
+			<tr th:each="pel, iter : ${reportList}">
+				<td th:text="${iter.count}"></td>  
 				<td th:text="${pel.titulo}"></td>
 				<td th:text="${pel.anyo}"></td>
 				<td th:text="${pel.formato}"></td>
