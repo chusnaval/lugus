@@ -21,15 +21,18 @@ public class SeriesExportService {
 	public String toMarkdown(List<Serie> list) {
 		StringBuilder md = new StringBuilder();
 		md.append("# Series \n\n");
-		md.append("| Título | Año | Temporada |  Formato | Situación | Notas |\n");
-		md.append("|---|---:|---|---|---|---|---|\n");
+		md.append("| Nº | Título | Año | Temporada |  Formato | Situación | Notas |\n");
+		md.append("|---|---|---:|---|---|---|---|---|\n");
 
 		for (Serie item : list) {
-		
+			int index = 1;
 			// quiero cada temporada en una fila diferente, con el mismo título , pero con la temporada en la columna de temporada
 				for (Season temp : item.getSeasons()) {
 					temp.calcularSituacion();
+					
 					md.append("| ")
+							.append(index++)
+							.append(" | ")
 							.append(escapeMd(item.getTitulo()))
 							.append(" | ")
 							.append(temp.getYear())
@@ -87,7 +90,7 @@ public class SeriesExportService {
 			float margin = 50;
 			float y = 760;
 			float leading = 16;
-
+			int index = 1;
 			try (PDPageContentStream content = new PDPageContentStream(doc, page)) {
 				content.beginText();
 				content.setFont(PDType1Font.HELVETICA_BOLD, 16);
@@ -99,10 +102,12 @@ public class SeriesExportService {
 				content.beginText();
 				content.setFont(PDType1Font.HELVETICA_BOLD, 11);
 				content.newLineAtOffset(margin, y);
+				content.showText("Nº");
+				content.newLineAtOffset(70, 0);
 				content.showText("Titulo");
 				content.newLineAtOffset(260, 0);
 				content.showText("Año");
-				content.newLineAtOffset(70, 0);
+				content.newLineAtOffset(70, 0);	
 				content.showText("Temporada");
 				content.newLineAtOffset(70, 0);
 				content.showText("Formato");
@@ -123,6 +128,8 @@ public class SeriesExportService {
 						content.beginText();
 						content.setFont(PDType1Font.HELVETICA, 10);
 						content.newLineAtOffset(margin, y);
+						content.showText(String.valueOf(index++));
+						content.newLineAtOffset(70, 0);
 						content.showText(trimForPdf(item.getTitulo(), 42));
 						content.newLineAtOffset(260, 0);
 						content.showText(String.valueOf(temp.getYear()));
@@ -166,11 +173,13 @@ public class SeriesExportService {
 	private String buildOdsContentXml(List<Serie> list) {
 		StringBuilder rows = new StringBuilder();
 
-		appendOdsRow(rows, "Título", "Año", "Temporada", "Formato", "Situación", "Notas");
+		appendOdsRow(rows, "Nº", "Título", "Año", "Temporada", "Formato", "Situación", "Notas");
 		for (Serie item : list) {
+			int index = 1;
 			for (Season temp : item.getSeasons()) {
 				temp.calcularSituacion();
 			appendOdsRow(rows,
+					String.valueOf(index++),
 					nullSafe(item.getTitulo()),
 					String.valueOf(temp.getYear()),
 					nullSafe(String.valueOf(temp.getOrder())),
@@ -199,8 +208,9 @@ public class SeriesExportService {
 				""".formatted(rows);
 	}
 
-	private void appendOdsRow(StringBuilder rows, String col1, String col2, String col3, String col4, String col5, String col6) {
+	private void appendOdsRow(StringBuilder rows, String col0, String col1, String col2, String col3, String col4, String col5, String col6) {
 		rows.append("<table:table-row>")
+				.append(odsCell(col0))
 				.append(odsCell(col1))
 				.append(odsCell(col2))
 				.append(odsCell(col3))
