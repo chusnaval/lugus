@@ -21,12 +21,14 @@ public class FilmExportService {
 	public String toMarkdown(List<Pelicula> list) {
 		StringBuilder md = new StringBuilder();
 		md.append("# Películas\n\n");
-		md.append("| Título | Año | Formato | Situación | Notas |\n");
-		md.append("|---|---:|---|\n");
-
+		md.append("| Nº | Título | Año | Formato | Situación | Notas |\n");
+		md.append("|---|---|---:|---|\n");
+		int index = 1;
 		for (Pelicula item : list) {
 			item.calcularSituacion();
 			md.append("| ")
+					.append(escapeMd(index++ + ""))
+					.append(" | ")
 					.append(escapeMd(item.getTitulo()))
 					.append(" | ")
 					.append(item.getAnyo())
@@ -93,6 +95,8 @@ public class FilmExportService {
 				content.beginText();
 				content.setFont(PDType1Font.HELVETICA_BOLD, 11);
 				content.newLineAtOffset(margin, y);
+				content.showText("Nº");
+				content.newLineAtOffset(70, 0);
 				content.showText("Titulo");
 				content.newLineAtOffset(260, 0);
 				content.showText("Anyo");
@@ -103,7 +107,8 @@ public class FilmExportService {
 				content.newLineAtOffset(120, 0);
 				content.showText("Notas");
 				content.endText();
-
+				
+				int index = 1;
 				y -= leading;
 				for (Pelicula item : list) {
 					if (y < 60) {
@@ -113,6 +118,8 @@ public class FilmExportService {
 					content.beginText();
 					content.setFont(PDType1Font.HELVETICA, 10);
 					content.newLineAtOffset(margin, y);
+					content.showText(String.valueOf(index++));
+					content.newLineAtOffset(70, 0);
 					content.showText(trimForPdf(item.getTitulo(), 42));
 					content.newLineAtOffset(260, 0);
 					content.showText(String.valueOf(item.getAnyo()));
@@ -153,10 +160,12 @@ public class FilmExportService {
 	private String buildOdsContentXml(List<Pelicula> list) {
 		StringBuilder rows = new StringBuilder();
 
-		appendOdsRow(rows, "Título", "Año", "Formato", "Situación", "Notas");
+		appendOdsRow(rows, "Nº", "Título", "Año", "Formato", "Situación", "Notas");
+		int index = 1;
 		for (Pelicula item : list) {
 			item.calcularSituacion();
 			appendOdsRow(rows,
+					String.valueOf(index++),
 					nullSafe(item.getTitulo()),
 					String.valueOf(item.getAnyo()),
 					nullSafe(item.getFormato().name()),
@@ -183,8 +192,9 @@ public class FilmExportService {
 				""".formatted(rows);
 	}
 
-	private void appendOdsRow(StringBuilder rows, String col1, String col2, String col3, String col4, String col5) {
+	private void appendOdsRow(StringBuilder rows, String col0, String col1, String col2, String col3, String col4, String col5) {
 		rows.append("<table:table-row>")
+				.append(odsCell(col0))
 				.append(odsCell(col1))
 				.append(odsCell(col2))
 				.append(odsCell(col3))

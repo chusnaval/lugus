@@ -67,7 +67,7 @@
 				<li class="list-group-item row"><strong class="col-3">Pack:</strong>
 
 					<input type="checkbox" th:value="${pelicula.pack}"
-					th:field="*{pack}"> <strong class="col-3">Steelbook:</strong>
+					th:field="*{pack}" th:disabled="${pelicula.padre != null}" > <strong class="col-3">Steelbook:</strong>
 
 					<input type="checkbox" th:value="${pelicula.steelbook}"
 					th:field="*{steelbook}"> <strong class="col-3">Funda:</strong>
@@ -150,6 +150,15 @@
 		<hr />
 	</form>
 	<div class="alert alert-warning" id="ubicAlert" role="alert"></div>
+	<br />
+	<div th:if="${pelicula.padre != null}">
+		<h4>Esta película esta incluida al pack:</h4>
+		<a th:href="@{'/peliculas/' + ${pelicula.padre.id}}"
+			class="btn btn-sm btn-outline-primary"
+			th:text="${pelicula.padre.titulo}">Ver</a>
+	</div>
+	<br />
+	<br />
 	<div th:if="${pelicula.pack == true}">
 		<h4>Películas del pack</h4>
 		<div th:if="${pelicula.peliculasPack.empty}">

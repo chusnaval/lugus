@@ -21,11 +21,13 @@ public class FilmWantedExportService {
 	public String toMarkdown(List<FilmWanted> list) {
 		StringBuilder md = new StringBuilder();
 		md.append("# Películas buscadas\n\n");
-		md.append("| Título | Año | Formato |\n");
-		md.append("|---|---:|---|\n");
-
+		md.append("| Nº | Título | Año | Formato |\n");
+		md.append("|---|---|---:|---|\n");
+		int index = 1;
 		for (FilmWanted item : list) {
 			md.append("| ")
+					.append(escapeMd(index++ + ""))
+					.append(" | ")
 					.append(escapeMd(item.getTitulo()))
 					.append(" | ")
 					.append(item.getAnyo())
@@ -88,6 +90,8 @@ public class FilmWantedExportService {
 				content.beginText();
 				content.setFont(PDType1Font.HELVETICA_BOLD, 11);
 				content.newLineAtOffset(margin, y);
+				content.showText("Nº");
+				content.newLineAtOffset(70, 0);
 				content.showText("Titulo");
 				content.newLineAtOffset(260, 0);
 				content.showText("Anyo");
@@ -95,6 +99,7 @@ public class FilmWantedExportService {
 				content.showText("Formato");
 				content.endText();
 
+				int index = 1;
 				y -= leading;
 				for (FilmWanted item : list) {
 					if (y < 60) {
@@ -104,6 +109,8 @@ public class FilmWantedExportService {
 					content.beginText();
 					content.setFont(PDType1Font.HELVETICA, 10);
 					content.newLineAtOffset(margin, y);
+					content.showText(String.valueOf(index++));
+					content.newLineAtOffset(70, 0);
 					content.showText(trimForPdf(item.getTitulo(), 42));
 					content.newLineAtOffset(260, 0);
 					content.showText(String.valueOf(item.getAnyo()));
@@ -139,10 +146,10 @@ public class FilmWantedExportService {
 
 	private String buildOdsContentXml(List<FilmWanted> list) {
 		StringBuilder rows = new StringBuilder();
-
-		appendOdsRow(rows, "Título", "Año", "Formato");
+		int index = 1;
+		appendOdsRow(rows, "Nº", "Título", "Año", "Formato");
 		for (FilmWanted item : list) {
-			appendOdsRow(rows,
+			appendOdsRow(rows, String.valueOf(index++),
 					nullSafe(item.getTitulo()),
 					String.valueOf(item.getAnyo()),
 					nullSafe(item.getFormato()));
@@ -166,8 +173,9 @@ public class FilmWantedExportService {
 				""".formatted(rows);
 	}
 
-	private void appendOdsRow(StringBuilder rows, String col1, String col2, String col3) {
+	private void appendOdsRow(StringBuilder rows, String col0, String col1, String col2, String col3) {
 		rows.append("<table:table-row>")
+				.append(odsCell(col0))
 				.append(odsCell(col1))
 				.append(odsCell(col2))
 				.append(odsCell(col3))
