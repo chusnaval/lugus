@@ -19,6 +19,7 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
+				<th>Nº</th>
 				<th>Título</th>
 				<th>Año</th>
 				<th>Temporada</th>
@@ -28,7 +29,8 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr th:each="pel : ${reportList}">
+			<tr th:each="pel, iter : ${reportList}">
+			 	<td th:text="${iter.count}"></td>  
 				<td th:text="${pel.serie.titulo}"></td>
 				<td th:text="${pel.year}"></td>
 				<td th:text="${pel.order}"></td>

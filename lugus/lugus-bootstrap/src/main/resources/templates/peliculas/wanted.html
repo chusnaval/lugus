@@ -19,13 +19,15 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
+				<th>Nº</th>
 				<th>Título</th>
 				<th>Año</th>
 				<th>Formato</th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr th:each="pel : ${wantedList}">
+			<tr th:each="pel, iter : ${wantedList}">
+				<td th:text="${iter.count}"></td>  
 				<td th:text="${pel.titulo}"></td>
 				<td th:text="${pel.anyo}"></td>
 				<td th:text="${pel.formato}"></td>
