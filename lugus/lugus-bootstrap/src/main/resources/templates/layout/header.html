@@ -47,8 +47,8 @@
 							<div class="dropdown-submenu">
 								<a class="dropdown-item dropdown-toggle" href="#">Informes</a>
 								<ul class="dropdown-menu dropdown-menu-dark custom-dark">
-									<li><a class="dropdown-item" th:href="@{/peliculas/wanted}">Buscadas</a></li>
-									<li><a class="dropdown-item" th:href="@{/peliculas/report}">Completo</a></li>
+									<li><a class="dropdown-item" sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/peliculas/wanted}">Buscadas</a></li>
+									<li><a class="dropdown-item" sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/peliculas/report}">Completo</a></li>
 								</ul>
 							</div>
 								<a class="dropdown-item"
@@ -68,8 +68,8 @@
 							<div class="dropdown-submenu">
 								<a class="dropdown-item dropdown-toggle" href="#">Informes</a>
 								<ul class="dropdown-menu dropdown-menu-dark custom-dark">
-									<li><a class="dropdown-item" th:href="@{/series/wanted}">Buscadas</a></li>
-									<li><a class="dropdown-item" th:href="@{/series/report}">Completo</a></li>
+									<li><a class="dropdown-item"  sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/series/wanted}">Buscadas</a></li>
+									<li><a class="dropdown-item"  sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/series/report}">Completo</a></li>
 								</ul>
 							</div>
 
@@ -94,6 +94,8 @@
 							aria-labelledby="navbarDropdown">
 							<a class="dropdown-item"  sec:authorize="hasRole('ROLE_ADMIN')"
 								th:href="@{/locations/list}">Ubicaciones</a> 
+							<a class="dropdown-item"  sec:authorize="hasRole('ROLE_ADMIN')"
+								th:href="@{/covers/list}">Carátulas</a> 	
 						</div>
 						</li>
 

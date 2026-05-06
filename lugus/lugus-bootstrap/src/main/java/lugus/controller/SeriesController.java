@@ -105,7 +105,7 @@ public class SeriesController {
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/wanted")
-	public String wanted(Model model) {
+	public String wanted(Principal principal,  HttpSession session, Model model) {
 		model.addAttribute("wantedList", serWantedService.findAllOrdered());
 		return "series/wanted";
 	}
@@ -153,7 +153,7 @@ public class SeriesController {
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/report")
-	public String report(Model model) {
+	public String report(Principal principal,  HttpSession session, Model model) {
 		List<Serie> list = service.findAllOrdered();
 		List<Season> seasons = list.stream()
 				.flatMap(s -> s.getSeasons().stream())

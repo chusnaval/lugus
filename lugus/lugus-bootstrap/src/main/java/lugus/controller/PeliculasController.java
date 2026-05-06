@@ -133,7 +133,7 @@ public class PeliculasController {
 
 		// si hay filtro anterior y no queremos reiniciarlo
 		if ((resetFilter != null && resetFilter)) {
-			filtro = resetearFiltro();
+			filtro = FiltrosDto.reset("tituloGest");
 
 		} else if ((recuperar != null && recuperar)) {
 
@@ -189,14 +189,14 @@ public class PeliculasController {
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/wanted")
-	public String wanted(Model model) {
+	public String wanted(Principal principal,  HttpSession session, Model model) {
 		model.addAttribute("wantedList", filmWantedService.findAllOrdered());
 		return "peliculas/wanted";
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@GetMapping("/report")
-	public String report(Model model) {
+	public String report(Principal principal,  HttpSession session, Model model) {
 		
 		List<Pelicula> films = service.findAllOrdered();
 		films.forEach(f -> f.calcularSituacion());
@@ -287,12 +287,7 @@ public class PeliculasController {
 		return ResponseEntity.badRequest().body("Formato no soportado");
 	}
 
-	private FiltrosDto resetearFiltro() {
-		FiltrosDto filtro = new FiltrosDto();
-		filtro.setOrden(Optional.of("tituloGest"));
-		filtro.setPack(false);
-		return filtro;
-	}
+	
 
 	private FiltrosDto recuperarFiltro(HttpSession session, FiltrosDto filtro) {
 		FiltrosDto aux = filtro;
