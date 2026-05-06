@@ -9,6 +9,7 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import lugus.model.core.Location;
 import lugus.model.films.Pelicula;
+import lugus.model.films.PeliculaFoto;
 import lugus.model.people.Actor;
 import lugus.model.people.Director;
 
@@ -108,5 +109,28 @@ public class PeliculaSpecification {
 
 	public static Specification<Pelicula> vigentes() {
 		return (root, query, cb) -> cb.isNull(root.get("tsBaja"));
+	}
+
+	public static Specification<Pelicula> tieneCaratula(boolean tieneCaratula) {
+	    return (root, query, cb) -> {
+
+	        // Subquery para PeliculaFoto
+	        Subquery<PeliculaFoto> sub = query.subquery(PeliculaFoto.class);
+	        Root<PeliculaFoto> foto = sub.from(PeliculaFoto.class);
+
+	        sub.select(foto)
+	           .where(
+	               cb.equal(foto.get("pelicula"), root),
+	               cb.isTrue(foto.get("caratula"))
+	           );
+
+	        if (tieneCaratula) {
+	            // Películas que SÍ tienen carátula
+	            return cb.exists(sub);
+	        } else {
+	            // Películas que NO tienen ninguna carátula
+	            return cb.not(cb.exists(sub));
+	        }
+	    };
 	}
 }

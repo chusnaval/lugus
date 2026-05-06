@@ -191,6 +191,11 @@ public class PeliculaService {
 		spec = spec.and(PeliculaSpecification.porNotas(filter.getNotas()));
 		spec = spec.and(PeliculaSpecification.vigentes());
 		
+		// test if has fotos associated as caratula
+		if(filter.getTieneCaratula() != null) {
+			spec = spec.and(PeliculaSpecification.tieneCaratula(filter.getTieneCaratula()));
+		}
+		
 		Specification<Pelicula> textoGroup = null;
 		if (StringUtils.hasText(filter.getTexto())) {
 			Specification<Pelicula> actorSpec = PeliculaSpecification.porActor(filter.getTexto());

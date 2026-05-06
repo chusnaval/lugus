@@ -111,4 +111,11 @@ public class FiltrosDto implements Serializable{
 		return map;
 	}
 
+	public static FiltrosDto reset(String field) {
+		FiltrosDto filtro = new FiltrosDto();
+		filtro.setOrden(Optional.of(field));
+		filtro.setPack(false);
+		return filtro;
+	}
+
 }

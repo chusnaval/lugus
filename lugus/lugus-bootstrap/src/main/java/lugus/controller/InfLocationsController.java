@@ -70,6 +70,11 @@ public class InfLocationsController {
 		StringBuilder resultado = new StringBuilder();
 		int maximo = formato == 1 ? LIMITE_POR_CARPETA : LIMITE_POR_ESTANTERIA;
 		int contador = 0;
+		
+		if(location == null || location.isBlank() || posibilidades.isEmpty()) {
+			return "";
+		}
+		
 		for (InfLocations infLocation : posibilidades) {
 			if (infLocation.getId().getCodigo().compareTo(location) > 0) {
 				contador += infLocation.getContador();
