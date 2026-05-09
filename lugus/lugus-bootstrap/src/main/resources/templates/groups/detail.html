@@ -61,7 +61,7 @@
 	</div>
 	<!-- en los grupos vacios debemos dar la oportunidad de borrarlos -->
 	<div th:if="${films.empty}" style="margin-bottom: 5%;">
-        <form th:action="@{/group/delete/${group.id}}" method="post">
+        <form th:action="@{'/group/delete/' + ${group.id}}" method="post">
             <input type="hidden" name="id" th:value="${group.id}" />
             <button type="submit" class="btn btn-sm btn-danger">Borrar grupo</button>
         </form>
