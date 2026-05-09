@@ -97,12 +97,18 @@ public class GroupApiController {
 			for (ImdbBasics d : im) {
 				// debemos evitar sugerencias ya registradas como Pelicula
 				// primero comprobamos si el título de IMDB ya existe en el result
-				if(d.getTitleid() != null && result.stream().filter(r -> r instanceof SimpleFilm)
-						.anyMatch(r -> ((SimpleFilm) r).tconst.equals(d.getTitleid()))) continue;
 				// por si acas el título de IMDB no coincide exactamente con el título de Pelicula, comprobamos si el título de IMDB ya existe como Pelicula
-				if(d.getTitleid() != null && peliculaService.findByImdbId(d.getTitleid()) != null) continue;
-				
+				String imdbTitle = d.getTitleid();
+				if(imdbTitle == null || imdbTitle.isBlank() || !peliculaService.findByImdbId(imdbTitle).isEmpty()) {
+					continue; // skip this suggestion
+				}
+				if(result.stream().filter(r -> r instanceof SimpleFilm)
+						.anyMatch(r -> ((SimpleFilm) r).tconst.equals(imdbTitle))) {
+					continue; // skip this suggestion
+				}
+					
 				result.add(new SimpleImdb(d.getTitleid(), d.getTitle(), d.getStartyear()));
+				
 			}
 		}
 
