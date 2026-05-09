@@ -25,4 +25,15 @@ GroupFilmsService {
 		return groupFilmsRepository.findAllByPeliculaIdOrderByGroupName(id);
 	}
 
+	public GroupFilms save(GroupFilms gf) {
+		return groupFilmsRepository.save(gf);
+	}
+
+	public int nextOrderForGroup(Integer groupId) {
+		List<GroupFilms> list = groupFilmsRepository.findAllByGroupIdOrderByOrden(groupId);
+		if (list == null || list.isEmpty()) return 1;
+		int max = list.stream().mapToInt(GroupFilms::getOrden).max().orElse(0);
+		return max + 1;
+	}
+
 }

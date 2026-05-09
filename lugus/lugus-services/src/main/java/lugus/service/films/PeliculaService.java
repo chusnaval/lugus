@@ -286,4 +286,17 @@ public class PeliculaService {
 	public List<Pelicula> findAllOrdered() {
 		return peliculaRepo.findAllByOrderByTituloGestAscAnyoAsc();
 	}
+
+	public List<Pelicula> findByTitulo(String titulo) {
+		// reuse repository method that accepts a Pageable - return first 20 matches
+		try {
+			org.springframework.data.domain.Pageable pg = org.springframework.data.domain.PageRequest.of(0, 20);
+			Specification<Pelicula> tituloSpec = PeliculaSpecification.porTitulo(titulo);
+
+			Specification<Pelicula> textoGroup = Specification.where(tituloSpec);
+			return peliculaRepo.findAll(textoGroup, pg).getContent();
+		} catch (Exception e) {
+			return java.util.Collections.emptyList();
+		}
+	}
 }

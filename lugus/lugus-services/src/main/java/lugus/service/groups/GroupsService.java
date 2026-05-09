@@ -44,4 +44,8 @@ public class GroupsService {
 
 		return groupRepository.findAll(spec, pageable);
 	}
+
+	public void delete(Integer id) {
+		groupRepository.deleteById(id);
+	}
 }
