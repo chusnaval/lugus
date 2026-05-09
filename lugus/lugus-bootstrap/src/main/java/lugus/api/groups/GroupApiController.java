@@ -84,7 +84,7 @@ public class GroupApiController {
 			if (pelis != null) {
 				for (Pelicula p : pelis) {
 					// return minimal object
-					result.add(new SimpleFilm(p.getId(), p.getImdbId(), p.getTitulo(), p.getAnyo()));
+					result.add(new SimpleFilm(p.getId(), p.getImdbId()!=null? p.getImdbId():"", p.getTitulo(), p.getAnyo()));
 				}
 			}
 		} catch (Exception e) {
