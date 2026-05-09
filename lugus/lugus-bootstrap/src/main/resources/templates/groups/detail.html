@@ -18,45 +18,61 @@
 
 <script defer="defer" type="text/javascript"
 	th:src="@{/js/createPetition.js}"></script>
+<!-- new script for group add movie modal -->
+<script defer="defer" type="text/javascript" th:src="@{/js/groupAddMovie.js}"></script>
 
 </head>
 <body class="container mt-4">
 	<div th:replace="~{layout/header :: header}"></div>
 
 	<h2 th:text="${group.name}">Name</h2>
-
+ 	 <input type="hidden" id="addMovieGroupId" th:value="${group.id}" />
 	<div th:if="${films.empty}">
 		<h5 >No hay películas registradas aún, o bien no he tenido tiempo o no se ha comprado/visto ninguna del grupo.</h5>
 		
 	</div>
-	<table th:unless="${films.empty}" class="table table-sm">
-		<tbody>
-			<tr th:each="f : ${films}">
-
-				<td><a th:if="${f.pelicula!=null}"
-					th:href="@{'/peliculas/' + ${f.pelicula.id}}" style="color: inherit;"><i
+	<div>
+		<table th:unless="${films.empty}" class="table table-sm">
+			<tbody>
+				<tr th:each="f : ${films}">
+	
+					<td><a th:if="${f.pelicula!=null}"
+						th:href="@{'/peliculas/' + ${f.pelicula.id}}" style="color: inherit;"><i
 						th:class="${f.pelicula.comprado==true ? 
-                 'fas fa-check-circle text-success col-1' : 
-                 (f.pelicula!=null && f.pelicula.comprado==false ? 
-                     'fas fa-exclamation-circle text-warning col-1' : 
-                     'far fa-times-circle text-danger col-1')}"
+		                 'fas fa-check-circle text-success col-1' : 
+		                 (f.pelicula!=null && f.pelicula.comprado==false ? 
+		                     'fas fa-exclamation-circle text-warning col-1' : 
+		                     'far fa-times-circle text-danger col-1')}"
 						th:classappend="${f.pelicula==null} ? 'link-disabled'"
 						th:attr="aria-disabled=${f.pelicula==null}" aria-hidden="true"></i>
-						
-				</a> <a th:id="${'pet_' + f.itb.tconst}" th:if="${f.pelicula==null}"
-					data-bs-toggle="modal" data-bs-target="#confirmModal"
-					th:data-bs-whatever="${f.itb.tconst}" style="color: inherit;"><i
-						class="far fa-times-circle text-danger col-1 peticion"
-						aria-hidden="true"></i> </a></td>
-
-				<td th:text="${f.title}"><input type="hidden"
-					th:value="${f.id}" /> <input type="hidden"
-					th:value="${f.itb.tconst}" /></td>
-			</tr>
-		</tbody>
-	</table>
-
-
+							
+					</a> <a th:id="${'pet_' + f.itb.tconst}" th:if="${f.pelicula==null}"
+						data-bs-toggle="modal" data-bs-target="#confirmModal"
+						th:data-bs-whatever="${f.itb.tconst}" style="color: inherit;"><i
+							class="far fa-times-circle text-danger col-1 peticion"
+							aria-hidden="true"></i> </a></td>
+	
+					<td th:text="${f.title}"><input type="hidden"
+						th:value="${f.id}" /> <input type="hidden"
+						th:value="${f.itb.tconst}" /></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<!-- en los grupos vacios debemos dar la oportunidad de borrarlos -->
+	<div th:if="${films.empty}" style="margin-bottom: 5%;">
+        <form th:action="@{/group/delete/${group.id}}" method="post">
+            <input type="hidden" name="id" th:value="${group.id}" />
+            <button type="submit" class="btn btn-sm btn-danger">Borrar grupo</button>
+        </form>
+   </div>
+   
+   <!-- NEW: Button to open Add Movie modal -->
+   <div class="my-3">
+       <button id="openAddMovieBtn" type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMovieModal">Añadir película al grupo</button>
+   </div>
+   
+	<!-- Botón para volver a la página anterior -->
 	<button type="button" id="backButton" onclick="history.back()" title="Volver" class="btn btn-sm btn-lumo">Volver</button>
 
 
@@ -81,6 +97,31 @@
 				</div>
 			</div>
 		</div>
+	</div>
+
+	<!-- NEW: Add Movie Modal -->
+	<div class="modal fade" id="addMovieModal" tabindex="-1" aria-labelledby="addMovieModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-lg">
+	    <div class="modal-content bg-dark text-white">
+	      <div class="modal-header bg-dark text-white">
+	        <h5 class="modal-title" id="addMovieModalLabel">Buscar película para añadir</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+	      </div>
+	      <div class="modal-body">
+	        <div class="input-group mb-3">
+	        
+	          <input type="text" id="addMovieSearchInput" class="form-control" placeholder="Buscar por título...">
+	          <button class="btn btn-outline-secondary" type="button" id="addMovieSearchBtn">Buscar</button>
+	        </div>
+	        <div id="addMovieResults">
+	          <!-- resultados dinámicos aquí -->
+	        </div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+	      </div>
+	    </div>
+	  </div>
 	</div>
 
 </body>
