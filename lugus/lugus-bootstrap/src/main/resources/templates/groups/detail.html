@@ -60,7 +60,8 @@
 		</table>
 	</div>
 	<!-- en los grupos vacios debemos dar la oportunidad de borrarlos -->
-	<div th:if="${films.empty}" style="margin-bottom: 5%;">
+	<!-- solo para el admin -->
+	<div th:if="${films.empty}" style="margin-bottom: 5%;" sec:authorize="hasRole('ROLE_ADMIN')">
         <form th:action="@{'/group/delete/' + ${group.id}}" method="post">
             <input type="hidden" name="id" th:value="${group.id}" />
             <button type="submit" class="btn btn-sm btn-danger">Borrar grupo</button>
@@ -68,7 +69,7 @@
    </div>
    
    <!-- NEW: Button to open Add Movie modal -->
-   <div class="my-3">
+   <div class="my-3" sec:authorize="hasRole('ROLE_ADMIN')">
        <button id="openAddMovieBtn" type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMovieModal">Añadir película al grupo</button>
    </div>
    
