@@ -2,12 +2,15 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('addMovieModal');
+	const editModal = document.getElementById('editGroupModal');
     if (!modal) return;
 
     const searchInput = document.getElementById('addMovieSearchInput');
     const groupIdInput = document.getElementById('addMovieGroupId');
     const searchBtn = document.getElementById('addMovieSearchBtn');
     const resultsDiv = document.getElementById('addMovieResults');
+	const filmAffinityLink = document.getElementById('filmAffinityLink');
+	const editGroupLink = document.getElementById('editGroupBtn');
 
     // container for alerts
     const alertContainerId = 'addMovieAlertContainer';
@@ -231,7 +234,150 @@ document.addEventListener('DOMContentLoaded', () => {
         appendMovieRow(detail);
     });
 
+    // attach delete handlers for existing delete buttons and delegate for future ones
+    function attachDeleteHandlers() {
+        // direct handlers
+        document.querySelectorAll('.delete-groupfilm-btn').forEach(btn => {
+            if (!btn.dataset.handlerAttached) {
+                btn.addEventListener('click', async (e) => {
+                    const groupFilmId = e.currentTarget.getAttribute('data-groupfilm-id');
+                    await deleteGroupFilmAjax(groupFilmId, groupIdInput.value, e.currentTarget);
+                });
+                btn.dataset.handlerAttached = 'true';
+            }
+        });
+    }
+
+    async function deleteGroupFilmAjax(groupFilmId, groupId, buttonElem) {
+        if (!confirm('¿Seguro que quieres eliminar esta entrada del grupo?')) return;
+        try {
+            const url = `/lugus/group/` + groupId + `/removeFilmAjax`;
+            const params = new URLSearchParams();
+            params.append('groupFilmId', groupFilmId);
+
+            const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString(), credentials: 'same-origin' });
+            if (!resp.ok) {
+                try {
+                    const data = await resp.json();
+                    showAlert('danger', data.message || 'Error al eliminar la entrada');
+                } catch (ee) {
+                    showAlert('danger', 'Error al eliminar la entrada');
+                }
+                return;
+            }
+            const data = await resp.json();
+            if (data.status === 'ok') {
+                showAlert('success', data.message || 'Entrada eliminada');
+                // remove the row from DOM
+                const row = buttonElem.closest('tr');
+                if (row) row.remove();
+
+                // test if any rows remain, if not show "no hay películas" message
+                // and show the delete group button again (since it was removed when the first movie was added)
+                const tbody = document.querySelector('table.table tbody');
+                if (tbody && tbody.children.length === 0) {
+                     // simpler to just reload the page to reset state, including the "Borrar grupo" button
+					 location.reload();
+                } 
+            } else {
+                showAlert('danger', data.message || 'Error al eliminar la entrada');
+            }
+        } catch (e) {
+            console.error(e);
+            showAlert('danger', 'Error al eliminar la entrada');
+        }
+    }
+
+    // call attach on load
+    attachDeleteHandlers();
+
+    // also re-attach when modal adds a new row via appendMovieRow
+    const originalAppend = appendMovieRow;
+    appendMovieRow = function(detail) {
+        originalAppend(detail);
+        attachDeleteHandlers();
+    }
+
     // also expose a global hook so other code can programmatically add rows
     window.appendGroupMovieRow = appendMovieRow;
 
+
+    function openGroupFilmAffinity(groupId) {
+        const url = `https://www.filmaffinity.com/es/movie-group.php?group-id=` + groupId;
+        window.open(url, '_blank');
+    } 
+
+
+    // === Edit group modal handling ===
+    const editGroupBtnElem = document.getElementById('editGroupBtn');
+    const editGroupName = document.getElementById('editGroupName');
+    const editGroupFilmAffinityId = document.getElementById('editGroupFilmAffinityId');
+    const editGroupSubmitBtn = document.getElementById('editGroupSubmitBtn');
+    const editGroupAlertContainer = document.getElementById('editGroupAlertContainer');
+
+    function showEditAlert(type, message) {
+        if (!editGroupAlertContainer) return;
+        editGroupAlertContainer.innerHTML = `<div class="alert alert-${type} alert-dismissible" role="alert">${escapeHtml(message)}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+    }
+
+    async function submitGroupUpdate() {
+        if (!editGroupSubmitBtn) return;
+        const name = editGroupName ? editGroupName.value.trim() : '';
+        const fa = editGroupFilmAffinityId ? editGroupFilmAffinityId.value.trim() : '';
+        if (!name) { showEditAlert('warning', 'El nombre del grupo es obligatorio.'); return; }
+
+        editGroupSubmitBtn.disabled = true;
+        try {
+            const groupId = groupIdInput.value;
+            const params = new URLSearchParams();
+            params.append('name', name);
+            if (fa) params.append('filmaffinityId', fa);
+
+            const resp = await fetch('/lugus/group/' + groupId + '/updateAjax', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString(), credentials: 'same-origin' });
+            if (!resp.ok) {
+                try { const data = await resp.json(); showEditAlert('danger', data.message || 'Error actualizando el grupo'); }
+                catch (e) { showEditAlert('danger', 'Error actualizando el grupo'); }
+                return;
+            }
+            const data = await resp.json();
+            if (data.status === 'ok') {
+                showEditAlert('success', data.message || 'Grupo actualizado');
+                // refresh page to show updated values
+                setTimeout(() => { location.reload(); }, 500);
+            } else {
+                showEditAlert('danger', data.message || 'Error actualizando el grupo');
+            }
+        } catch (e) {
+            console.error(e);
+            showEditAlert('danger', 'Error actualizando el grupo');
+        } finally {
+            editGroupSubmitBtn.disabled = false;
+        }
+    }
+
+    if (editGroupSubmitBtn) {
+        editGroupSubmitBtn.addEventListener('click', (e) => { e.preventDefault(); submitGroupUpdate(); });
+    }
+
+    // guard filmAffinityLink to avoid NPE
+    if (typeof filmAffinityLink !== 'undefined' && filmAffinityLink && filmAffinityLink.addEventListener) {
+        filmAffinityLink.addEventListener('click', async (e) => {
+            const groupFilmId = e.currentTarget.getAttribute('data-groupfa-id');
+            await openGroupFilmAffinity(groupFilmId);
+        });
+    }
+
+    // guard editGroupLink similarly (if needed to prefill modal values)
+    if (typeof editGroupLink !== 'undefined' && editGroupLink && editGroupLink.addEventListener) {
+        // when modal is shown, ensure inputs are populated (Thymeleaf should already set them)
+        const editModalElem = document.getElementById('editGroupModal');
+        if (editModalElem) {
+            editModalElem.addEventListener('shown.bs.modal', () => {
+                if (editGroupName) editGroupName.focus();
+                const a = document.getElementById('editGroupAlertContainer'); if (a) a.innerHTML = '';
+            });
+        }
+    }
+
+				  
 });

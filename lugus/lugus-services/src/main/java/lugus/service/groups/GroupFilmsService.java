@@ -1,6 +1,7 @@
 package lugus.service.groups;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,14 @@ GroupFilmsService {
 		if (list == null || list.isEmpty()) return 1;
 		int max = list.stream().mapToInt(GroupFilms::getOrden).max().orElse(0);
 		return max + 1;
+	}
+
+	public Optional<GroupFilms> findById(Integer id) {
+		return groupFilmsRepository.findById(id);
+	}
+
+	public void deleteById(Integer id) {
+		groupFilmsRepository.deleteById(id);
 	}
 
 }

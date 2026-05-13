@@ -34,6 +34,11 @@ public class GroupsService {
 		return groupRepository.findAll();
 	}
 
+	public Group saveGroup(Group group) {
+		return groupRepository.save(group);
+	}
+
+
 	public Page<Group> findAllBy(FiltrosDto filter) {
 		
 		Sort sort = Sort.by(Direction.ASC, "name");

@@ -59,5 +59,17 @@ public class GroupFilms {
 
 		return titulo;
 	}
+	
+	public String getYear() {
+		String result = "";
+		if (pelicula != null) {
+			result += pelicula.getAnyo();
+		}else {
+			result += itb.getStartyear();
+		}
+
+		return result;
+	}
+
 
 }

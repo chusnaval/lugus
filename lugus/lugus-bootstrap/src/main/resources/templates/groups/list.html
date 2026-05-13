@@ -25,6 +25,43 @@
 	<div th:replace="~{layout/header :: header}"></div>
 	<h3>Grupos</h3>
 	<div th:replace="~{layout/filters :: filters}"></div>
+	
+	<br>
+	<!-- new group button -->
+	<div class="my-3" sec:authorize="hasRole('ROLE_ADMIN')">
+	    <button id="openCreateGroupBtn" type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#createGroupModal">Nuevo grupo</button>
+	</div>
+	<br/>
+	
+	<!-- Create Group Modal -->
+	<div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="createGroupModalLabel">Crear nuevo grupo</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+	      </div>
+	      <div class="modal-body">
+	        <div id="createGroupAlertContainer"></div>
+	        <div class="mb-3">
+	          <label for="newGroupName" class="form-label">Nombre del grupo</label>
+	          <input type="text" class="form-control" id="newGroupName" placeholder="Nombre...">
+	        </div>
+	        <div class="mb-3">
+	          <label for="newGroupFilmAffinityId" class="form-label">ID Filmaffinity (opcional)</label>
+	          <input type="text" class="form-control" id="newGroupFilmAffinityId" placeholder="Ej: 12345">
+	        </div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+	        <button type="button" class="btn btn-primary" id="createGroupSubmitBtn">Crear</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- include groupCreate.js -->
+	<script defer="defer" th:src="@{/js/groupCreate.js}"></script>
 
 	<div class="container-fluid">
 		<div class="row justify-content-center g-4">
