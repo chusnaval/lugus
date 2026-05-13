@@ -246,4 +246,34 @@ public class GroupController {
 		return ResponseEntity.ok(body);
 	}
 
+	/**
+	 * Update group's name and filmaffinityId via AJAX.
+	 */
+	@PostMapping("/{id}/updateAjax")
+	@ResponseBody
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<Map<String, String>> updateGroupAjax(Principal principal, @PathVariable Integer id, @RequestParam String name, @RequestParam(required = false) String filmaffinityId) throws PermisoException {
+		Map<String, String> body = new HashMap<>();
+		Optional<Group> gOpt = groupsService.findById(id);
+		if (gOpt.isEmpty()) {
+			body.put("status", "error");
+			body.put("message", "Grupo no encontrado");
+			return ResponseEntity.badRequest().body(body);
+		}
+		Group g = gOpt.get();
+		if (name == null || name.trim().isEmpty()) {
+			body.put("status", "error");
+			body.put("message", "El nombre es requerido");
+			return ResponseEntity.badRequest().body(body);
+		}
+		g.setName(name.trim());
+		if (filmaffinityId != null) {
+			g.setFilmaffinityId(Integer.valueOf(filmaffinityId.trim()));
+		}
+		groupsService.saveGroup(g);
+		body.put("status", "ok");
+		body.put("message", "Grupo actualizado");
+		return ResponseEntity.ok(body);
+	}
+
 }

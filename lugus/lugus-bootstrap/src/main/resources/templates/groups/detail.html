@@ -67,6 +67,9 @@
 			</tbody>
 		</table>
 	</div>
+	
+	<br/>
+	
 	<!-- en los grupos vacios debemos dar la oportunidad de borrarlos -->
 	<!-- solo para el admin -->
 	<div th:if="${films.empty}" style="margin-bottom: 5%;" sec:authorize="hasRole('ROLE_ADMIN')">
@@ -78,12 +81,20 @@
    
    <!-- NEW: Button to open Add Movie modal -->
    <div class="my-3" sec:authorize="hasRole('ROLE_ADMIN')">
-       <button id="openAddMovieBtn" type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMovieModal">Añadir película al grupo</button>
+       <button id="openAddMovieBtn" type="button" class="btn btn-sm btn-lumo" data-bs-toggle="modal" data-bs-target="#addMovieModal">Añadir película al grupo</button>
+       <button id="editGroupBtn" type="button" class="btn btn-sm btn-lumo" data-bs-toggle="modal" data-bs-target="#editGroupModal">Editar grupo</button>
    </div>
-   
-	<!-- Botón para volver a la página anterior -->
-	<button type="button" id="backButton" onclick="history.back()" title="Volver" class="btn btn-sm btn-lumo">Volver</button>
-
+	
+	<div class="row">   
+		<div class="col-3" th:if="${group.filmaffinityId}">
+		   <button type="button" id="filmAffinityLink" class="btn btn-sm btn-lumo"
+			 th:attr="data-groupfa-id=${group.filmaffinityId}" >Ver en FilmAffinity</button>
+	   </div>
+		<!-- Botón para volver a la página anterior -->
+		<div class="col-3">
+			<button type="button" id="backButton" onclick="history.back()" title="Volver" class="btn btn-sm btn-lumo">Volver</button>
+		</div>
+	</div>
 
 	<div class="modal fade" id="confirmModal" tabindex="-1"
 		aria-labelledby="confirmModalLabel" aria-hidden="true">
@@ -107,6 +118,33 @@
 			</div>
 		</div>
 	</div>
+	
+		<!-- Edi Group Modal -->
+	<div class="modal fade" id="editGroupModal" tabindex="-1" aria-labelledby="editGroupModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+	    <div class="modal-content bg-dark text-white">
+	      <div class="modal-header bg-dark text-white">
+	        <h5 class="modal-title" id="editGroupModalLabel">Editar grupo</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+	      </div>
+	      <div class="modal-body">
+	        <div id="editGroupAlertContainer"></div>
+	        <div class="mb-3">
+	          <label for="editGroupName" class="form-label">Nombre del grupo</label>
+	          <input type="text" class="form-control" id="editGroupName" th:value="${group.name}">
+	        </div>
+	        <div class="mb-3">
+	          <label for="editGroupFilmAffinityId" class="form-label">ID Filmaffinity (opcional)</label>
+	          <input type="text" class="form-control" id="editGroupFilmAffinityId" th:value="${group.filmaffinityId}">
+	        </div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+	        <button type="button" class="btn btn-primary" id="editGroupSubmitBtn">Guardar</button>
+	      </div>
+	    </div>
+	  </div>
+	</div> 
 
 	<!-- NEW: Add Movie Modal -->
 	<div class="modal fade" id="addMovieModal" tabindex="-1" aria-labelledby="addMovieModalLabel" aria-hidden="true">
