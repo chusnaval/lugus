@@ -53,9 +53,16 @@
 							class="far fa-times-circle text-danger col-1 peticion"
 							aria-hidden="true"></i> </a></td>
 	
-					<td th:text="${f.title}"><input type="hidden"
+					<td th:text="${f.title} + ' - (' + ${f.year} + ')'">
+					<input type="hidden"
 						th:value="${f.id}" /> <input type="hidden"
 						th:value="${f.itb.tconst}" /></td>
+					<td>
+						<!-- delete button for admins -->
+						<button type="button" sec:authorize="hasRole('ROLE_ADMIN')"
+						 class="btn btn-sm btn-danger delete-groupfilm-btn"
+						  th:attr="data-groupfilm-id=${f.id}">Borrar</button>
+					</td>
 				</tr>
 			</tbody>
 		</table>

@@ -193,4 +193,57 @@ public class GroupController {
 		}
 	}
 
+	/**
+	 * Remove a film from a group via AJAX. Expects parameter groupFilmId (int).
+	 */
+	@PostMapping("/{id}/removeFilmAjax")
+	@ResponseBody
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<Map<String, String>> removeFilmAjax(Principal principal, @PathVariable Integer id, @RequestParam Integer groupFilmId) throws PermisoException {
+		Map<String, String> body = new HashMap<>();
+		Optional<GroupFilms> gfOpt = groupFilmsService.findById(groupFilmId);
+		if (gfOpt.isEmpty()) {
+			body.put("status", "error");
+			body.put("message", "Entry not found");
+			return ResponseEntity.badRequest().body(body);
+		}
+		GroupFilms gf = gfOpt.get();
+		if (gf.getGroup() == null || gf.getGroup().getId() != id) {
+			body.put("status", "error");
+			body.put("message", "Group mismatch");
+			return ResponseEntity.badRequest().body(body);
+		}
+		groupFilmsService.deleteById(groupFilmId);
+		body.put("status", "ok");
+		body.put("message", "Entrada eliminada");
+		return ResponseEntity.ok(body);
+	}
+
+	/**
+	 * Create a new group via AJAX. Expects 'name' and optional 'filmaffinityId'.
+	 */
+	@PostMapping("/createAjax")
+	@ResponseBody
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<Map<String, Object>> createGroupAjax(Principal principal,
+			@RequestParam String name,
+			@RequestParam(required = false) String filmaffinityId) throws PermisoException {
+		Map<String, Object> body = new HashMap<>();
+		if (name == null || name.trim().isEmpty()) {
+			body.put("status", "error");
+			body.put("message", "El nombre es requerido");
+			return ResponseEntity.badRequest().body(body);
+		}
+		Group g = new Group();
+		g.setName(name.trim());
+		if (filmaffinityId != null && !filmaffinityId.isBlank()) {
+			g.setFilmaffinityId(Integer.valueOf(filmaffinityId.trim()));
+		}
+		Group saved = groupsService.saveGroup(g);
+		body.put("status", "ok");
+		body.put("id", saved.getId());
+		body.put("name", saved.getName());
+		return ResponseEntity.ok(body);
+	}
+
 }

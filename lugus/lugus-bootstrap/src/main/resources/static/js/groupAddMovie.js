@@ -231,6 +231,70 @@ document.addEventListener('DOMContentLoaded', () => {
         appendMovieRow(detail);
     });
 
+    // attach delete handlers for existing delete buttons and delegate for future ones
+    function attachDeleteHandlers() {
+        // direct handlers
+        document.querySelectorAll('.delete-groupfilm-btn').forEach(btn => {
+            if (!btn.dataset.handlerAttached) {
+                btn.addEventListener('click', async (e) => {
+                    const groupFilmId = e.currentTarget.getAttribute('data-groupfilm-id');
+                    await deleteGroupFilmAjax(groupFilmId, groupIdInput.value, e.currentTarget);
+                });
+                btn.dataset.handlerAttached = 'true';
+            }
+        });
+    }
+
+    async function deleteGroupFilmAjax(groupFilmId, groupId, buttonElem) {
+        if (!confirm('¿Seguro que quieres eliminar esta entrada del grupo?')) return;
+        try {
+            const url = `/lugus/group/` + groupId + `/removeFilmAjax`;
+            const params = new URLSearchParams();
+            params.append('groupFilmId', groupFilmId);
+
+            const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString(), credentials: 'same-origin' });
+            if (!resp.ok) {
+                try {
+                    const data = await resp.json();
+                    showAlert('danger', data.message || 'Error al eliminar la entrada');
+                } catch (ee) {
+                    showAlert('danger', 'Error al eliminar la entrada');
+                }
+                return;
+            }
+            const data = await resp.json();
+            if (data.status === 'ok') {
+                showAlert('success', data.message || 'Entrada eliminada');
+                // remove the row from DOM
+                const row = buttonElem.closest('tr');
+                if (row) row.remove();
+
+                // test if any rows remain, if not show "no hay películas" message
+                // and show the delete group button again (since it was removed when the first movie was added)
+                const tbody = document.querySelector('table.table tbody');
+                if (tbody && tbody.children.length === 0) {
+                     // simpler to just reload the page to reset state, including the "Borrar grupo" button
+					 location.reload();
+                } 
+            } else {
+                showAlert('danger', data.message || 'Error al eliminar la entrada');
+            }
+        } catch (e) {
+            console.error(e);
+            showAlert('danger', 'Error al eliminar la entrada');
+        }
+    }
+
+    // call attach on load
+    attachDeleteHandlers();
+
+    // also re-attach when modal adds a new row via appendMovieRow
+    const originalAppend = appendMovieRow;
+    appendMovieRow = function(detail) {
+        originalAppend(detail);
+        attachDeleteHandlers();
+    }
+
     // also expose a global hook so other code can programmatically add rows
     window.appendGroupMovieRow = appendMovieRow;
 
