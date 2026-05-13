@@ -246,14 +246,18 @@ public class PeliculaService {
 	 */
 	protected static Sort buildSort(final Optional<String> field, final Optional<String> direction) {
 		Sort sort;
+		// when order by "compra", we want to order by tsModif and tsAlta,
+		// when ts modif is null, we want to order by tsAlta, and in desc
+		// because we want to see first the last modified, and when is null, the last created
+		
 		if (field.isPresent() && "compra".equals(field.get())) {
-			if (direction.isPresent() && "ASC".equalsIgnoreCase(direction.get())) {
-				sort = Sort.by(Sort.Order.desc("tsModif").with(Sort.NullHandling.NULLS_LAST),
-						Sort.Order.desc("tsAlta"));
-			} else {
-
-				sort = Sort.by(Sort.Order.asc("tsModif").with(Sort.NullHandling.NULLS_FIRST), Sort.Order.asc("tsAlta"));
-			}
+			
+			Direction dir = Direction.DESC;
+			Sort.Order orderModif = new Sort.Order(dir, "tsModif").with(Sort.NullHandling.NULLS_LAST);
+			Sort.Order orderAlta = new Sort.Order(dir, "tsAlta").with(Sort.NullHandling.NULLS_LAST);
+			
+			sort = Sort.by(orderModif, orderAlta);
+			
 		} else {
 			sort = Sort.by(Direction.fromString(direction.orElse("ASC")), field.isPresent() ? field.get() : "tituloGest");
 		}
