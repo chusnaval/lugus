@@ -67,6 +67,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -595,6 +596,7 @@ public class PeliculasController {
 		existing.setFunda(nuevo.isFunda());
 		existing.setComprado(nuevo.isComprado());
 		existing.setImdbId(nuevo.getImdbCodigo());
+		existing.setTsModif(Instant.now());
 		existing.calcularCodigo();
 		service.save(existing);
 
