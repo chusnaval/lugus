@@ -53,7 +53,7 @@
 
 					<div class="info-line d-flex justify-content-between">
 						<span th:text="${p.anyo}"></span>
-						<span th:text="${p.formato}"></span>
+						<span th:text="${p.formato}" th:classappend="${p.comprado} ? 'border-' + ${p.formato}  : 'border-no-comprado'"></span>
 					</div>
 							
 					<div class="info-line">

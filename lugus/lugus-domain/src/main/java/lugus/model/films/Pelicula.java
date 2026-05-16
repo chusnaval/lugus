@@ -133,6 +133,11 @@ public class Pelicula {
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private final Set<PeliculaFoto> peliculaFotos = new HashSet<>();
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
+	@ToString.Exclude
+	private final Set<PeliculasEnlaces> peliculasEnlaces = new HashSet<>();
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
