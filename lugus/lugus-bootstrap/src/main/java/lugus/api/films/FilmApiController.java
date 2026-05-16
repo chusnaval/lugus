@@ -50,8 +50,8 @@ public class FilmApiController {
 		return mapper.mapToDTO(page.getContent().get(number));
 	}
 
-	@GetMapping("/ultimas")
-	public List<Pelicula> ultimas() {
+	@GetMapping(value="/ultimas", produces = "application/json;charset=UTF-8")
+	public List<Pelicula> ultimas() throws LugusNotFoundException {
 
 		return service.findForHome().getContent();
 	}
