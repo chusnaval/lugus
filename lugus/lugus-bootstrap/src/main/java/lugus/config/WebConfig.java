@@ -13,11 +13,13 @@ public class WebConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration cfg = new CorsConfiguration();
-        cfg.setAllowedOrigins(List.of("http://localhost:5173")); // origen del frontend
-        cfg.setAllowedMethods(List.of("*"));
-        cfg.setAllowedHeaders(List.of("*"));
         cfg.setAllowCredentials(true);
-
+        
+        cfg.setAllowedOrigins(List.of("http://localhost:5173")); // origen del frontend
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setExposedHeaders(List.of("Set-Cookie"));
+        
         UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
         src.registerCorsConfiguration("/**", cfg);
         return new CorsFilter(src);

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import lugus.model.films.Pelicula;
 import lugus.service.films.PeliculaService;
 
 @RestController
+@ResponseBody
 @RequestMapping("/v1/api/films")
 @RequiredArgsConstructor
 public class FilmApiController {
@@ -40,11 +42,18 @@ public class FilmApiController {
 		}
 		return result;
 	}
-	
+
 	@GetMapping("/random/wanted")
 	PeliculaCreateDto randomw() throws LugusNotFoundException {
 		Page<Pelicula> page = service.wanted();
 		int number = (int) (Math.random() * page.getNumberOfElements()) + 1;
 		return mapper.mapToDTO(page.getContent().get(number));
 	}
+
+	@GetMapping("/ultimas")
+	public List<Pelicula> ultimas() {
+
+		return service.findForHome().getContent();
+	}
+
 }
