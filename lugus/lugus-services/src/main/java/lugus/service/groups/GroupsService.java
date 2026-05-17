@@ -53,4 +53,12 @@ public class GroupsService {
 	public void delete(Integer id) {
 		groupRepository.deleteById(id);
 	}
+
+	public int incompletedGroups() {
+		return groupRepository.countIncompleteGroups();
+	}
+
+	public long count() {
+		return groupRepository.count();
+	}
 }

@@ -18,6 +18,7 @@ import lugus.exception.LugusNotFoundException;
 import lugus.mapper.films.FilmMapper;
 import lugus.model.films.Pelicula;
 import lugus.service.films.PeliculaService;
+import lugus.service.groups.GroupsService;
 
 @RestController
 @ResponseBody
@@ -28,6 +29,8 @@ public class FilmApiController {
 	private final PeliculaService service;
 
 	private final FilmMapper mapper;
+	
+	private final GroupsService	groupsService;
 
 	@GetMapping("/{id}")
 	FilmDto one(@PathVariable Integer id) throws LugusNotFoundException {
@@ -65,7 +68,8 @@ public class FilmApiController {
 		FilmStatsDto stats = new FilmStatsDto();
 		stats.setTotalFilms(service.contarTodas());
 		stats.setRecentFilms(service.addedInLastDays(30));
-		
+		stats.setIncompleteGroups(groupsService.incompletedGroups());
+		stats.setCompleteGroups((int) (groupsService.count() - groupsService.incompletedGroups()));
 		return stats;
 	}
 	
