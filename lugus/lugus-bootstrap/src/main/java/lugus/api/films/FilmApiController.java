@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import lugus.dto.films.FilmDto;
+import lugus.dto.films.FilmStatsDto;
 import lugus.dto.films.PeliculaCreateDto;
 import lugus.exception.LugusNotFoundException;
 import lugus.mapper.films.FilmMapper;
@@ -28,9 +30,9 @@ public class FilmApiController {
 	private final FilmMapper mapper;
 
 	@GetMapping("/{id}")
-	PeliculaCreateDto one(@PathVariable Integer id) throws LugusNotFoundException {
+	FilmDto one(@PathVariable Integer id) throws LugusNotFoundException {
 		Pelicula film = service.findById(id).orElseThrow(() -> new LugusNotFoundException(id));
-		return mapper.mapToDTO(film);
+		return mapper.mapToFilmDTO(film);
 	}
 
 	@GetMapping("/wanted")
@@ -51,9 +53,21 @@ public class FilmApiController {
 	}
 
 	@GetMapping(value="/ultimas", produces = "application/json;charset=UTF-8")
-	public List<Pelicula> ultimas() throws LugusNotFoundException {
+	public List<FilmDto> ultimas() throws LugusNotFoundException {
 
-		return service.findForHome().getContent();
+		return service.findForHome().getContent().stream()
+                .map(mapper::mapToFilmDTO)
+                .toList();
 	}
+	
+	@GetMapping(value="/stats", produces = "application/json;charset=UTF-8")
+	public FilmStatsDto getStats() {
+		FilmStatsDto stats = new FilmStatsDto();
+		stats.setTotalFilms(service.contarTodas());
+		stats.setRecentFilms(service.addedInLastDays(30));
+		
+		return stats;
+	}
+	
 
 }

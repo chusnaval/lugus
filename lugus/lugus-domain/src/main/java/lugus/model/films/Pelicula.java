@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -133,7 +134,7 @@ public class Pelicula {
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private final Set<PeliculaFoto> peliculaFotos = new HashSet<>();
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
@@ -313,4 +314,19 @@ public class Pelicula {
 		}
 		return false;
 	}
+
+	public String getCoverUrl() {
+		String coverUrl = null;
+		if (this.peliculaFotos != null && !this.peliculaFotos.isEmpty()) {
+			Optional<PeliculaFoto> aux = this.peliculaFotos.stream().findFirst();
+			if (aux.isPresent()) {
+				PeliculaFoto pf = aux.get();
+				if (pf.isCaratula()) {
+					coverUrl = pf.getUrl();
+				}
+			}
+		}
+		return coverUrl;
+	}
+
 }

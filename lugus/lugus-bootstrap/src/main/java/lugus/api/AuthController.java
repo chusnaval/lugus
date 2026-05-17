@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,10 +41,12 @@ public class AuthController {
 
             Authentication auth = authenticationManager.authenticate(authReq);
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(auth);
+            SecurityContextHolder.setContext(context);
 
             // Crear sesión y cookie JSESSIONID
-            httpRequest.getSession(true);
+            httpRequest.getSession(true) .setAttribute("SPRING_SECURITY_CONTEXT", context);
 
             return ResponseEntity.ok(Map.of("status", "ok"));
 
@@ -55,6 +58,9 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<?> me(Authentication auth) {
+    	if (auth == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         return ResponseEntity.ok(Map.of("user", auth.getName()));
     }
 
