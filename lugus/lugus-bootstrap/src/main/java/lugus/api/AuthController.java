@@ -1,5 +1,6 @@
 package lugus.api;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,11 +59,24 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<?> me(Authentication auth) {
-    	if (auth == null) {
+        if (auth == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(Map.of("user", auth.getName()));
+
+        // Extraer roles del Authentication
+        List<String> roles = auth.getAuthorities()
+                .stream()
+                .map(a -> a.getAuthority()) // ROLE_ADMIN, ROLE_USER, etc.
+                .toList();
+
+        return ResponseEntity.ok(
+            Map.of(
+                "username", auth.getName(),
+                "roles", roles
+            )
+        );
     }
+
 
   
 }

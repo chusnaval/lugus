@@ -84,7 +84,7 @@ public class FilmMapper {
 
 		dto.setWatched(false); // TODO
 		dto.setSynopsis("");// TODO
-		dto.setImdbUrl(null);// TODO
+		dto.setImdbUrl("https://www.imdb.com/es-es/title/" + film.getImdbId());
 		dto.setFaUrl(null);// TODO
 		dto.setLastSeen(null);// TODO
 		dto.setCountry(null);// TODO
