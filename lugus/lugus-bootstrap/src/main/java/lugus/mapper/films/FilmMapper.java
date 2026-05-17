@@ -2,6 +2,8 @@ package lugus.mapper.films;
 
 import org.springframework.stereotype.Component;
 
+import lugus.dto.films.CastDto;
+import lugus.dto.films.DirectorDTO;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.GroupDto;
 import lugus.dto.films.PeliculaCreateDto;
@@ -47,6 +49,9 @@ public class FilmMapper {
 		dto.setYear(film.getAnyo());
 		dto.setMgmtCode(film.getCodigo());
 
+		createDirectors(dto, film);
+		createCasting(dto, film);
+		
 		if (film.getFormato() != null) {
 			dto.setFormat(film.getFormato().name());
 		}
@@ -87,15 +92,27 @@ public class FilmMapper {
 		return dto;
 	}
 
+	private void createDirectors(FilmDto dto, Pelicula film) {
+		film.getDirectores().stream()
+				.forEach(dir -> dto.addDirector(new DirectorDTO(dir.getId(), dir.getNombre())));
+
+	}
+	
+	private void createCasting(FilmDto dto, Pelicula film) {
+		film.getActores().stream()
+				.forEach(act -> dto.addCast(new CastDto(act.getId(), act.getNombre(), act.getPersonaje())));
+
+	}
+
 	private GroupDto getFirstGroup(Pelicula film) {
 		GroupDto group = new GroupDto();
-		
-		for(GroupFilms gf : film.getGroups()) {
+
+		for (GroupFilms gf : film.getGroups()) {
 			group.setId(gf.getGroup().getId());
 			group.setName(gf.getGroup().getName());
 			group.setFaId(gf.getGroup().getFilmaffinityId());
 		}
-		
+
 		return group;
 	}
 }

@@ -2,6 +2,7 @@ package lugus.model.series;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -30,6 +31,7 @@ import lombok.ToString;
 import lugus.converter.FormatoConverter;
 import lugus.converter.GeneroConverter;
 import lugus.model.core.Location;
+import lugus.model.films.PeliculaFoto;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.model.values.LangVersion;
@@ -159,5 +161,19 @@ public class Serie {
 			}
 		}
 		
+	}
+
+	public String getCoverUrl() {
+		String coverUrl = null;
+		if (this.serieFotos != null && !this.serieFotos.isEmpty()) {
+			Optional<SerieFoto> aux = this.serieFotos.stream().findFirst();
+			if (aux.isPresent()) {
+				SerieFoto pf = aux.get();
+				if (pf.isCaratula()) {
+					coverUrl = pf.getUrl();
+				}
+			}
+		}
+		return coverUrl;
 	}
 }

@@ -3,6 +3,7 @@ package lugus.service.series;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -195,6 +196,15 @@ public class SeriesService {
 
 	public List<Serie> findAllOrdered() {
 		return serieRepo.findAllByOrderByTituloGestAscAnyoInicioAsc();
+	}
+
+	public long contarTodas() {
+		return serieRepo.count();
+	}
+
+	public int addedInLastDays(int days) {
+		Instant limit = Instant.now().minus(days, ChronoUnit.DAYS);
+		return serieRepo.countByTsAltaAfter(limit);
 	}
 
 }

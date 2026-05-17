@@ -1,5 +1,8 @@
 package lugus.dto.films;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,9 +54,8 @@ public class FilmDto {
 	private ConditionDto condition;
 	private FilmDto father;
 
-	private DirectorDTO[] director;
-
-	private CastDto[] casting;
+	private List<DirectorDTO> director = new ArrayList<>();
+	private List<CastDto> casting = new ArrayList<>();
 
 	private String coverSrc;
 
@@ -70,4 +72,18 @@ public class FilmDto {
 	private GroupDto group;
 
 	private String country;
+
+	public void addDirector(DirectorDTO directorDTO) {
+		if (director == null) {
+			director = new ArrayList<>();
+		}
+		director.add(directorDTO);
+	}
+
+	public void addCast(CastDto castDto) {
+		if (casting == null) {
+			casting = new ArrayList<>();
+		}
+		casting.add(castDto);
+	}
 }

@@ -1,5 +1,6 @@
 package lugus.repository.series;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -31,4 +32,6 @@ public interface SerieRepository {
 	Collection<? extends Serie> findByTituloGestAndAnyoInicio(String title, Integer year);
 
 	List<Serie> findAllByOrderByTituloGestAscAnyoInicioAsc();
+
+	int countByTsAltaAfter(Instant limit);
 }

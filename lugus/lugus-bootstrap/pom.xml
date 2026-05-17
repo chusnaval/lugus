@@ -98,6 +98,11 @@
       <version>${lombok.version}</version>
       <optional>true</optional>
     </dependency>
+    <dependency>
+    	<groupId>chusnaval.org</groupId>
+    	<artifactId>lugus-domain</artifactId>
+    	<version>0.0.6</version>
+    </dependency>
   </dependencies>
 
   <build>

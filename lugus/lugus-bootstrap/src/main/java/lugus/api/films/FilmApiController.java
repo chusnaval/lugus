@@ -29,13 +29,15 @@ public class FilmApiController {
 	private final PeliculaService service;
 
 	private final FilmMapper mapper;
-	
-	private final GroupsService	groupsService;
+
+	private final GroupsService groupsService;
 
 	@GetMapping("/{id}")
 	FilmDto one(@PathVariable Integer id) throws LugusNotFoundException {
-		Pelicula film = service.findById(id).orElseThrow(() -> new LugusNotFoundException(id));
-		return mapper.mapToFilmDTO(film);
+		Pelicula film = service.findById(id).orElse(null);
+		if (film != null)
+			return mapper.mapToFilmDTO(film);
+		return null;
 	}
 
 	@GetMapping("/wanted")
@@ -55,15 +57,13 @@ public class FilmApiController {
 		return mapper.mapToDTO(page.getContent().get(number));
 	}
 
-	@GetMapping(value="/ultimas", produces = "application/json;charset=UTF-8")
+	@GetMapping(value = "/ultimas", produces = "application/json;charset=UTF-8")
 	public List<FilmDto> ultimas() throws LugusNotFoundException {
 
-		return service.findForHome().getContent().stream()
-                .map(mapper::mapToFilmDTO)
-                .toList();
+		return service.findForHome().getContent().stream().map(mapper::mapToFilmDTO).toList();
 	}
-	
-	@GetMapping(value="/stats", produces = "application/json;charset=UTF-8")
+
+	@GetMapping(value = "/stats", produces = "application/json;charset=UTF-8")
 	public FilmStatsDto getStats() {
 		FilmStatsDto stats = new FilmStatsDto();
 		stats.setTotalFilms(service.contarTodas());
@@ -72,6 +72,5 @@ public class FilmApiController {
 		stats.setCompleteGroups((int) (groupsService.count() - groupsService.incompletedGroups()));
 		return stats;
 	}
-	
 
 }
