@@ -100,7 +100,7 @@ public class FilmMapper {
 	
 	private void createCasting(FilmDto dto, Pelicula film) {
 		film.getActores().stream()
-				.forEach(act -> dto.addCast(new CastDto(act.getId(), act.getNombre(), act.getPersonaje())));
+				.forEach(act -> dto.addCast(new CastDto(act.getPersona(), act.getNombre(), act.getPersonaje())));
 
 	}
 
