@@ -7,8 +7,12 @@ import lugus.dto.films.DirectorDTO;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.GroupDto;
 import lugus.dto.films.PeliculaCreateDto;
+import lugus.model.core.Location;
 import lugus.model.films.Pelicula;
+import lugus.model.films.PeliculaFoto;
 import lugus.model.groups.GroupFilms;
+import lugus.model.values.Formato;
+import lugus.model.values.Genero;
 
 @Component
 public class FilmMapper {
@@ -51,7 +55,7 @@ public class FilmMapper {
 
 		createDirectors(dto, film);
 		createCasting(dto, film);
-		
+
 		if (film.getFormato() != null) {
 			dto.setFormat(film.getFormato().name());
 		}
@@ -93,11 +97,10 @@ public class FilmMapper {
 	}
 
 	private void createDirectors(FilmDto dto, Pelicula film) {
-		film.getDirectores().stream()
-				.forEach(dir -> dto.addDirector(new DirectorDTO(dir.getId(), dir.getNombre())));
+		film.getDirectores().stream().forEach(dir -> dto.addDirector(new DirectorDTO(dir.getId(), dir.getNombre())));
 
 	}
-	
+
 	private void createCasting(FilmDto dto, Pelicula film) {
 		film.getActores().stream()
 				.forEach(act -> dto.addCast(new CastDto(act.getPersona(), act.getNombre(), act.getPersonaje())));
@@ -114,5 +117,31 @@ public class FilmMapper {
 		}
 
 		return group;
+	}
+
+	public Pelicula mapToFilm(FilmDto dto) {
+		Pelicula pelicula = new Pelicula();
+		pelicula.setTitulo(dto.getTitle());
+		pelicula.setTituloGest(dto.getTitleMgmt());
+		pelicula.setAnyo(dto.getYear());
+		pelicula.setCodigo(dto.getMgmtCode());
+
+		pelicula.setFormato(Formato.getById(Short.valueOf(dto.getFormat())));
+
+		pelicula.setGenero(Genero.getById(dto.getGenreCode()));
+
+		pelicula.setPack(dto.isPack());
+		pelicula.setSteelbook(dto.isSteelbook());
+		pelicula.setFunda(dto.isSlipcover());
+		pelicula.setComprado(dto.isOwned());
+		pelicula.setNotas(dto.getNotes());
+
+		pelicula.setImdbId(dto.getImdbId());
+		pelicula.setRating(dto.getRating());
+		pelicula.setVotes(dto.getVotes());
+
+		
+
+		return pelicula;
 	}
 }
