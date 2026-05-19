@@ -1,5 +1,7 @@
 package lugus.mapper.groups;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -7,6 +9,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lugus.dto.groups.GroupDTO;
 import lugus.model.groups.Group;
+import lugus.model.groups.GroupFilms;
 
 
 @Component
@@ -17,6 +20,13 @@ public class GroupMapper {
 		GroupDTO dto = new GroupDTO();
 		dto.setId(group.getId());
 		dto.setName(group.getName());
+		dto.setMovieCount(group.getFilms().size());
+		String cover = "./covers/placeholder.png";
+		Optional<GroupFilms> gf = group.getFilms().stream().findFirst();
+		if(gf.isPresent() && gf.get().getPelicula()!=null) {
+			cover = gf.get().getPelicula().getCoverUrl();
+		}
+		dto.setCover(cover);
 		return dto;
 		
 	}

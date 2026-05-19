@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,10 +69,14 @@ public class GroupApiController {
 			films.add(fmapper.mapToDTO(gf));
 		}
 		
-		gdto.setFilms(films);
+		gdto.setMovies(films);
 		return gdto;
 	}
 
+	@GetMapping("/page")
+	public Page<GroupDTO> getSagas(@PageableDefault(size = 24) Pageable pageable) {
+	    return service.findAll(pageable).map(mapper::mapToDTO);
+	}
 	/**
 	 * Search movies by title: returns registered movies first, then IMDB suggestions.
 	 */

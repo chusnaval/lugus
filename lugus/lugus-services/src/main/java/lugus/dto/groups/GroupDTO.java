@@ -8,4 +8,8 @@ public class GroupDTO {
 	private int id;
 	
 	private String name;
+	
+	private int movieCount;
+	
+	private String cover;
 }

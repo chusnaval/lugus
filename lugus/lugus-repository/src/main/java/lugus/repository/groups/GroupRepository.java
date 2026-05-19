@@ -39,4 +39,6 @@ public interface GroupRepository {
 			""")
 	int countIncompleteGroups();
 
+	Page<Group> findAll(Pageable pageable);
+
 }

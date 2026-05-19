@@ -61,4 +61,10 @@ public class GroupsService {
 	public long count() {
 		return groupRepository.count();
 	}
+
+	public Page<Group> findAll(
+			Pageable pageable) {
+		
+		return groupRepository.findAll(pageable);
+	}
 }
