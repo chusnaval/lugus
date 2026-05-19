@@ -13,6 +13,8 @@ import lugus.model.films.Pelicula;
 public interface PeliculaRepository {
 
 	long count();
+	
+	long countByComprado(final boolean value);
 
 	List<Pelicula> findAll();
 

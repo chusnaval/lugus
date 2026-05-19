@@ -19,6 +19,7 @@ import lugus.dto.core.LocationDTO;
 import lugus.exception.LugusNotFoundException;
 import lugus.mapper.core.LocationMapper;
 import lugus.model.core.Location;
+import lugus.model.core.LocationType;
 import lugus.service.core.LocationService;
 
 @RestController
@@ -34,6 +35,7 @@ public class LocationApiController {
 	@GetMapping
 	List<LocationDTO> all() {
 		List<Location> sources = service.findAll();
+		
 		return sources.stream().map(mapper::mapToDTO).collect(Collectors.toList());
 	}
 
@@ -50,11 +52,12 @@ public class LocationApiController {
 	}
 
 	@PutMapping("/{id}")
-	LocationDTO replaceEmployee(@RequestBody LocationDTO newSource, @PathVariable String id) {
+	LocationDTO replace(@RequestBody LocationDTO newSource, @PathVariable String id) {
 		Optional<Location> location = service.findById(id);
 		if (location.isPresent()) {
 			Location obj = location.get();
 			obj.setDescripcion(newSource.getDescripcion());
+			obj.setLocationType(new LocationType( newSource.getLocationType().getId() ));
 			obj = service.save(obj);
 
 			return mapper.mapToDTO(obj);
@@ -64,7 +67,7 @@ public class LocationApiController {
 	}
 
 	@DeleteMapping("/{id}")
-	void deleteEmployee(@PathVariable String id) {
+	void delete(@PathVariable String id) {
 		service.deleteById(id);
 	}
 

@@ -207,4 +207,8 @@ public class SeriesService {
 		return serieRepo.countByTsAltaAfter(limit);
 	}
 
+	public int countByComprado(boolean value) {
+		return serieRepo.countByComprado(value);
+	}
+
 }

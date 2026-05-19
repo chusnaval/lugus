@@ -34,4 +34,6 @@ public interface SerieRepository {
 	List<Serie> findAllByOrderByTituloGestAscAnyoInicioAsc();
 
 	int countByTsAltaAfter(Instant limit);
+
+	int countByComprado(boolean value);
 }

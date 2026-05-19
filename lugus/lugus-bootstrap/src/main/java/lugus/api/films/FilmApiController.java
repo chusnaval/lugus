@@ -135,7 +135,7 @@ public class FilmApiController {
 	@GetMapping(value = "/stats", produces = "application/json;charset=UTF-8")
 	public FilmStatsDto getStats() {
 		FilmStatsDto stats = new FilmStatsDto();
-		stats.setTotalFilms(service.contarTodas());
+		stats.setTotalFilms(service.contarTodasCompradas());
 		stats.setRecentFilms(service.addedInLastDays(30));
 		stats.setIncompleteGroups(groupsService.incompletedGroups());
 		stats.setCompleteGroups((int) (groupsService.count() - groupsService.incompletedGroups()));

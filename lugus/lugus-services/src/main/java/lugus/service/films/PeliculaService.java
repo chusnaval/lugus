@@ -162,6 +162,9 @@ public class PeliculaService {
 		return peliculaRepo.count();
 	}
 
+	public long contarTodasCompradas() {
+		return peliculaRepo.countByComprado(true);
+	}
 	/**
 	 * Complete movies search with all filters available
 	 * 

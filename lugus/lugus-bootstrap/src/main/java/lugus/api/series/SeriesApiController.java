@@ -59,8 +59,8 @@ public class SeriesApiController {
 		SeriesStatsDto stats = new SeriesStatsDto();
 		stats.setTotal(service.contarTodas());
 		stats.setRecent(service.addedInLastDays(30));
-		stats.setIncompleteGroups(0);
-		stats.setCompleteGroups(0);
+		stats.setIncompleteGroups(service.countByComprado(false));
+		stats.setCompleteGroups(service.countByComprado(true));
 		return stats;
 	}
 }

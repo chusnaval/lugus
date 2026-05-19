@@ -24,4 +24,12 @@ public class LocationTypeService {
 	public List<LocationType> findAll() {
 		return repository.findAll();
 	}
+
+	public LocationType save(LocationType obj) {
+		return repository.save(obj);
+	}
+
+	public void deleteById(Integer id) {
+		repository.deleteById(id);		
+	}
 }
