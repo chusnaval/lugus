@@ -8,20 +8,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import lugus.dto.groups.TitleDto;
-import lugus.mapper.titles.TitleMapper;
-import lugus.service.titles.TitlesService;
+import lugus.dto.groups.SearchTitleResultDto;
+import lugus.service.titles.TitleSearchService;
 
 @RestController
 @RequestMapping("/v1/api/titles")
 @RequiredArgsConstructor
 public class TitlesApiController {
-	
-	private final TitlesService service;
-	
-	// BUSCAR TITULOS
+
+	private final TitleSearchService searchService;
+
 	@GetMapping("/search")
-	public List<TitleDto> searchTitles(@RequestParam String query) {
-		return service.searchTitles(query).stream().map(TitleMapper::toDto).toList();
+	public List<SearchTitleResultDto> search(@RequestParam String query) {
+		return searchService.search(query);
 	}
 }

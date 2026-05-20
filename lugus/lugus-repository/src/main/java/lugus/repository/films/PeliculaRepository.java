@@ -1,13 +1,13 @@
 package lugus.repository.films;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+
 import lugus.model.films.Pelicula;
 
 public interface PeliculaRepository {
@@ -43,5 +43,7 @@ public interface PeliculaRepository {
 	List<Pelicula> findAllByOrderByTituloGestAscAnyoAsc();
 	
 	int countByTsAltaAfter(Instant date);
+
+	List<Pelicula> findByTituloContainingIgnoreCase(String query);
 
 }

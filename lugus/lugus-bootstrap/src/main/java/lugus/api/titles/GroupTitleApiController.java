@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.groups.GroupTitleDto;
+import lugus.dto.groups.SearchTitleResultDto;
 import lugus.mapper.groups.GroupTitleMapper;
+import lugus.model.titles.Title;
 import lugus.service.titles.GroupTitleService;
+import lugus.service.titles.TitleCreationService;
 
 @RestController
 @RequestMapping("/v1/api/groupsTitles")
@@ -21,14 +24,8 @@ import lugus.service.titles.GroupTitleService;
 public class GroupTitleApiController {
 
 	private final GroupTitleService service;
+	private final TitleCreationService titleCreationService;
 
-
-
-	// AÑADIR TITULO A GRUPO
-	@PostMapping("/{groupId}/titles")
-	public GroupTitleDto addTitle(@PathVariable int groupId, @RequestBody AddTitleRequest req) {
-		return GroupTitleMapper.toDto(service.addTitleToGroup(groupId, req.getTitleId()));
-	}
 
 	// ELIMINAR TITULO DE GRUPO
 	@DeleteMapping("/{groupId}/titles/{groupTitleId}")
@@ -41,4 +38,13 @@ public class GroupTitleApiController {
 	public void moveTitle(@PathVariable int groupId, @PathVariable int groupTitleId, @RequestParam String dir) {
 		service.moveTitle(groupId, groupTitleId, dir);
 	}
+	
+    @PostMapping("/{groupId}/titles")
+    public GroupTitleDto addTitle(
+            @PathVariable int groupId,
+            @RequestBody SearchTitleResultDto dto
+    ) {
+        Title title = titleCreationService.getOrCreateTitle(dto);
+        return GroupTitleMapper.toDto(service.addTitleToGroup(groupId, title.getId()));
+    }
 }

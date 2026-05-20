@@ -31,7 +31,6 @@ import lombok.ToString;
 import lugus.converter.FormatoConverter;
 import lugus.converter.GeneroConverter;
 import lugus.model.core.Location;
-import lugus.model.films.PeliculaFoto;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.model.values.LangVersion;
@@ -98,6 +97,9 @@ public class Serie {
 
 	@Column(name = "ts_baja", columnDefinition = "TIMESTAMP")
 	private Instant tsBaja;
+	
+	@Column(name = "imdb_id")
+	private String imdbId;
 	
 	@Column
 	private boolean completa;
