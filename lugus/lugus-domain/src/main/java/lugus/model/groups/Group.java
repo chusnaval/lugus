@@ -36,7 +36,7 @@ public class Group {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<GroupFilms> films = new HashSet<>();;
+	private Set<GroupTitle> films = new HashSet<>();;
 	
 	private transient boolean hasFilms = false;
 }

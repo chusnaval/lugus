@@ -1,5 +1,7 @@
 package lugus.dto.groups;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -14,4 +16,6 @@ public class GroupDTO {
 	private String cover;
 	
 	private Integer filmaffinityId;
+	
+	 private List<GroupTitleDto> titles;
 }

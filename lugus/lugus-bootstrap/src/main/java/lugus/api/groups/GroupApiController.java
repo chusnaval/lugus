@@ -20,16 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.groups.GroupDTO;
-import lugus.dto.groups.GroupDetailedDTO;
-import lugus.dto.groups.GroupFilmsDTO;
 import lugus.exception.LugusNotFoundException;
-import lugus.mapper.groups.GroupFilmsMapper;
 import lugus.mapper.groups.GroupMapper;
 import lugus.model.groups.Group;
-import lugus.model.groups.GroupFilms;
 import lugus.model.films.Pelicula;
 import lugus.service.films.PeliculaService;
-import lugus.service.groups.GroupFilmsService;
 import lugus.service.groups.GroupsService;
 import lugus.service.imdb.ImdbBasicsService;
 import lugus.model.imdb.ImdbBasics;
@@ -40,11 +35,7 @@ public class GroupApiController {
 
 	private final GroupsService service;
 	
-	private final GroupFilmsService fService;
-	
 	private final GroupMapper mapper;
-	
-	private final GroupFilmsMapper fmapper;
 
 	private final PeliculaService peliculaService;
 
@@ -57,20 +48,9 @@ public class GroupApiController {
 	}
 	
 	@GetMapping("/{id}")
-	GroupDetailedDTO one(@PathVariable Integer id) throws LugusNotFoundException {
+	GroupDTO one(@PathVariable Integer id) throws LugusNotFoundException {
 		Group group = service.findById(id).orElseThrow(() -> new LugusNotFoundException(id));
-		GroupDetailedDTO gdto = new GroupDetailedDTO();
-		gdto.setId(group.getId());
-		gdto.setName(group.getName());
-		
-		List<GroupFilms> gfs = fService.findByGroup(id);
-		List<GroupFilmsDTO> films = new ArrayList<>();
-		for(GroupFilms gf : gfs) {
-			films.add(fmapper.mapToDTO(gf));
-		}
-		
-		gdto.setMovies(films);
-		return gdto;
+		return mapper.mapToDTO(group);
 	}
 
 	@GetMapping("/page")
