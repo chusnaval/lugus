@@ -12,4 +12,6 @@ public class GroupDTO {
 	private int movieCount;
 	
 	private String cover;
+	
+	private Integer filmaffinityId;
 }

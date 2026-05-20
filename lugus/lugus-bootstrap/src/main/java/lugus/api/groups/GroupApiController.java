@@ -2,13 +2,18 @@ package lugus.api.groups;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,16 +27,11 @@ import lugus.mapper.groups.GroupFilmsMapper;
 import lugus.mapper.groups.GroupMapper;
 import lugus.model.groups.Group;
 import lugus.model.groups.GroupFilms;
-import lugus.model.imdb.ImdbDirectorFilm;
-import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.films.Pelicula;
 import lugus.service.films.PeliculaService;
 import lugus.service.groups.GroupFilmsService;
 import lugus.service.groups.GroupsService;
 import lugus.service.imdb.ImdbBasicsService;
-import lugus.service.imdb.ImdbDirectorFilmService;
-import lugus.service.imdb.ImdbTitleAkasService;
-import lugus.service.imdb.ImdbTitleBasicsService;
 import lugus.model.imdb.ImdbBasics;
 @RestController
 @RequestMapping("/v1/api/groups")
@@ -77,6 +77,34 @@ public class GroupApiController {
 	public Page<GroupDTO> getSagas(@PageableDefault(size = 24) Pageable pageable) {
 	    return service.findAll(pageable).map(mapper::mapToDTO);
 	}
+	
+	@PostMapping
+	GroupDTO newGroup(@RequestBody GroupDTO dto) {
+		Group Group = service.saveGroup(mapper.mapToEntity(dto));
+		return mapper.mapToDTO(Group);
+	}
+	
+	@PutMapping("/{id}")
+	GroupDTO replace(@RequestBody GroupDTO newSource, @PathVariable Integer id) {
+		Optional<Group> Group = service.findById(id);
+		if (Group.isPresent()) {
+			Group obj = Group.get();
+			obj.setName(newSource.getName());
+			obj.setFilmaffinityId(newSource.getFilmaffinityId());
+			obj = service.saveGroup(obj);
+
+			return mapper.mapToDTO(obj);
+		} else {
+			throw new LugusNotFoundException(id);
+		}
+	}
+
+	@DeleteMapping("/{id}")
+	void delete(@PathVariable Integer id) {
+		service.delete(id);
+	}
+
+	
 	/**
 	 * Search movies by title: returns registered movies first, then IMDB suggestions.
 	 */

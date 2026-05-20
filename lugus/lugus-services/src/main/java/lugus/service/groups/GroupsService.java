@@ -64,7 +64,12 @@ public class GroupsService {
 
 	public Page<Group> findAll(
 			Pageable pageable) {
+		Sort sort = Sort.by(Direction.ASC, "name");
 		
-		return groupRepository.findAll(pageable);
+		Pageable pageable2 = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+		Specification<Group> spec = Specification.where(null);
+
+		return groupRepository.findAll(spec, pageable2);
 	}
 }

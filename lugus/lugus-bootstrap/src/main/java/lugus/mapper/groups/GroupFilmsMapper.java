@@ -22,6 +22,7 @@ public class GroupFilmsMapper {
 		dto.setFilm(gp.getPelicula()!=null?gp.getPelicula().getId():-1);
 		dto.setYear(gp.getPelicula()!=null?gp.getPelicula().getAnyo():Integer.parseInt(gp.getItb().getStartyear()));
 		dto.setCover(gp.getPelicula()!=null?gp.getPelicula().getCoverUrl():"./covers/placeholder.png");
+		dto.setImdbId(gp.getPelicula()!=null?gp.getPelicula().getImdbId():gp.getItb().getTconst());
 		return dto;
 		
 	}

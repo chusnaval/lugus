@@ -18,4 +18,6 @@ public class GroupFilmsDTO {
 	private int year;
 	
 	private String cover;
+	
+	private String imdbId;
 }
