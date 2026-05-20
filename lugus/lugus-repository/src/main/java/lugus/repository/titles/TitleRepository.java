@@ -25,4 +25,6 @@ public interface TitleRepository {
 			    WHERE LOWER(t.title) LIKE LOWER(CONCAT('%', :query, '%'))
 			""")
 	List<Title> search(@Param("query") String query);
+
+	Optional<Title> findByPelicula_Id(Integer id);
 }

@@ -14,4 +14,6 @@ public interface ImdbTitleBasicsRepository {
 
 	Iterable<ImdbTitleBasics> searchByPrimarytitleContainingIgnoreCase(String query);
 
+	Optional<ImdbTitleBasics> findByTconst(String tconst);
+
 }

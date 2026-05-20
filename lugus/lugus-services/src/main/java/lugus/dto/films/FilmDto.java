@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lugus.dto.core.FormatDTO;
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class FilmDto {
 
 	private String titleMgmt;
 
-	private String format;
+	private FormatDTO format;
 
 	private int year;
 

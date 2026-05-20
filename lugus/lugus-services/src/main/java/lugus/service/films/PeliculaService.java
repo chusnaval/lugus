@@ -2,6 +2,7 @@ package lugus.service.films;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
+import lugus.dto.films.FilmDto;
 import lugus.dto.films.PeliculaChildDto;
 import lugus.dto.films.PeliculaCreateDto;
 import lugus.exception.LugusNotFoundException;
@@ -14,6 +15,8 @@ import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.repository.films.PeliculaRepository;
 import lugus.service.core.SourceService;
+import lugus.service.imdb.ImdbTitleBasicsService;
+import lugus.service.titles.TitlesService;
 import lugus.service.core.LocationService;
 import lugus.service.user.CurrentUserProvider;
 
@@ -32,9 +35,7 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +50,8 @@ public class PeliculaService {
 	private final LocationService locService;
 	private final SourceService sourceService;
 	private final CurrentUserProvider currentUserProvider;
+	private final TitlesService titlesService;
+	private final ImdbTitleBasicsService imdbTitleBasicsService;
 
 	public List<Pelicula> findAll() {
 		return peliculaRepo.findAll();
@@ -98,6 +101,72 @@ public class PeliculaService {
 		}
 
 		return saved;
+	}
+
+	@Transactional
+	public Pelicula update(Integer id, FilmDto dto) throws IOException, URISyntaxException {
+
+		Pelicula p = peliculaRepo.findById(id).orElseThrow(() -> new RuntimeException("Pelicula no encontrada"));
+		Optional<Location> loc = locService.findById(dto.getLocation());
+		
+		p.setTitulo(dto.getTitle());
+		p.setTituloGest(dto.getTitleMgmt());
+		p.setAnyo(dto.getYear());
+		p.setImdbId(dto.getImdbId());
+		p.setTsModif(Instant.now());
+		p.setFormato(Formato.getById(Short.valueOf(dto.getFormat().getCodigo())));
+		p.setGenero(Genero.getById(dto.getGenreCode()));
+		p.setLocation(loc.get());
+		p.setCodigo(dto.getMgmtCode());
+		p.setComprado(dto.isOwned());
+		p.setPack(dto.isPack());
+		p.setFunda(dto.isSlipcover());
+		p.setSteelbook(dto.isSteelbook());
+		p.setNotas(dto.getNotes());
+		addCaratula(p, dto.getCoverSrc());
+		peliculaRepo.save(p);
+
+		// Sincronizar Title si existe
+		titlesService.findByPelicula_Id(id).ifPresent(title -> {
+			title.setTitle(p.getTitulo());
+			title.setYear(p.getAnyo());
+			title.setPosterUrl(dto.getCoverSrc());
+
+			// actualizar IMDB si ha cambiado
+			if (dto.getImdbId() != null) {
+				imdbTitleBasicsService.findByTconst(dto.getImdbId()).ifPresent(title::setImdb);
+			}
+
+			titlesService.save(title);
+		});
+
+		return p;
+	}
+
+	public void addCaratula(Pelicula pelicula, String url) throws IOException, URISyntaxException {
+
+		final DwFotoServiceI dwFotoService = new DwFotoService();
+		Optional<Source> sourceObj = sourceService.findById(calcularIdSource(url));
+		PeliculaFoto pf = new PeliculaFoto();
+		pf.setUrl(url);
+		if (sourceObj.isPresent()) {
+			pf.setSource(sourceObj.get());
+		}
+		pf.setFoto(dwFotoService.descargar(sourceObj.get().getId(), url));
+		pf.setCaratula(true);
+
+		pelicula.getPeliculaFotos().clear();
+		pelicula.addCaratula(pf);
+	}
+
+	public Integer calcularIdSource(String url) {
+		List<Source> sources = sourceService.findAll();
+		int id = 10;
+		Optional<Source> source = sources.stream().filter(s -> s.getSuggest() != null && url.contains(s.getSuggest())).findFirst();
+		if(source.isPresent()) {
+			id = source.get().getId();
+		}
+		return id;
 	}
 
 	private Location findLocation(PeliculaCreateDto dto) {
@@ -165,6 +234,7 @@ public class PeliculaService {
 	public long contarTodasCompradas() {
 		return peliculaRepo.countByComprado(true);
 	}
+
 	/**
 	 * Complete movies search with all filters available
 	 * 

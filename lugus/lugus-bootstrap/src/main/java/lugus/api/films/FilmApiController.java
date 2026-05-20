@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -59,6 +60,14 @@ public class FilmApiController {
 		return null;
 	}
 	
+	@PutMapping("/{id}")
+	public FilmDto update(
+	        @PathVariable Integer id,
+	        @RequestBody FilmDto dto
+	) throws IOException, URISyntaxException {
+	    return mapper.mapToFilmDTO(service.update(id, dto));
+	}
+	
 	@PostMapping("new")
 	ResponseEntity<Object> save(@RequestBody FilmDto dto, Authentication auth) throws LugusNotFoundException, IOException, URISyntaxException {
 		Pelicula film = mapper.mapToFilm(dto);
@@ -70,7 +79,7 @@ public class FilmApiController {
 		Pelicula saved = service.save(film);
 		if (dto.getCoverSrc() != null && !dto.getCoverSrc().isEmpty()) {
 			final DwFotoServiceI dwFotoService = new DwFotoService();
-			final int sourceId = calcularSource(dto.getCoverSrc());
+			final int sourceId = service.calcularIdSource(dto.getCoverSrc());
 			Optional<Source> sourceObj = sourceService.findById(sourceId);
 			PeliculaFoto pf = new PeliculaFoto();
 			pf.setUrl(dto.getCoverSrc());
@@ -92,13 +101,7 @@ public class FilmApiController {
 		return ResponseEntity.ok().build();
 	}
 	
-	private int calcularSource(String coverSrc) {
-		int source = 0;
-		if(coverSrc!=null && !coverSrc.isBlank()) {
-			
-		}
-		return source;
-	}
+	
 
 	private Location findLocation(FilmDto dto) {
 		Location loc = null;

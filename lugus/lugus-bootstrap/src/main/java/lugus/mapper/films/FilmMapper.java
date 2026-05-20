@@ -2,14 +2,13 @@ package lugus.mapper.films;
 
 import org.springframework.stereotype.Component;
 
+import lugus.dto.core.FormatDTO;
 import lugus.dto.films.CastDto;
 import lugus.dto.films.DirectorDTO;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.GroupDto;
 import lugus.dto.films.PeliculaCreateDto;
-import lugus.model.core.Location;
 import lugus.model.films.Pelicula;
-import lugus.model.films.PeliculaFoto;
 import lugus.model.groups.GroupFilms;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
@@ -57,7 +56,7 @@ public class FilmMapper {
 		createCasting(dto, film);
 
 		if (film.getFormato() != null) {
-			dto.setFormat(film.getFormato().name());
+			dto.setFormat(new FormatDTO(""+film.getFormato().getId(), film.getFormato().name()));
 		}
 
 		if (film.getGenero() != null) {
@@ -126,7 +125,7 @@ public class FilmMapper {
 		pelicula.setAnyo(dto.getYear());
 		pelicula.setCodigo(dto.getMgmtCode());
 
-		pelicula.setFormato(Formato.getById(Short.valueOf(dto.getFormat())));
+		pelicula.setFormato(Formato.getById(Short.valueOf(dto.getFormat().getCodigo())));
 
 		pelicula.setGenero(Genero.getById(dto.getGenreCode()));
 

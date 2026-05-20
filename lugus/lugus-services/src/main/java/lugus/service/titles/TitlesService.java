@@ -22,4 +22,13 @@ public class TitlesService {
 	   public Optional<Title> findById(Long titleId) {
 		return titleRepo.findById(titleId);
 	   }
+
+	   public Optional<Title> findByPelicula_Id(Integer id) {
+		   return titleRepo.findByPelicula_Id(id);
+	   }
+
+	   public Title save(Title title) {
+		return titleRepo.save(title);
+		
+	   }
 }

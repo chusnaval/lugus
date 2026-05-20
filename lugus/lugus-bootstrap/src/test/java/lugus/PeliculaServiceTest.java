@@ -37,7 +37,7 @@ class PeliculaServiceTest {
         sourceService = mock(SourceService.class);
 		currentUserProvider = mock(CurrentUserProvider.class);
 		when(currentUserProvider.currentUsername()).thenReturn("test-user");
-        service = new PeliculaService(repo, locService, sourceService, currentUserProvider);
+        service = new PeliculaService(repo, locService, sourceService, currentUserProvider, null, null);
     }
 
     @Test

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import lugus.dto.core.FormatDTO;
 import lugus.dto.films.FilmDto;
 import lugus.exception.LugusNotFoundException;
 import lugus.model.imdb.ImdbTitleAkas;
@@ -44,7 +45,7 @@ public class ImdbApiController {
 				dto.setTitle(film.getOriginaltitle());
 				dto.setTitleMgmt(film.getOriginaltitle());
 			}
-			dto.setFormat(Formato.DVD.name());
+			dto.setFormat(new FormatDTO(""+Formato.DVD.getId(), Formato.DVD.name()));
 			try {
 				dto.setYear(Integer.parseInt(film.getStartyear()));
 			}catch(Exception e) {

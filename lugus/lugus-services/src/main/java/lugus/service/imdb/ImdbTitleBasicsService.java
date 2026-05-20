@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lugus.model.films.Pelicula;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.repository.imdb.ImdbTitleBasicsRepository;
 
@@ -16,5 +17,9 @@ public class ImdbTitleBasicsService {
 
 	public Optional<ImdbTitleBasics> findById(String tconst) {
 		return imdbTitleBasicsRepository.findById(tconst);
+	}
+
+	public Optional<ImdbTitleBasics> findByTconst(String tconst) {
+		return imdbTitleBasicsRepository.findByTconst(tconst);
 	}
 }
