@@ -11,6 +11,7 @@ import lugus.model.core.Source;
 import lugus.model.core.Location;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
+import lugus.model.groups.Group;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.repository.films.PeliculaRepository;
@@ -247,7 +248,7 @@ public class PeliculaService {
 	public Page<Pelicula> findAllBy(FiltrosDto filter) {
 		Sort sort = buildSort(filter.getOrden(), filter.getDireccion());
 		int pageNum = filter.getPagina().orElse(0);
-		Pageable pageable = PageRequest.of(pageNum, NUM_ELEMENTS_PER_PAGE, sort);
+		Pageable pageable = PageRequest.of(pageNum, filter.getPageSize(), sort);
 
 		Specification<Pelicula> spec = Specification.where(null);
 
@@ -263,19 +264,20 @@ public class PeliculaService {
 		spec = spec.and(PeliculaSpecification.byLocation(filter.getLocation()));
 		spec = spec.and(PeliculaSpecification.porNotas(filter.getNotas()));
 		spec = spec.and(PeliculaSpecification.vigentes());
-
+		spec = spec.and(PeliculaSpecification.porTitulo(filter.getTitulo()));
+		
 		// test if has fotos associated as caratula
 		if (filter.getTieneCaratula() != null) {
 			spec = spec.and(PeliculaSpecification.tieneCaratula(filter.getTieneCaratula()));
 		}
 
 		Specification<Pelicula> textoGroup = null;
-		if (StringUtils.hasText(filter.getTexto())) {
-			Specification<Pelicula> actorSpec = PeliculaSpecification.porActor(filter.getTexto());
-			Specification<Pelicula> directorSpec = PeliculaSpecification.porDirector(filter.getTexto());
-			Specification<Pelicula> tituloSpec = PeliculaSpecification.porTitulo(filter.getTexto());
+		if (StringUtils.hasText(filter.getActor()) || StringUtils.hasText(filter.getDirector())) {
+			Specification<Pelicula> actorSpec = PeliculaSpecification.porActor(filter.getActor());
+			Specification<Pelicula> directorSpec = PeliculaSpecification.porDirector(filter.getDirector());
 
-			textoGroup = Specification.where(actorSpec).or(directorSpec).or(tituloSpec);
+
+			textoGroup = Specification.where(actorSpec).or(directorSpec);
 		}
 
 		if (textoGroup != null) {
@@ -382,5 +384,15 @@ public class PeliculaService {
 	public int addedInLastDays(int days) {
 		Instant limit = Instant.now().minus(days, ChronoUnit.DAYS);
 		return peliculaRepo.countByTsAltaAfter(limit);
+	}
+
+	public Page<Pelicula> findAll(Pageable pageable) {
+		Sort sort = Sort.by(Direction.ASC, "tituloGest");
+		
+		Pageable pageable2 = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+		Specification<Pelicula> spec = Specification.where(null);
+
+		return peliculaRepo.findAll(spec, pageable2);
 	}
 }

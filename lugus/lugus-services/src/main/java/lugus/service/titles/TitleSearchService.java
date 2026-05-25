@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.groups.SearchTitleResultDto;
@@ -73,9 +75,11 @@ public class TitleSearchService {
                 SearchTitleResultDto dto = new SearchTitleResultDto();
                 dto.setSource("IMDB");
                 dto.setTitle(imdb.getPrimarytitle());
-                dto.setYear(Integer.valueOf(imdb.getStartyear()));
+                if(!ObjectUtils.isEmpty(imdb.getStartyear())) {
+                	dto.setYear(Integer.valueOf(imdb.getStartyear()));
+                }
                 dto.setType(imdb.getTitletype().equals("tvSeries") ? "SERIES" : "MOVIE");
-                dto.setPosterUrl("./covers/placeholder.png"); 
+                dto.setPosterUrl("/covers/placeholder.png"); 
                 dto.setImdbId(imdb.getTconst());
                 results.add(dto);
             }

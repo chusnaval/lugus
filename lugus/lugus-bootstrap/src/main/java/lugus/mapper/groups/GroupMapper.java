@@ -26,7 +26,7 @@ public class GroupMapper {
 		dto.setId(group.getId());
 		dto.setName(group.getName());
 		dto.setMovieCount(group.getFilms().size());
-		String cover = "./covers/placeholder.png";
+		String cover = "/covers/placeholder.png";
 		Optional<GroupTitle> gf = group.getFilms().stream().findFirst();
 		if(gf.isPresent() && gf.get().getTitle().getPelicula()!=null) {
 			cover = gf.get().getTitle().getPelicula().getCoverUrl();

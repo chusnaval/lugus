@@ -36,6 +36,22 @@ public enum Formato {
 
 		throw new IllegalArgumentException("No existe el formato");
 	}
+	
+	/**
+	 * Obtenemos el equivalente
+	 * 
+	 * @param i
+	 * @return
+	 */
+	public static Formato getByName(String value) {
+		for (Formato aux : values()) {
+			if (aux.name().equalsIgnoreCase(value)) {
+				return aux;
+			}
+		}
+
+		throw new IllegalArgumentException("No existe el formato");
+	}
 
 	public static List<Formato> valoresOrdenados() {
 		List<Formato> lista = new ArrayList<>();

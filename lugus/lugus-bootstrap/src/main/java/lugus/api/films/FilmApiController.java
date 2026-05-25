@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.FilmStatsDto;
 import lugus.dto.films.PeliculaCreateDto;
@@ -29,6 +31,7 @@ import lugus.model.core.Location;
 import lugus.model.core.Source;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
+import lugus.model.values.Formato;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
 import lugus.service.films.DwFotoService;
@@ -66,6 +69,61 @@ public class FilmApiController {
 	        @RequestBody FilmDto dto
 	) throws IOException, URISyntaxException {
 	    return mapper.mapToFilmDTO(service.update(id, dto));
+	}
+	
+	@GetMapping("/page")
+	public Page<FilmDto> getAllFilms(
+	        @RequestParam Integer page,
+	        @RequestParam Integer size,
+	        @RequestParam(required = false) Boolean owned,
+	        @RequestParam(required = false) String title,
+	        @RequestParam(required = false) String casting,
+	        @RequestParam(required = false) Integer fromYear,
+	        @RequestParam(required = false) Integer toYear,
+	        @RequestParam(required = false) String format,
+	        @RequestParam(required = false) String genre,
+	        @RequestParam(required = false) Boolean pack,
+	        @RequestParam(required = false) String sort,
+	        @RequestParam(required = false) String sortDirection
+	) {
+		FiltrosDto filtro = new FiltrosDto();
+		if(page!=null) {
+			filtro.setPagina(Optional.of(page));
+		}
+		if(title!=null) {
+			filtro.setTitulo(title);
+		}
+		if(casting!=null) {
+			filtro.setActor(casting);
+			filtro.setDirector(casting);
+		}
+		if(fromYear!=null) {
+			filtro.setFromAnyo(fromYear);
+		}
+		if(toYear!=null) {
+			filtro.setToAnyo(toYear);
+		}
+		if(format!=null) {
+			filtro.setFormato((int) Formato.getByName(format).getId());
+		}
+		if(genre!=null) {
+			filtro.setGenero(genre);
+		}
+		if(pack!=null) {
+			filtro.setPack(pack);
+		}
+
+		if(sort!=null) {
+			filtro.setOrden(Optional.of(sort));
+		}
+		if(sortDirection!=null) {
+			filtro.setDireccion(Optional.of(sortDirection));
+		}
+		if(owned!=null) {
+			filtro.setComprado(owned);
+		}
+		filtro.setPageSize(size);
+	    return service.findAllBy(filtro).map(mapper::mapToFilmDTO);
 	}
 	
 	@PostMapping("new")
