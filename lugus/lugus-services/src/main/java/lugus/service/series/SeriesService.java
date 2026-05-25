@@ -42,7 +42,6 @@ import lugus.service.user.CurrentUserProvider;
 public class SeriesService {
 
 	private static final int NUM_ELEMENTS_PER_HOME = 5;
-	private static final int NUM_ELEMENTS_PER_PAGE = 30;
 	private final SerieRepository serieRepo;
 	private final LocationService locService;
 	private final SourceService sourceService;
@@ -79,7 +78,7 @@ public class SeriesService {
 	public Page<Serie> findAllBy(FiltrosDto filter) {
 		Sort sort = buildSort(filter.getOrden(), filter.getDireccion());
 
-		Pageable pageable = PageRequest.of(filter.getPagina().get(), NUM_ELEMENTS_PER_PAGE, sort);
+		Pageable pageable = PageRequest.of(filter.getPagina().get(), filter.getPageSize(), sort);
 
 		Specification<Serie> spec = Specification.where(null);
 
@@ -88,7 +87,7 @@ public class SeriesService {
 		spec = spec.and(SerieSpecification.porGenero(filter.getGenero()));
 		spec = spec.and(SerieSpecification.byLocation(filter.getLocation()));
 		spec = spec.and(SerieSpecification.porNotas(filter.getNotas()));
-		spec = spec.and(SerieSpecification.porTitulo(filter.getTexto()));
+		spec = spec.and(SerieSpecification.porTitulo(filter.getTitulo()));
 		
 		return serieRepo.findAll(spec, pageable);
 	}

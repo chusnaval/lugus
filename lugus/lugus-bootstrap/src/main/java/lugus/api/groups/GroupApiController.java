@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import lugus.dto.core.FiltrosDto;
+import lugus.dto.films.SerieDto;
 import lugus.dto.groups.GroupDTO;
 import lugus.exception.LugusNotFoundException;
 import lugus.mapper.groups.GroupMapper;
@@ -28,6 +30,7 @@ import lugus.service.films.PeliculaService;
 import lugus.service.groups.GroupsService;
 import lugus.service.imdb.ImdbBasicsService;
 import lugus.model.imdb.ImdbBasics;
+import lugus.model.values.Formato;
 @RestController
 @RequestMapping("/v1/api/groups")
 @RequiredArgsConstructor
@@ -54,8 +57,19 @@ public class GroupApiController {
 	}
 
 	@GetMapping("/page")
-	public Page<GroupDTO> getSagas(@PageableDefault(size = 24) Pageable pageable) {
-	    return service.findAll(pageable).map(mapper::mapToDTO);
+	public Page<GroupDTO> getSagas(
+	        @RequestParam Integer page,
+	        @RequestParam Integer size,
+	        @RequestParam(required = false) String title
+	     
+	) {
+		FiltrosDto filtro = new FiltrosDto();
+		filtro.setPagina(Optional.of(page));
+		filtro.setPageSize(size);
+		if(title!=null) {
+			filtro.setTitulo(title);
+		}
+	    return service.findAllBy(filtro).map(mapper::mapToDTO);
 	}
 	
 	@PostMapping
