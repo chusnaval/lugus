@@ -1,12 +1,20 @@
 package lugus.api.series;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,8 +27,15 @@ import lugus.dto.films.SeriesStatsDto;
 import lugus.dto.series.SerieCreateDto;
 import lugus.exception.LugusNotFoundException;
 import lugus.mapper.series.SeriesMapper;
+import lugus.model.core.Location;
+import lugus.model.core.Source;
 import lugus.model.series.Serie;
+import lugus.model.series.SerieFoto;
 import lugus.model.values.Formato;
+import lugus.service.core.LocationService;
+import lugus.service.core.SourceService;
+import lugus.service.films.DwFotoService;
+import lugus.service.films.DwFotoServiceI;
 import lugus.service.series.SeriesService;
 
 @RestController
@@ -31,6 +46,10 @@ public class SeriesApiController {
 	private final SeriesMapper mapper;
 	
 	private final SeriesService service;
+	
+	private final SourceService sourceService;
+	
+	private final LocationService locService;
 	
 	@GetMapping("/{id}")
 	SerieDto one(@PathVariable int id) {
@@ -94,6 +113,54 @@ public class SeriesApiController {
 		}
 		filtro.setPageSize(size);
 	    return service.findAllBy(filtro).map(mapper::mapToSerieDTO);
+	}
+	
+	@PutMapping("/{id}")
+	public SerieDto update(
+	        @PathVariable Integer id,
+	        @RequestBody SerieDto dto
+	) throws IOException, URISyntaxException {
+	    return mapper.mapToSerieDTO(service.update(id, dto));
+	}
+	
+	@PostMapping("new")
+	ResponseEntity<Object> save(@RequestBody SerieDto dto, Authentication auth) throws LugusNotFoundException, IOException, URISyntaxException {
+		Serie serie = mapper.mapToSerie(dto);
+		Location loc = findLocation(dto);
+		serie.setLocation(loc);
+		serie.calcularCodigo();
+		serie.setTsAlta(Instant.now());
+		serie.setUsrAlta(auth.getName());
+		Serie saved = service.save(serie);
+		if (dto.getCoverSrc() != null && !dto.getCoverSrc().isEmpty()) {
+			final DwFotoServiceI dwFotoService = new DwFotoService();
+			final int sourceId = service.calcularIdSource(dto.getCoverSrc());
+			Optional<Source> sourceObj = sourceService.findById(sourceId);
+			SerieFoto pf = new SerieFoto();
+			pf.setUrl(dto.getCoverSrc());
+			if (sourceObj.isPresent()) {
+				pf.setSource(sourceObj.get());
+			}
+			pf.setFoto(dwFotoService.descargar(sourceId, dto.getCoverSrc()));
+			pf.setCaratula(true);
+
+			saved.addCaratula(pf);
+			saved = service.save(saved);
+		}
+
+		
+		
+		return ResponseEntity.ok().build();
+	}
+	
+	
+	private Location findLocation(SerieDto dto) {
+		Location loc = null;
+		if (dto.getLocation() != null && !dto.getLocation().isBlank()) {
+			loc = locService.findById(dto.getLocation())
+					.orElseThrow(() -> new LugusNotFoundException(dto.getLocation()));
+		}
+		return loc;
 	}
 	
 	@GetMapping("/wanted")

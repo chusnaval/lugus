@@ -20,10 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
+import lugus.dto.films.FilmDto;
+import lugus.dto.films.SerieDto;
 import lugus.dto.series.SerieCreateDto;
 import lugus.exception.LugusNotFoundException;
 import lugus.infrastructure.repository.series.SerieSpecification;
 import lugus.model.core.Source;
+import lugus.model.films.Pelicula;
+import lugus.model.films.PeliculaFoto;
 import lugus.model.core.Location;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
@@ -92,6 +96,16 @@ public class SeriesService {
 		return serieRepo.findAll(spec, pageable);
 	}
 	
+	public Integer calcularIdSource(String url) {
+		List<Source> sources = sourceService.findAll();
+		int id = 10;
+		Optional<Source> source = sources.stream().filter(s -> s.getSuggest() != null && url.contains(s.getSuggest())).findFirst();
+		if(source.isPresent()) {
+			id = source.get().getId();
+		}
+		return id;
+	}
+
 	/**
 	 * Complete movies search with all filters available
 	 * 
@@ -130,6 +144,51 @@ public class SeriesService {
 		return sort;
 	}
 
+	@Transactional
+	public Serie update(Integer id, SerieDto dto) throws IOException, URISyntaxException {
+
+		Serie p = serieRepo.findById(id).orElseThrow(() -> new RuntimeException("Pelicula no encontrada"));
+		Optional<Location> loc = locService.findById(dto.getLocation());
+		
+		p.setTitulo(dto.getTitle());
+		p.setTituloGest(dto.getTitleMgmt());
+		p.setAnyoInicio(dto.getStartYear());
+		p.setAnyoFin(dto.getFinishYear());
+		p.setTsModif(Instant.now());
+		if(dto.getFormat()!=null) {
+			p.setFormato(Formato.getById(Short.valueOf(dto.getFormat())));
+		}
+		p.setGenero(Genero.getById(dto.getGenreCode()));
+		if(loc.isPresent()) {
+			p.setLocation(loc.get());
+		}
+		p.setCodigo(dto.getMgmtCode());
+		p.setComprado(dto.isOwned());
+		p.setNotas(dto.getNotes());
+		addCaratula(p, dto.getCoverSrc());
+		serieRepo.save(p);
+
+		
+
+		return p;
+	}
+	
+	public void addCaratula(Serie serie, String url) throws IOException, URISyntaxException {
+
+		final DwFotoServiceI dwFotoService = new DwFotoService();
+		Optional<Source> sourceObj = sourceService.findById(calcularIdSource(url));
+		SerieFoto pf = new SerieFoto();
+		pf.setUrl(url);
+		if (sourceObj.isPresent()) {
+			pf.setSource(sourceObj.get());
+		}
+		pf.setFoto(dwFotoService.descargar(sourceObj.get().getId(), url));
+		pf.setCaratula(true);
+
+		serie.getSerieFotos().clear();
+		serie.addCaratula(pf);
+	}
+	
 	public Page<Serie> findForHome() {
 		Sort sort = buildSort(Optional.of("compra"), Optional.of("ASC"));
 

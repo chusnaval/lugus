@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,13 +23,13 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
 import lugus.exception.PermisoException;
+import lugus.model.films.Pelicula;
 import lugus.model.groups.Group;
 import lugus.model.groups.GroupFilms;
 import lugus.model.imdb.ImdbTitleBasics;
-import lugus.model.films.Pelicula;
+import lugus.service.films.PeliculaService;
 import lugus.service.groups.GroupFilmsService;
 import lugus.service.groups.GroupsService;
-import lugus.service.films.PeliculaService;
 import lugus.service.imdb.ImdbTitleBasicsService;
 
 @Controller

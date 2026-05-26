@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import lugus.dto.films.SerieDto;
 import lugus.dto.series.SerieCreateDto;
 import lugus.model.series.Serie;
+import lugus.model.values.Formato;
+import lugus.model.values.Genero;
 
 @Component
 public class SeriesMapper {
@@ -65,5 +67,27 @@ public class SeriesMapper {
 		dto.setNotes(serie.getNotas());
 		dto.setCoverSrc(serie.getCoverUrl());
 		return dto;
+	}
+
+	public Serie mapToSerie(SerieDto dto) {
+		Serie serie = new Serie();
+		serie.setTitulo(dto.getTitle());
+		serie.setTituloGest(dto.getTitleMgmt());
+		serie.setAnyoInicio(dto.getStartYear());
+		serie.setAnyoFin(dto.getFinishYear());
+		serie.setCodigo(dto.getMgmtCode());
+
+		serie.setFormato(Formato.getById(Short.valueOf(dto.getFormat())));
+		serie.setGenero(Genero.getById(dto.getGenreCode()));
+
+		serie.setCompleta(dto.isCompleted());
+		serie.setComprado(dto.isOwned());
+		serie.setNotas(dto.getNotes());
+
+
+
+		
+
+		return serie;
 	}
 }

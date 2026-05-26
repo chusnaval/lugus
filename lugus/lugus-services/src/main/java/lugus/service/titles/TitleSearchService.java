@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.groups.SearchTitleResultDto;

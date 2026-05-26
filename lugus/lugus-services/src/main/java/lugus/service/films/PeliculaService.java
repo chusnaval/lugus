@@ -1,25 +1,12 @@
 package lugus.service.films;
 
-import lombok.RequiredArgsConstructor;
-import lugus.dto.core.FiltrosDto;
-import lugus.dto.films.FilmDto;
-import lugus.dto.films.PeliculaChildDto;
-import lugus.dto.films.PeliculaCreateDto;
-import lugus.exception.LugusNotFoundException;
-import lugus.infrastructure.repository.films.PeliculaSpecification;
-import lugus.model.core.Source;
-import lugus.model.core.Location;
-import lugus.model.films.Pelicula;
-import lugus.model.films.PeliculaFoto;
-import lugus.model.groups.Group;
-import lugus.model.values.Formato;
-import lugus.model.values.Genero;
-import lugus.repository.films.PeliculaRepository;
-import lugus.service.core.SourceService;
-import lugus.service.imdb.ImdbTitleBasicsService;
-import lugus.service.titles.TitlesService;
-import lugus.service.core.LocationService;
-import lugus.service.user.CurrentUserProvider;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,21 +19,33 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import jakarta.validation.Valid;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lugus.dto.core.FiltrosDto;
+import lugus.dto.films.FilmDto;
+import lugus.dto.films.PeliculaChildDto;
+import lugus.dto.films.PeliculaCreateDto;
+import lugus.dto.filters.CoversFilter;
+import lugus.dto.filters.CoversSpecs;
+import lugus.exception.LugusNotFoundException;
+import lugus.infrastructure.repository.films.PeliculaSpecification;
+import lugus.model.core.Location;
+import lugus.model.core.Source;
+import lugus.model.films.Pelicula;
+import lugus.model.films.PeliculaFoto;
+import lugus.model.values.Formato;
+import lugus.model.values.Genero;
+import lugus.repository.films.PeliculaRepository;
+import lugus.service.core.LocationService;
+import lugus.service.core.SourceService;
+import lugus.service.imdb.ImdbTitleBasicsService;
+import lugus.service.titles.TitlesService;
+import lugus.service.user.CurrentUserProvider;
 
 @Service
 @RequiredArgsConstructor
 public class PeliculaService {
 
 	private static final int NUM_ELEMENTS_PER_HOME = 5;
-	private static final int NUM_ELEMENTS_PER_PAGE = 30;
 	private final PeliculaRepository peliculaRepo;
 	private final LocationService locService;
 	private final SourceService sourceService;
@@ -117,7 +116,9 @@ public class PeliculaService {
 		p.setTsModif(Instant.now());
 		p.setFormato(Formato.getById(Short.valueOf(dto.getFormat().getCodigo())));
 		p.setGenero(Genero.getById(dto.getGenreCode()));
-		p.setLocation(loc.get());
+		if(loc.isPresent()) {
+			p.setLocation(loc.get());
+		}
 		p.setCodigo(dto.getMgmtCode());
 		p.setComprado(dto.isOwned());
 		p.setPack(dto.isPack());
@@ -394,5 +395,14 @@ public class PeliculaService {
 		Specification<Pelicula> spec = Specification.where(null);
 
 		return peliculaRepo.findAll(spec, pageable2);
+	} 
+
+	public Page<Pelicula> getCoversPage(int page, int size, CoversFilter filter) {
+		Pageable pageable = PageRequest.of(page, size);
+
+	    Specification<Pelicula> spec = CoversSpecs.withFilters(filter);
+
+	    return peliculaRepo.findAll(spec, pageable);
+	            
 	}
 }

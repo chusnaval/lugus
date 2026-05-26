@@ -6,8 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
-import lugus.dto.films.SerieDto;
 import lugus.dto.groups.GroupDTO;
 import lugus.exception.LugusNotFoundException;
 import lugus.mapper.groups.GroupMapper;
@@ -30,7 +27,6 @@ import lugus.service.films.PeliculaService;
 import lugus.service.groups.GroupsService;
 import lugus.service.imdb.ImdbBasicsService;
 import lugus.model.imdb.ImdbBasics;
-import lugus.model.values.Formato;
 @RestController
 @RequestMapping("/v1/api/groups")
 @RequiredArgsConstructor

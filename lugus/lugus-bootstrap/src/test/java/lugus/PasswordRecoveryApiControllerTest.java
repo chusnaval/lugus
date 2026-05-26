@@ -80,6 +80,7 @@ class PasswordRecoveryApiControllerTest {
 		}).when(passwordRecoveryNotifier).sendRecoveryToken(anyString(), anyString(), anyString(), anyLong());
 	}
 
+	@SuppressWarnings("null")
 	@Test
 	@DisplayName("Debe permitir recuperar y cambiar contraseña usando los endpoints")
 	void shouldResetPasswordUsingRecoveryEndpoints() throws Exception {

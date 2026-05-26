@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import lugus.model.films.Pelicula;
-import lugus.model.groups.Group;
 
 public interface PeliculaRepository {
 
