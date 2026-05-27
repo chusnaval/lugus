@@ -111,6 +111,9 @@ public class Pelicula {
 
 	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
 	private Instant tsAlta;
+	
+	@Column(name = "ts_compra", nullable = false, columnDefinition = "TIMESTAMP")
+	private Instant tsCompra;
 
 	@Column(name = "usr_modif")
 	private String usrModif;
@@ -174,7 +177,22 @@ public class Pelicula {
 	@Column
 	private Integer votes;
 
+	
+	@Column(name="fa_id")
+	private String faId;
+	
+	@Column(name="trailer_url")
+	private String trailerUrl;
+	
+	@Column(name="country")
+	private String country;
+	
+	@Column(name = "last_seen", nullable = true, columnDefinition = "TIMESTAMP")
+	private Instant lastSeen;
+	
 	private transient String situacion;
+	
+	
 
 	public String getDescLocation() {
 		if (location == null) {

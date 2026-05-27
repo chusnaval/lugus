@@ -1,5 +1,6 @@
 package lugus.dto.films;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class FilmDto {
 
 	private String imdbUrl;
 
-	private String faUrl;
+	private String faId;
 
 	private String lastSeen;
 
@@ -73,6 +74,10 @@ public class FilmDto {
 	private GroupDto group;
 
 	private String country;
+
+	private String trailerUrl;
+	
+	private Instant tsCompra;
 
 	public void addDirector(DirectorDTO directorDTO) {
 		if (director == null) {

@@ -69,6 +69,15 @@ public class PeliculaService {
 		}
 		return Optional.empty();
 	}
+	
+	public Pelicula updateTrailer(Integer id, String url) {
+	    Pelicula p = peliculaRepo.findById(id)
+	        .orElseThrow(() -> new RuntimeException("Not found"));
+
+	    p.setTrailerUrl(url);
+	   return peliculaRepo.save(p);
+	}
+
 
 	@Transactional
 	public Pelicula crear(PeliculaCreateDto dto) throws IOException, URISyntaxException {

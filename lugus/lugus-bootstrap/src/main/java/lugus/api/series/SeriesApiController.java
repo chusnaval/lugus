@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
-import lugus.dto.films.FilmDto;
 import lugus.dto.films.SerieDto;
 import lugus.dto.films.SeriesStatsDto;
 import lugus.dto.series.SerieCreateDto;

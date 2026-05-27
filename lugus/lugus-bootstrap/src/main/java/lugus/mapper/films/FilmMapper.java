@@ -84,13 +84,16 @@ public class FilmMapper {
 		if (film.getGroups() != null && film.getGroups().isEmpty()) {
 			dto.setGroup(getFirstGroup(film));
 		}
+		dto.setFaId(film.getFaId());
+		dto.setTrailerUrl(film.getTrailerUrl());
+		dto.setWatched(film.getLastSeen()!=null); 
+		if(film.getImdbId()!=null) {
+			dto.setImdbUrl("https://www.imdb.com/es-es/title/" + film.getImdbId());
+		}
+		dto.setCountry(film.getCountry());
 
-		dto.setWatched(false); // TODO
 		dto.setSynopsis("");// TODO
-		dto.setImdbUrl("https://www.imdb.com/es-es/title/" + film.getImdbId());
-		dto.setFaUrl(null);// TODO
 		dto.setLastSeen(null);// TODO
-		dto.setCountry(null);// TODO
 
 		return dto;
 	}
