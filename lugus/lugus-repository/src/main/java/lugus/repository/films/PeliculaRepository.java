@@ -46,5 +46,7 @@ public interface PeliculaRepository {
 
 	List<Pelicula> findByTituloContainingIgnoreCase(String query);
 
+	boolean existsByCodigoAndPack(String codigo, boolean pack);
+
 
 }

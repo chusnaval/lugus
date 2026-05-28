@@ -56,7 +56,7 @@ class PeliculaServiceTest {
         child.setFormato(Formato.BLURAY);
         child.setGenero(Genero.ACCION);
         child.setAnyo(1990);
-        child.calcularCodigo();
+        child.calcularCodigoInicial();
         padre.addHijo(child);
         
         // --- Act -------------------------------------------------------------

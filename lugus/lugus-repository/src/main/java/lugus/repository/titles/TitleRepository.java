@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import lugus.model.titles.Title;
+import lugus.model.values.TitleType;
 
 @Repository
 public interface TitleRepository {
@@ -27,4 +28,10 @@ public interface TitleRepository {
 	List<Title> search(@Param("query") String query);
 
 	Optional<Title> findByPelicula_Id(Integer id);
+
+	Optional<Title> findBySerie_Id(Integer id);
+
+	List<Title> findAll();
+
+	List<Title> findByType(TitleType external);
 }

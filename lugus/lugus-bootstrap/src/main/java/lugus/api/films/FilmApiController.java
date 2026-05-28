@@ -36,6 +36,7 @@ import lugus.model.core.Source;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
 import lugus.model.values.Formato;
+import lugus.model.values.TitleType;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
 import lugus.service.films.DwFotoService;
@@ -43,6 +44,7 @@ import lugus.service.films.DwFotoServiceI;
 import lugus.service.films.PeliculaService;
 import lugus.service.groups.GroupsService;
 import lugus.service.people.InsertPersonalDataService;
+import lugus.service.titles.TitlesService;
 
 @RestController
 @ResponseBody
@@ -59,6 +61,8 @@ public class FilmApiController {
 	private final SourceService sourceService;
 	private final InsertPersonalDataService insertImdbService;
 	private final FilmExportService filmExportService;
+	
+	private final TitlesService titlesService;
 
 	@GetMapping("/{id}")
 	FilmDto one(@PathVariable Integer id) throws LugusNotFoundException {
@@ -96,7 +100,8 @@ public class FilmApiController {
 		Pelicula film = mapper.mapToFilm(dto);
 		Location loc = findLocation(dto);
 		film.setLocation(loc);
-		film.calcularCodigo();
+		film.calcularCodigoInicial();
+		service.calculateCodeSuffix(film);
 		film.setTsAlta(Instant.now());
 		film.setUsrAlta(auth.getName());
 		Pelicula saved = service.save(film);
@@ -113,13 +118,25 @@ public class FilmApiController {
 			pf.setCaratula(true);
 
 			saved.addCaratula(pf);
-			saved = service.save(saved);
+			service.save(saved);
 		}
 
 		if (dto.getImdbId() != null && !dto.getImdbId().isBlank()) {
 			insertImdbService.insert(saved.getId(), dto.getImdbId());
+						
+			titlesService.findByImdb_Id(dto.getImdbId()).ifPresent(title -> {
+				title.setTitle(saved.getTitulo());
+				title.setYear(saved.getAnyo());
+				title.setType(TitleType.MOVIE);
+				title.setPosterUrl(dto.getCoverSrc());
+				titlesService.save(title);
+			});
 		}
+		
+		
 
+		
+		
 		return ResponseEntity.ok().build();
 	}
 

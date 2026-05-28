@@ -4,6 +4,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import lugus.model.core.Source;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
 
@@ -40,8 +41,8 @@ public class CoversSpecs {
 				return null;
 
 			Join<Pelicula, PeliculaFoto> fotos = root.join("peliculaFotos", JoinType.LEFT);
-
-			return cb.equal(fotos.get("source"), source);
+			Join<PeliculaFoto, Source> sourceJoin = fotos.join("source", JoinType.LEFT);
+			return cb.equal(sourceJoin.get("id"), Integer.valueOf(source));
 		};
 	}
 }

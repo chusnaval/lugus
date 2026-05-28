@@ -112,7 +112,7 @@ public class Pelicula {
 	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
 	private Instant tsAlta;
 	
-	@Column(name = "ts_compra", nullable = false, columnDefinition = "TIMESTAMP")
+	@Column(name = "ts_compra", nullable = true, columnDefinition = "TIMESTAMP")
 	private Instant tsCompra;
 
 	@Column(name = "usr_modif")
@@ -205,7 +205,7 @@ public class Pelicula {
 		return !peliculaFotos.isEmpty();
 	}
 
-	public void calcularCodigo() {
+	public void calcularCodigoInicial() {
 		// Eliminar artículos del título
 		String procesado = tituloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
 

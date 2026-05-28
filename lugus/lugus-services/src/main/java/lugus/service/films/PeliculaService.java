@@ -91,7 +91,8 @@ public class PeliculaService {
 				.formato(formato).genero(genero).pack(dto.isPack()).steelbook(dto.isSteelbook()).funda(dto.isFunda())
 				.imdbId(dto.getImdbCodigo()).comprado(dto.isComprado()).notas(dto.getNotas()).location(loc)
 				.usrAlta(username).tsAlta(Instant.now()).tsModif(Instant.now()).build();
-		p.calcularCodigo();
+		p.calcularCodigoInicial();
+		calculateCodeSuffix(p);
 		Pelicula saved = peliculaRepo.save(p);
 
 		if (dto.getUrl() != null && !dto.getUrl().isEmpty()) {
@@ -151,6 +152,7 @@ public class PeliculaService {
 			titlesService.save(title);
 		});
 
+		
 		return p;
 	}
 
@@ -214,9 +216,28 @@ public class PeliculaService {
 				.formato(formato).genero(genero).pack(false).steelbook(padre.isSteelbook()).funda(padre.isFunda())
 				.comprado(padre.isComprado()).notas(padre.getNotas()).location(padre.getLocation()).usrAlta(username)
 				.tsAlta(Instant.now()).build();
-		p.calcularCodigo();
+		p.calcularCodigoInicial();
+		calculateCodeSuffix(p);
+		
 		return peliculaRepo.save(p);
 
+	}
+
+	public void calculateCodeSuffix(Pelicula p) {
+		// we must find if the code starts exists in not pack films, 
+		// and if not exists we add "-1" to the code,
+		//and if exists we add "-2", and so on, until we find a code that not exists
+		boolean codeExists = true;
+		int suffix = 1;
+		String baseCode = p.getCodigo();
+		while (codeExists) {
+			if (peliculaRepo.existsByCodigoAndPack(p.getCodigo(), false)) {
+				p.setCodigo(baseCode + "-" + suffix);
+				suffix++;
+			} else {
+				codeExists = false;
+			}
+		}
 	}
 
 	public boolean existsById(Integer id) {
@@ -339,10 +360,11 @@ public class PeliculaService {
 		if (field.isPresent() && "compra".equals(field.get())) {
 
 			Direction dir = Direction.DESC;
+			Sort.Order orderCompra= new Sort.Order(dir, "tsCompra").with(Sort.NullHandling.NULLS_LAST);
 			Sort.Order orderModif = new Sort.Order(dir, "tsModif").with(Sort.NullHandling.NULLS_LAST);
 			Sort.Order orderAlta = new Sort.Order(dir, "tsAlta").with(Sort.NullHandling.NULLS_LAST);
 
-			sort = Sort.by(orderModif, orderAlta);
+			sort = Sort.by(orderCompra, orderModif, orderAlta);
 
 		} else {
 			sort = Sort.by(Direction.fromString(direction.orElse("ASC")),

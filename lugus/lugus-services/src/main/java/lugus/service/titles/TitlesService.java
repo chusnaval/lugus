@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lugus.model.titles.Title;
+import lugus.model.values.TitleType;
 import lugus.repository.titles.TitleRepository;
 
 @Service
@@ -26,9 +27,25 @@ public class TitlesService {
 	   public Optional<Title> findByPelicula_Id(Integer id) {
 		   return titleRepo.findByPelicula_Id(id);
 	   }
+	   
+	   public Optional<Title> findBySerie_Id(Integer id) {
+		   return titleRepo.findBySerie_Id(id);
+	   }
+	   
+	   public Optional<Title> findByImdb_Id(String id) {
+		   return titleRepo.findByImdb_Tconst(id);
+	   }
 
 	   public Title save(Title title) {
 		return titleRepo.save(title);
 		
+	   }
+
+	   public List<Title> findAll() {
+		return titleRepo.findAll();
+	   }
+
+	   public List<Title> findByType(TitleType external) {
+		return titleRepo.findByType(external);
 	   }
 }
