@@ -96,15 +96,7 @@ public class SeriesService {
 		return serieRepo.findAll(spec, pageable);
 	}
 	
-	public Integer calcularIdSource(String url) {
-		List<Source> sources = sourceService.findAll();
-		int id = 10;
-		Optional<Source> source = sources.stream().filter(s -> s.getSuggest() != null && url.contains(s.getSuggest())).findFirst();
-		if(source.isPresent()) {
-			id = source.get().getId();
-		}
-		return id;
-	}
+	
 
 	/**
 	 * Complete movies search with all filters available
@@ -176,7 +168,7 @@ public class SeriesService {
 	public void addCaratula(Serie serie, String url) throws IOException, URISyntaxException {
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
-		Optional<Source> sourceObj = sourceService.findById(calcularIdSource(url));
+		Optional<Source> sourceObj = sourceService.findById(sourceService.calcularIdSource(url));
 		SerieFoto pf = new SerieFoto();
 		pf.setUrl(url);
 		if (sourceObj.isPresent()) {

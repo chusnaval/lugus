@@ -55,6 +55,7 @@ public class SeriesApiController {
 	
 	private final SeriesExportService seriesExportService;
 	
+	
 	@GetMapping("/{id}")
 	SerieDto one(@PathVariable int id) {
 		Serie serie = service.findById(id).orElse(null);
@@ -138,7 +139,7 @@ public class SeriesApiController {
 		Serie saved = service.save(serie);
 		if (dto.getCoverSrc() != null && !dto.getCoverSrc().isEmpty()) {
 			final DwFotoServiceI dwFotoService = new DwFotoService();
-			final int sourceId = service.calcularIdSource(dto.getCoverSrc());
+			final int sourceId = sourceService.calcularIdSource(dto.getCoverSrc());
 			Optional<Source> sourceObj = sourceService.findById(sourceId);
 			SerieFoto pf = new SerieFoto();
 			pf.setUrl(dto.getCoverSrc());

@@ -7,8 +7,10 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.Query;
 
 import lugus.model.films.Pelicula;
+import lugus.model.values.Formato;
 
 public interface PeliculaRepository {
 
@@ -48,5 +50,15 @@ public interface PeliculaRepository {
 
 	boolean existsByCodigoAndPack(String codigo, boolean pack);
 
+	int countByFormatoAndPack(Formato format, boolean pack);
+
+	int countByCompradoAndPack(boolean b, boolean c);
+
+	long countByPack(boolean b);
+
+	int countByFormatoAndCompradoAndPack(Formato format, boolean b, boolean c);
+
+	@Query("SELECT p.genero, COUNT(p) FROM Pelicula p GROUP BY p.genero")
+	List<Object[]> countByGenero();
 
 }

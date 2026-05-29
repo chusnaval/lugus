@@ -6,7 +6,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +34,7 @@ import lugus.model.core.Location;
 import lugus.model.core.Source;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
+import lugus.model.values.Categoria;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.repository.films.PeliculaRepository;
@@ -69,15 +72,13 @@ public class PeliculaService {
 		}
 		return Optional.empty();
 	}
-	
+
 	public Pelicula updateTrailer(Integer id, String url) {
-	    Pelicula p = peliculaRepo.findById(id)
-	        .orElseThrow(() -> new RuntimeException("Not found"));
+		Pelicula p = peliculaRepo.findById(id).orElseThrow(() -> new RuntimeException("Not found"));
 
-	    p.setTrailerUrl(url);
-	   return peliculaRepo.save(p);
+		p.setTrailerUrl(url);
+		return peliculaRepo.save(p);
 	}
-
 
 	@Transactional
 	public Pelicula crear(PeliculaCreateDto dto) throws IOException, URISyntaxException {
@@ -118,7 +119,7 @@ public class PeliculaService {
 
 		Pelicula p = peliculaRepo.findById(id).orElseThrow(() -> new RuntimeException("Pelicula no encontrada"));
 		Optional<Location> loc = locService.findById(dto.getLocation());
-		
+
 		p.setTitulo(dto.getTitle());
 		p.setTituloGest(dto.getTitleMgmt());
 		p.setAnyo(dto.getYear());
@@ -126,7 +127,7 @@ public class PeliculaService {
 		p.setTsModif(Instant.now());
 		p.setFormato(Formato.getById(Short.valueOf(dto.getFormat().getCodigo())));
 		p.setGenero(Genero.getById(dto.getGenreCode()));
-		if(loc.isPresent()) {
+		if (loc.isPresent()) {
 			p.setLocation(loc.get());
 		}
 		p.setCodigo(dto.getMgmtCode());
@@ -152,14 +153,13 @@ public class PeliculaService {
 			titlesService.save(title);
 		});
 
-		
 		return p;
 	}
 
 	public void addCaratula(Pelicula pelicula, String url) throws IOException, URISyntaxException {
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
-		Optional<Source> sourceObj = sourceService.findById(calcularIdSource(url));
+		Optional<Source> sourceObj = sourceService.findById(sourceService.calcularIdSource(url));
 		PeliculaFoto pf = new PeliculaFoto();
 		pf.setUrl(url);
 		if (sourceObj.isPresent()) {
@@ -172,15 +172,6 @@ public class PeliculaService {
 		pelicula.addCaratula(pf);
 	}
 
-	public Integer calcularIdSource(String url) {
-		List<Source> sources = sourceService.findAll();
-		int id = 10;
-		Optional<Source> source = sources.stream().filter(s -> s.getSuggest() != null && url.contains(s.getSuggest())).findFirst();
-		if(source.isPresent()) {
-			id = source.get().getId();
-		}
-		return id;
-	}
 
 	private Location findLocation(PeliculaCreateDto dto) {
 		Location loc = null;
@@ -218,15 +209,15 @@ public class PeliculaService {
 				.tsAlta(Instant.now()).build();
 		p.calcularCodigoInicial();
 		calculateCodeSuffix(p);
-		
+
 		return peliculaRepo.save(p);
 
 	}
 
 	public void calculateCodeSuffix(Pelicula p) {
-		// we must find if the code starts exists in not pack films, 
+		// we must find if the code starts exists in not pack films,
 		// and if not exists we add "-1" to the code,
-		//and if exists we add "-2", and so on, until we find a code that not exists
+		// and if exists we add "-2", and so on, until we find a code that not exists
 		boolean codeExists = true;
 		int suffix = 1;
 		String baseCode = p.getCodigo();
@@ -264,7 +255,7 @@ public class PeliculaService {
 	}
 
 	public long contarTodasCompradas() {
-		return peliculaRepo.countByComprado(true);
+		return peliculaRepo.countByCompradoAndPack(true, false);
 	}
 
 	/**
@@ -296,7 +287,7 @@ public class PeliculaService {
 		spec = spec.and(PeliculaSpecification.porNotas(filter.getNotas()));
 		spec = spec.and(PeliculaSpecification.vigentes());
 		spec = spec.and(PeliculaSpecification.porTitulo(filter.getTitulo()));
-		
+
 		// test if has fotos associated as caratula
 		if (filter.getTieneCaratula() != null) {
 			spec = spec.and(PeliculaSpecification.tieneCaratula(filter.getTieneCaratula()));
@@ -306,7 +297,6 @@ public class PeliculaService {
 		if (StringUtils.hasText(filter.getActor()) || StringUtils.hasText(filter.getDirector())) {
 			Specification<Pelicula> actorSpec = PeliculaSpecification.porActor(filter.getActor());
 			Specification<Pelicula> directorSpec = PeliculaSpecification.porDirector(filter.getDirector());
-
 
 			textoGroup = Specification.where(actorSpec).or(directorSpec);
 		}
@@ -360,7 +350,7 @@ public class PeliculaService {
 		if (field.isPresent() && "compra".equals(field.get())) {
 
 			Direction dir = Direction.DESC;
-			Sort.Order orderCompra= new Sort.Order(dir, "tsCompra").with(Sort.NullHandling.NULLS_LAST);
+			Sort.Order orderCompra = new Sort.Order(dir, "tsCompra").with(Sort.NullHandling.NULLS_LAST);
 			Sort.Order orderModif = new Sort.Order(dir, "tsModif").with(Sort.NullHandling.NULLS_LAST);
 			Sort.Order orderAlta = new Sort.Order(dir, "tsAlta").with(Sort.NullHandling.NULLS_LAST);
 
@@ -420,20 +410,36 @@ public class PeliculaService {
 
 	public Page<Pelicula> findAll(Pageable pageable) {
 		Sort sort = Sort.by(Direction.ASC, "tituloGest");
-		
+
 		Pageable pageable2 = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
 		Specification<Pelicula> spec = Specification.where(null);
 
 		return peliculaRepo.findAll(spec, pageable2);
-	} 
+	}
 
 	public Page<Pelicula> getCoversPage(int page, int size, CoversFilter filter) {
 		Pageable pageable = PageRequest.of(page, size);
 
-	    Specification<Pelicula> spec = CoversSpecs.withFilters(filter);
+		Specification<Pelicula> spec = CoversSpecs.withFilters(filter);
 
-	    return peliculaRepo.findAll(spec, pageable);
-	            
+		return peliculaRepo.findAll(spec, pageable);
+
+	}
+
+	public int contarPorFormato(Formato format) {
+		return peliculaRepo.countByFormatoAndCompradoAndPack(format, true, false);
+	}
+
+	public int contarNoCompradas() {
+		return peliculaRepo.countByCompradoAndPack(false, false);
+	}
+
+	public Map<Object, Integer> contarPorCategoria() {
+
+		Map<String, Integer> porGenero = peliculaRepo.countByGenero().stream()
+				.collect(Collectors.toMap(row -> ((Genero) row[0]).getCodigo(), row -> ((Long) row[1]).intValue()));
+		return porGenero.entrySet().stream().collect(Collectors.groupingBy(
+				e -> Genero.getById(e.getKey()).getCategoria(), Collectors.summingInt(Map.Entry::getValue)));
 	}
 }

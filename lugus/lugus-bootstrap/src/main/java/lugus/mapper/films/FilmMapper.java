@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import lugus.dto.core.FormatDTO;
 import lugus.dto.films.CastDto;
+import lugus.dto.films.ConditionDto;
 import lugus.dto.films.DirectorDTO;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.GroupDto;
@@ -55,6 +56,10 @@ public class FilmMapper {
 		createDirectors(dto, film);
 		createCasting(dto, film);
 
+		if(film.getEstado() != null) {
+			dto.setCondition(new ConditionDto(film.getEstado().getId(), film.getEstado().getName()));
+		}
+		
 		if (film.getFormato() != null) {
 			dto.setFormat(new FormatDTO(""+film.getFormato().getId(), film.getFormato().name()));
 		}

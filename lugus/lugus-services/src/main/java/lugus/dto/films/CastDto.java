@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CastDto {
+	
 	private int id;
 
 	private String name;

@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.FilmDto;
+import lugus.dto.films.FilmGenreDto;
 import lugus.dto.films.FilmStatsDto;
 import lugus.dto.films.PeliculaCreateDto;
 import lugus.exception.LugusNotFoundException;
@@ -35,6 +37,7 @@ import lugus.model.core.Location;
 import lugus.model.core.Source;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
+import lugus.model.values.Categoria;
 import lugus.model.values.Formato;
 import lugus.model.values.TitleType;
 import lugus.service.core.LocationService;
@@ -44,6 +47,7 @@ import lugus.service.films.DwFotoServiceI;
 import lugus.service.films.PeliculaService;
 import lugus.service.groups.GroupsService;
 import lugus.service.people.InsertPersonalDataService;
+import lugus.service.series.SeriesService;
 import lugus.service.titles.TitlesService;
 
 @RestController
@@ -61,7 +65,6 @@ public class FilmApiController {
 	private final SourceService sourceService;
 	private final InsertPersonalDataService insertImdbService;
 	private final FilmExportService filmExportService;
-	
 	private final TitlesService titlesService;
 
 	@GetMapping("/{id}")
@@ -107,7 +110,7 @@ public class FilmApiController {
 		Pelicula saved = service.save(film);
 		if (dto.getCoverSrc() != null && !dto.getCoverSrc().isEmpty()) {
 			final DwFotoServiceI dwFotoService = new DwFotoService();
-			final int sourceId = service.calcularIdSource(dto.getCoverSrc());
+			final int sourceId = sourceService.calcularIdSource(dto.getCoverSrc());
 			Optional<Source> sourceObj = sourceService.findById(sourceId);
 			PeliculaFoto pf = new PeliculaFoto();
 			pf.setUrl(dto.getCoverSrc());
@@ -179,6 +182,30 @@ public class FilmApiController {
 		stats.setRecentFilms(service.addedInLastDays(30));
 		stats.setIncompleteGroups(groupsService.incompletedGroups());
 		stats.setCompleteGroups((int) (groupsService.count() - groupsService.incompletedGroups()));
+		stats.setVhs(service.contarPorFormato(Formato.VHS));
+		stats.setDvd(service.contarPorFormato(Formato.DVD));
+		stats.setBluray(service.contarPorFormato(Formato.BLURAY));
+		stats.setUhd(service.contarPorFormato(Formato.ULTRAHD));
+		stats.setDigital(service.contarPorFormato(Formato.DIGITAL));
+		stats.setNotOwned(service.contarNoCompradas());
+		
+		Map<Object, Integer> categorias = service.contarPorCategoria();
+		stats.setGenerosPorCategoria(new FilmGenreDto());
+		stats.getGenerosPorCategoria().setArteEntretenimiento(categorias.get(Categoria.ARTE_ENTRETENIMIENTO));
+		stats.getGenerosPorCategoria().setLiteraturaNarrativa(categorias.get(Categoria.LITERATURA_NARRATIVA));
+		stats.getGenerosPorCategoria().setCienciaFiccion(categorias.get(Categoria.CIENCIA_FICCION));
+		stats.getGenerosPorCategoria().setAccion(categorias.get(Categoria.ACCION));
+		stats.getGenerosPorCategoria().setMisterio(categorias.get(Categoria.MISTERIO));
+		stats.getGenerosPorCategoria().setTerror(categorias.get(Categoria.TERROR));
+		stats.getGenerosPorCategoria().setConflicto(categorias.get(Categoria.CONFLICTO));
+		stats.getGenerosPorCategoria().setDocumental(categorias.get(Categoria.DOCUMENTAL));
+		
+		
+		
+		
+		
+		
+		
 		return stats;
 	}
 

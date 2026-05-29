@@ -14,4 +14,12 @@ public class FilmStatsDto {
 	private int recentFilms;
 	private int completeGroups;
 	private int incompleteGroups;
+	private int vhs;
+	private int dvd;
+	private int bluray;
+	private int uhd;
+	private int digital;
+	private int notOwned;
+	
+    private FilmGenreDto generosPorCategoria;
 }
