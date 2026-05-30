@@ -34,7 +34,7 @@ import lugus.model.core.Location;
 import lugus.model.core.Source;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
-import lugus.model.values.Categoria;
+import lugus.model.user.Usuario;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.repository.films.PeliculaRepository;
@@ -80,6 +80,9 @@ public class PeliculaService {
 		return peliculaRepo.save(p);
 	}
 
+	
+
+	
 	@Transactional
 	public Pelicula crear(PeliculaCreateDto dto) throws IOException, URISyntaxException {
 		Location loc = findLocation(dto);

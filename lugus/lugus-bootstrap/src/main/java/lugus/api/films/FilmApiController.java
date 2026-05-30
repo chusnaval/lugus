@@ -45,9 +45,9 @@ import lugus.service.core.SourceService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
 import lugus.service.films.PeliculaService;
+import lugus.service.films.PeliculasUsuarioService;
 import lugus.service.groups.GroupsService;
 import lugus.service.people.InsertPersonalDataService;
-import lugus.service.series.SeriesService;
 import lugus.service.titles.TitlesService;
 
 @RestController
@@ -66,24 +66,32 @@ public class FilmApiController {
 	private final InsertPersonalDataService insertImdbService;
 	private final FilmExportService filmExportService;
 	private final TitlesService titlesService;
+	private final PeliculasUsuarioService usuarioPeliculaService;
 
 	@GetMapping("/{id}")
-	FilmDto one(@PathVariable Integer id) throws LugusNotFoundException {
+	FilmDto one(@PathVariable Integer id, Authentication auth) throws LugusNotFoundException {
 		Pelicula film = service.findById(id).orElse(null);
 		if (film != null)
-			return mapper.mapToFilmDTO(film);
+			return mapper.mapToFilmDTO(film, auth.getName());
 		return null;
 	}
 
 	@PatchMapping("/{id}/trailer")
 	public FilmDto updateTrailer(@PathVariable Integer id, @RequestBody TrailerUpdateRequest req) {
-		return mapper.mapToFilmDTO(service.updateTrailer(id, req.trailerUrl()));
+		return mapper.mapToFilmDTO(service.updateTrailer(id, req.trailerUrl()), null);
 	}
 
 	@PutMapping("/{id}")
 	public FilmDto update(@PathVariable Integer id, @RequestBody FilmDto dto) throws IOException, URISyntaxException {
-		return mapper.mapToFilmDTO(service.update(id, dto));
+		return mapper.mapToFilmDTO(service.update(id, dto), null);
 	}
+	
+	@PostMapping("/{id}/toggle")
+	public ResponseEntity<?> toggleOwned(@PathVariable Integer id, Authentication auth) {
+		usuarioPeliculaService.toggleOwned(auth.getName(), id);
+	    return ResponseEntity.ok().build();
+	}
+
 
 	@GetMapping("/page")
 	public Page<FilmDto> getAllFilms(@RequestParam Integer page, @RequestParam Integer size,

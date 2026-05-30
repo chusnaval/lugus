@@ -78,6 +78,10 @@ public class FilmDto {
 	private String trailerUrl;
 	
 	private Instant tsCompra;
+	
+	private boolean mine;
+	
+	private boolean favorite;
 
 	public void addDirector(DirectorDTO directorDTO) {
 		if (director == null) {

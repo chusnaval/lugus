@@ -45,6 +45,16 @@ public class FilmMapper {
 		return dto;
 	}
 
+	public FilmDto mapToFilmDTO(Pelicula film, String login) {
+		FilmDto dto = mapToFilmDTO(film);
+		if (login != null) {
+			dto.setFavorite(film.isFavorite(login));
+			dto.setMine(film.isMine(login));
+		}
+
+		return dto;
+	}
+	
 	public FilmDto mapToFilmDTO(Pelicula film) {
 		FilmDto dto = new FilmDto();
 		dto.setId(film.getId());
@@ -56,12 +66,12 @@ public class FilmMapper {
 		createDirectors(dto, film);
 		createCasting(dto, film);
 
-		if(film.getEstado() != null) {
+		if (film.getEstado() != null) {
 			dto.setCondition(new ConditionDto(film.getEstado().getId(), film.getEstado().getName()));
 		}
-		
+
 		if (film.getFormato() != null) {
-			dto.setFormat(new FormatDTO(""+film.getFormato().getId(), film.getFormato().name()));
+			dto.setFormat(new FormatDTO("" + film.getFormato().getId(), film.getFormato().name()));
 		}
 
 		if (film.getGenero() != null) {
@@ -91,12 +101,12 @@ public class FilmMapper {
 		}
 		dto.setFaId(film.getFaId());
 		dto.setTrailerUrl(film.getTrailerUrl());
-		dto.setWatched(film.getLastSeen()!=null); 
-		if(film.getImdbId()!=null) {
+		dto.setWatched(film.getLastSeen() != null);
+		if (film.getImdbId() != null) {
 			dto.setImdbUrl("https://www.imdb.com/es-es/title/" + film.getImdbId());
 		}
 		dto.setCountry(film.getCountry());
-
+	
 		dto.setSynopsis("");// TODO
 		dto.setLastSeen(null);// TODO
 
@@ -146,8 +156,6 @@ public class FilmMapper {
 		pelicula.setImdbId(dto.getImdbId());
 		pelicula.setRating(dto.getRating());
 		pelicula.setVotes(dto.getVotes());
-
-		
 
 		return pelicula;
 	}

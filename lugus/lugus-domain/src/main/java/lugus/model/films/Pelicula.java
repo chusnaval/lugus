@@ -111,7 +111,7 @@ public class Pelicula {
 
 	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
 	private Instant tsAlta;
-	
+
 	@Column(name = "ts_compra", nullable = true, columnDefinition = "TIMESTAMP")
 	private Instant tsCompra;
 
@@ -177,22 +177,46 @@ public class Pelicula {
 	@Column
 	private Integer votes;
 
-	
-	@Column(name="fa_id")
+	@Column(name = "fa_id")
 	private String faId;
-	
-	@Column(name="trailer_url")
+
+	@Column(name = "trailer_url")
 	private String trailerUrl;
-	
-	@Column(name="country")
+
+	@Column(name = "country")
 	private String country;
-	
+
 	@Column(name = "last_seen", nullable = true, columnDefinition = "TIMESTAMP")
 	private Instant lastSeen;
+
+
 	
 	private transient String situacion;
+
+	/**
+	 * Constructor para facilitar la creación de instancias con solo el ID, útil
+	 * para asociaciones sin necesidad de cargar toda la entidad.
+	 * 
+	 * @param peliculaId
+	 */
+	public Pelicula(Integer peliculaId) {
+		this.id = peliculaId;
+	}
 	
+	public boolean isFavorite(String login) {
+		return peliculasUsuario.stream()
+				.filter(up -> up.getUsuario().getLogin().equals(login))
+				.map(PeliculasUsuario::isFavorita)
+				.findFirst()
+				.orElse(false);
+	}
 	
+	public boolean isMine(String login) {
+		return peliculasUsuario.stream()
+				.filter(up -> up.getUsuario().getLogin().equals(login))
+				.findFirst()
+				.isPresent();
+	}
 
 	public String getDescLocation() {
 		if (location == null) {

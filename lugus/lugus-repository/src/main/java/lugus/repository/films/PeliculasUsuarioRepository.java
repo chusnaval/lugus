@@ -2,6 +2,7 @@
 package lugus.repository.films;
 
 import java.util.List;
+import java.util.Optional;
 
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculasUsuario;
@@ -12,7 +13,7 @@ public interface PeliculasUsuarioRepository {
 
     List<PeliculasUsuario> findByPelicula(Pelicula pelicula);
 
-    PeliculasUsuario findByUsuarioAndPelicula(Usuario usuario, Pelicula pelicula);
+    Optional<PeliculasUsuario> findByUsuarioAndPelicula(Usuario usuario, Pelicula pelicula);
 
     void delete(PeliculasUsuario entity);
 
