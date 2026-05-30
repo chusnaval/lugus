@@ -332,6 +332,19 @@ public class PeliculaService {
 		return peliculaRepo.findAll(spec, pageable);
 	}
 
+	public Page<Pelicula> lastForGenre(String generoCodigo) {
+		Sort sort = buildSort(Optional.of("compra"), Optional.of("ASC"));
+
+		Pageable pageable = PageRequest.of(0, 4, sort);
+
+		Specification<Pelicula> spec = Specification.where(null);
+
+		spec = spec.and(PeliculaSpecification.porComprado(true));
+		spec = spec.and(PeliculaSpecification.porGenero(generoCodigo));
+
+		return peliculaRepo.findAll(spec, pageable);
+	}
+	
 	/**
 	 * Reverse intented order in novelty order, because customers reports this in
 	 * feedback

@@ -175,6 +175,12 @@ public class FilmApiController {
 		return service.findForHome().getContent().stream().map(mapper::mapToFilmDTO).toList();
 	}
 
+	@GetMapping(value = "/ultimas/{genero}", produces = "application/json;charset=UTF-8")
+	public List<FilmDto> ultimas(@PathVariable String genero) throws LugusNotFoundException {
+
+		return service.lastForGenre(genero).getContent().stream().map(mapper::mapToFilmDTO).toList();
+	}
+
 	@GetMapping(value = "/stats", produces = "application/json;charset=UTF-8")
 	public FilmStatsDto getStats() {
 		FilmStatsDto stats = new FilmStatsDto();
@@ -199,11 +205,6 @@ public class FilmApiController {
 		stats.getGenerosPorCategoria().setTerror(categorias.get(Categoria.TERROR));
 		stats.getGenerosPorCategoria().setConflicto(categorias.get(Categoria.CONFLICTO));
 		stats.getGenerosPorCategoria().setDocumental(categorias.get(Categoria.DOCUMENTAL));
-		
-		
-		
-		
-		
 		
 		
 		return stats;

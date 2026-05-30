@@ -27,6 +27,7 @@ public class FavoritosUsuarioApiController {
     private final SeriesService seriesService;
     private final FavoritosUsuarioMapper mapper;
 
+    
     @PostMapping("/pelicula/{peliculaId}")
     public ResponseEntity<FavoritosUsuarioDto> addFavoritoPelicula(@PathVariable Integer peliculaId, Principal principal) {
         String login = principal.getName();
