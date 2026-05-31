@@ -11,5 +11,7 @@ public class GroupDetailedDTO {
 	
 	private String name;
 	
-	private List<GroupFilmsDTO> films;
+	private String description;
+	
+	private List<GroupFilmsDTO> movies;
 }

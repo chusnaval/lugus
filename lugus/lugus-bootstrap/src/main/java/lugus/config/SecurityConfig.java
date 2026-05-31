@@ -2,15 +2,22 @@ package lugus.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @Configuration
@@ -26,51 +33,47 @@ public class SecurityConfig {
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http, LoginFailureHandler loginFailureHandler) throws Exception {
 
-	    http
-	        // 1) CORS SIEMPRE PRIMERO
-	        .cors(Customizer.withDefaults())
+		 http
+         .csrf(csrf -> csrf.disable())
+         .cors(cors -> {})
+         .securityContext(security -> security
+                 .securityContextRepository(new HttpSessionSecurityContextRepository()) 
+             )
+         .authorizeHttpRequests(auth -> auth
+             .requestMatchers("/lugus/api/auth/login").permitAll()
+             .requestMatchers("/lugus/api/auth/me").authenticated()
+             .requestMatchers("/lugus/api/**").authenticated()
+             .anyRequest().permitAll()
+         )
+         .formLogin(form -> form.disable())
+         .logout(logout -> logout.disable())
+         .exceptionHandling(ex -> ex
+             .authenticationEntryPoint((req, res, e) -> {
+                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+             })
+         )
+         .sessionManagement(sess -> sess
+        				    .maximumSessions(-1)
+        				    .sessionRegistry(sessionRegistry())
+        				);
 
-	        // 2) CSRF desactivado para API REST
-	        .csrf(csrf -> csrf.disable())
-
-	        // 3) Autorizaciones
-	        .authorizeHttpRequests(auth -> auth
-	            .requestMatchers(
-	                "/login",
-	                "/css/**",
-	                "/js/**",
-	                "/public/**",
-	                "/api/auth/password-recovery/**",
-	                "/api/auth/login",      //  login REST
-	                "/actuator/health",
-	                "/actuator/health/**",
-	                "/actuator/info"
-	            ).permitAll()
-	            .anyRequest().authenticated()
-	        )
-
-	        // 4) Login clásico (solo para web server-side)
-	        .formLogin(form -> form
-	            .loginPage("/login")
-	            .loginProcessingUrl("/perform_login")
-	            .defaultSuccessUrl("/guardarUsuario", true)
-	            .failureHandler(loginFailureHandler)
-	            .permitAll()
-	        )
-
-	        // 5) Logout
-	        .logout(logout -> logout
-	            .logoutUrl("/logout")
-	            .logoutSuccessUrl("/login?logout=true")
-	            .invalidateHttpSession(true)
-	            .deleteCookies("JSESSIONID")
-	            .clearAuthentication(true)
-	            .permitAll()
-	        );
+        
 
 	    return http.build();
 	}
-
+	
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+	    return new WebMvcConfigurer() {
+	        @Override
+	        public void addCorsMappings(@NonNull CorsRegistry registry) {
+	            registry.addMapping("/**")
+	                .allowedOrigins("http://localhost:5173")
+	                .allowedMethods("*")
+	                .allowCredentials(true);
+	        }
+	    };
+	}
 
 	@Bean
 	PasswordEncoder passwordEncoder() {
@@ -80,5 +83,10 @@ public class SecurityConfig {
 	@Bean
 	AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
 		return authConfig.getAuthenticationManager();
+	}
+	
+	@Bean
+	public SessionRegistry sessionRegistry() {
+	    return new SessionRegistryImpl();
 	}
 }

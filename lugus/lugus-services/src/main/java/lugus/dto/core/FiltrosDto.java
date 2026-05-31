@@ -54,6 +54,8 @@ public class FiltrosDto implements Serializable{
 	private String director;
 
 	private String actor;
+	
+	private int pageSize = 30;
 
 	private Optional<Integer> pagina = Optional.of(0);
 

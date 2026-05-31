@@ -3,6 +3,7 @@ package lugus.service.series;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,19 +20,19 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
+import lugus.dto.films.SerieDto;
 import lugus.dto.series.SerieCreateDto;
 import lugus.exception.LugusNotFoundException;
 import lugus.infrastructure.repository.series.SerieSpecification;
-import lugus.model.core.Source;
 import lugus.model.core.Location;
+import lugus.model.core.Source;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.repository.series.SerieRepository;
-
-import lugus.service.core.SourceService;
 import lugus.service.core.LocationService;
+import lugus.service.core.SourceService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
 import lugus.service.user.CurrentUserProvider;
@@ -41,7 +42,6 @@ import lugus.service.user.CurrentUserProvider;
 public class SeriesService {
 
 	private static final int NUM_ELEMENTS_PER_HOME = 5;
-	private static final int NUM_ELEMENTS_PER_PAGE = 30;
 	private final SerieRepository serieRepo;
 	private final LocationService locService;
 	private final SourceService sourceService;
@@ -78,7 +78,7 @@ public class SeriesService {
 	public Page<Serie> findAllBy(FiltrosDto filter) {
 		Sort sort = buildSort(filter.getOrden(), filter.getDireccion());
 
-		Pageable pageable = PageRequest.of(filter.getPagina().get(), NUM_ELEMENTS_PER_PAGE, sort);
+		Pageable pageable = PageRequest.of(filter.getPagina().get(), filter.getPageSize(), sort);
 
 		Specification<Serie> spec = Specification.where(null);
 
@@ -87,11 +87,13 @@ public class SeriesService {
 		spec = spec.and(SerieSpecification.porGenero(filter.getGenero()));
 		spec = spec.and(SerieSpecification.byLocation(filter.getLocation()));
 		spec = spec.and(SerieSpecification.porNotas(filter.getNotas()));
-		spec = spec.and(SerieSpecification.porTitulo(filter.getTexto()));
+		spec = spec.and(SerieSpecification.porTitulo(filter.getTitulo()));
 		
 		return serieRepo.findAll(spec, pageable);
 	}
 	
+	
+
 	/**
 	 * Complete movies search with all filters available
 	 * 
@@ -130,6 +132,51 @@ public class SeriesService {
 		return sort;
 	}
 
+	@Transactional
+	public Serie update(Integer id, SerieDto dto) throws IOException, URISyntaxException {
+
+		Serie p = serieRepo.findById(id).orElseThrow(() -> new RuntimeException("Pelicula no encontrada"));
+		Optional<Location> loc = locService.findById(dto.getLocation());
+		
+		p.setTitulo(dto.getTitle());
+		p.setTituloGest(dto.getTitleMgmt());
+		p.setAnyoInicio(dto.getStartYear());
+		p.setAnyoFin(dto.getFinishYear());
+		p.setTsModif(Instant.now());
+		if(dto.getFormat()!=null) {
+			p.setFormato(Formato.getById(Short.valueOf(dto.getFormat())));
+		}
+		p.setGenero(Genero.getById(dto.getGenreCode()));
+		if(loc.isPresent()) {
+			p.setLocation(loc.get());
+		}
+		p.setCodigo(dto.getMgmtCode());
+		p.setComprado(dto.isOwned());
+		p.setNotas(dto.getNotes());
+		addCaratula(p, dto.getCoverSrc());
+		serieRepo.save(p);
+
+		
+
+		return p;
+	}
+	
+	public void addCaratula(Serie serie, String url) throws IOException, URISyntaxException {
+
+		final DwFotoServiceI dwFotoService = new DwFotoService();
+		Optional<Source> sourceObj = sourceService.findById(sourceService.calcularIdSource(url));
+		SerieFoto pf = new SerieFoto();
+		pf.setUrl(url);
+		if (sourceObj.isPresent()) {
+			pf.setSource(sourceObj.get());
+		}
+		pf.setFoto(dwFotoService.descargar(sourceObj.get().getId(), url));
+		pf.setCaratula(true);
+
+		serie.getSerieFotos().clear();
+		serie.addCaratula(pf);
+	}
+	
 	public Page<Serie> findForHome() {
 		Sort sort = buildSort(Optional.of("compra"), Optional.of("ASC"));
 
@@ -195,6 +242,19 @@ public class SeriesService {
 
 	public List<Serie> findAllOrdered() {
 		return serieRepo.findAllByOrderByTituloGestAscAnyoInicioAsc();
+	}
+
+	public long contarTodas() {
+		return serieRepo.count();
+	}
+
+	public int addedInLastDays(int days) {
+		Instant limit = Instant.now().minus(days, ChronoUnit.DAYS);
+		return serieRepo.countByTsAltaAfter(limit);
+	}
+
+	public int countByComprado(boolean value) {
+		return serieRepo.countByComprado(value);
 	}
 
 }

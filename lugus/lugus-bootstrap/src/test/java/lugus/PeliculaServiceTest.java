@@ -37,7 +37,7 @@ class PeliculaServiceTest {
         sourceService = mock(SourceService.class);
 		currentUserProvider = mock(CurrentUserProvider.class);
 		when(currentUserProvider.currentUsername()).thenReturn("test-user");
-        service = new PeliculaService(repo, locService, sourceService, currentUserProvider);
+        service = new PeliculaService(repo, locService, sourceService, currentUserProvider, null, null);
     }
 
     @Test
@@ -56,7 +56,7 @@ class PeliculaServiceTest {
         child.setFormato(Formato.BLURAY);
         child.setGenero(Genero.ACCION);
         child.setAnyo(1990);
-        child.calcularCodigo();
+        child.calcularCodigoInicial();
         padre.addHijo(child);
         
         // --- Act -------------------------------------------------------------

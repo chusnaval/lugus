@@ -17,4 +17,8 @@ public class ImdbBasicsService {
 	public List<ImdbBasics> findByTitleAndRegion(final String title, final String region) {
 		return imdbBasicsRepository.findByTitleContainingIgnoreCaseAndRegionAndLanguage(title, region, null);
 	}
+
+	public ImdbBasics findById(String id) {
+		return imdbBasicsRepository.findByTitleid(id);
+	}
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lugus.dto.core.LocationDTO;
+import lugus.dto.core.LocationTypeDTO;
 import lugus.model.core.Location;
 import lugus.model.core.LocationType;
 
@@ -18,6 +19,8 @@ public class LocationMapper {
 		LocationDTO dto = new LocationDTO();
 		dto.setCodigo(loc.getCodigo());
 		dto.setDescripcion(loc.getDescripcion());
+		dto.setCount(loc.getPeliculas().size());
+		dto.setLocationType(new LocationTypeDTO(loc.getLocationType().getId(), loc.getLocationType().getDescription(), loc.getLocationType().getLocations().size()));
 		return dto;
 		
 	}
@@ -26,7 +29,9 @@ public class LocationMapper {
 		Location local = new Location();
 		local.setCodigo(dto.getCodigo());
 		local.setDescripcion(dto.getDescripcion());
-		local.setLocationType(new LocationType(dto.getType()));
+		if(dto.getLocationType()!=null) {
+			local.setLocationType(new LocationType(dto.getLocationType().getId()));
+		}
 		
 		return local;
 	}

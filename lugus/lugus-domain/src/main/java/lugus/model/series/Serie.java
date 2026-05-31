@@ -2,6 +2,7 @@ package lugus.model.series;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -97,6 +98,9 @@ public class Serie {
 	@Column(name = "ts_baja", columnDefinition = "TIMESTAMP")
 	private Instant tsBaja;
 	
+	@Column(name = "imdb_id")
+	private String imdbId;
+	
 	@Column
 	private boolean completa;
 	
@@ -159,5 +163,19 @@ public class Serie {
 			}
 		}
 		
+	}
+
+	public String getCoverUrl() {
+		String coverUrl = null;
+		if (this.serieFotos != null && !this.serieFotos.isEmpty()) {
+			Optional<SerieFoto> aux = this.serieFotos.stream().findFirst();
+			if (aux.isPresent()) {
+				SerieFoto pf = aux.get();
+				if (pf.isCaratula()) {
+					coverUrl = pf.getUrl();
+				}
+			}
+		}
+		return coverUrl;
 	}
 }

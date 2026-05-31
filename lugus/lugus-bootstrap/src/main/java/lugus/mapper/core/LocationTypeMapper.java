@@ -15,15 +15,16 @@ public class LocationTypeMapper {
 	public LocationTypeDTO mapToDTO(LocationType loc) {
 		LocationTypeDTO dto = new LocationTypeDTO();
 		dto.setId(loc.getId());
-		dto.setDescripcion(loc.getDescription());
+		dto.setDescription(loc.getDescription());
+		dto.setCount(loc.getLocations().size());
 		return dto;
 		
 	}
 
 	public LocationType mapToEntity(LocationTypeDTO dto) {
 		LocationType local = new LocationType();
-		local.setId(local.getId());
-		local.setDescription(local.getDescription());
+		local.setId(dto.getId());
+		local.setDescription(dto.getDescription());
 		return local;
 	}
 }

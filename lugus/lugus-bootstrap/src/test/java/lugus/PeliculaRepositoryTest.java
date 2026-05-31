@@ -33,7 +33,7 @@ class PeliculaRepositoryTest {
         padre.setFormato(Formato.BLURAY);
         padre.setGenero(Genero.AVENTURA);
         padre.setTsAlta(Instant.now());
-        padre.calcularCodigo();
+        padre.calcularCodigoInicial();
         repo.save(padre);
 
         Pelicula child = new Pelicula();
@@ -43,7 +43,7 @@ class PeliculaRepositoryTest {
         child.setFormato(Formato.BLURAY);
         child.setGenero(Genero.AVENTURA);
         child.setTsAlta(Instant.now());
-        child.calcularCodigo();
+        child.calcularCodigoInicial();
         repo.save(child);
         
         padre.addHijo(child); 

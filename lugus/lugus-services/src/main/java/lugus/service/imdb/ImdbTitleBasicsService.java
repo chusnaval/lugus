@@ -17,4 +17,8 @@ public class ImdbTitleBasicsService {
 	public Optional<ImdbTitleBasics> findById(String tconst) {
 		return imdbTitleBasicsRepository.findById(tconst);
 	}
+
+	public Optional<ImdbTitleBasics> findByTconst(String tconst) {
+		return imdbTitleBasicsRepository.findByTconst(tconst);
+	}
 }

@@ -12,4 +12,8 @@ public interface ImdbTitleBasicsRepository {
 
 	void deleteById(String id);
 
+	Iterable<ImdbTitleBasics> searchByPrimarytitleContainingIgnoreCase(String query);
+
+	Optional<ImdbTitleBasics> findByTconst(String tconst);
+
 }

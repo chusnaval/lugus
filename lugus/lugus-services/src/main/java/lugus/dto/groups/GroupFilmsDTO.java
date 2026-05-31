@@ -11,7 +11,13 @@ public class GroupFilmsDTO {
 	
 	private int orden;
 	
-	private boolean inCollection;
+	private String status;
 	
 	private int film;
+	
+	private int year;
+	
+	private String cover;
+	
+	private String imdbId;
 }

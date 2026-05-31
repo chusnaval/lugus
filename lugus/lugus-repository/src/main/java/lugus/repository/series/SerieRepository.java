@@ -1,5 +1,6 @@
 package lugus.repository.series;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import lugus.model.films.Pelicula;
 import lugus.model.series.Serie;
 
 
@@ -31,4 +31,12 @@ public interface SerieRepository {
 	Collection<? extends Serie> findByTituloGestAndAnyoInicio(String title, Integer year);
 
 	List<Serie> findAllByOrderByTituloGestAscAnyoInicioAsc();
+
+	int countByTsAltaAfter(Instant limit);
+
+	int countByComprado(boolean value);
+
+	Optional<Serie> findByImdbId(String imdbId);
+
+	Iterable<Serie> searchByTituloContainingIgnoreCase(String query);
 }

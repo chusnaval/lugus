@@ -10,6 +10,8 @@ public class LocationDTO {
 
 	private String descripcion;
 	
-	private int type;
+	private LocationTypeDTO locationType;
+	
+	private int count;
 	
 }

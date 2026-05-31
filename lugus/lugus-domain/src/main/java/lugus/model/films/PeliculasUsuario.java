@@ -28,7 +28,8 @@ import lugus.model.user.Usuario;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class PeliculasUsuario {
 
-    @Id
+  
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
@@ -48,6 +49,8 @@ public class PeliculasUsuario {
     private Float lbRating;
 
     private boolean vista;
+    
+    private boolean favorita;
 
 
 }

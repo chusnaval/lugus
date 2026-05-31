@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -111,6 +112,9 @@ public class Pelicula {
 	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
 	private Instant tsAlta;
 
+	@Column(name = "ts_compra", nullable = true, columnDefinition = "TIMESTAMP")
+	private Instant tsCompra;
+
 	@Column(name = "usr_modif")
 	private String usrModif;
 
@@ -133,7 +137,7 @@ public class Pelicula {
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private final Set<PeliculaFoto> peliculaFotos = new HashSet<>();
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
@@ -173,7 +177,46 @@ public class Pelicula {
 	@Column
 	private Integer votes;
 
+	@Column(name = "fa_id")
+	private String faId;
+
+	@Column(name = "trailer_url")
+	private String trailerUrl;
+
+	@Column(name = "country")
+	private String country;
+
+	@Column(name = "last_seen", nullable = true, columnDefinition = "TIMESTAMP")
+	private Instant lastSeen;
+
+
+	
 	private transient String situacion;
+
+	/**
+	 * Constructor para facilitar la creación de instancias con solo el ID, útil
+	 * para asociaciones sin necesidad de cargar toda la entidad.
+	 * 
+	 * @param peliculaId
+	 */
+	public Pelicula(Integer peliculaId) {
+		this.id = peliculaId;
+	}
+	
+	public boolean isFavorite(String login) {
+		return peliculasUsuario.stream()
+				.filter(up -> up.getUsuario().getLogin().equals(login))
+				.map(PeliculasUsuario::isFavorita)
+				.findFirst()
+				.orElse(false);
+	}
+	
+	public boolean isMine(String login) {
+		return peliculasUsuario.stream()
+				.filter(up -> up.getUsuario().getLogin().equals(login))
+				.findFirst()
+				.isPresent();
+	}
 
 	public String getDescLocation() {
 		if (location == null) {
@@ -186,7 +229,7 @@ public class Pelicula {
 		return !peliculaFotos.isEmpty();
 	}
 
-	public void calcularCodigo() {
+	public void calcularCodigoInicial() {
 		// Eliminar artículos del título
 		String procesado = tituloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
 
@@ -313,4 +356,19 @@ public class Pelicula {
 		}
 		return false;
 	}
+
+	public String getCoverUrl() {
+		String coverUrl = null;
+		if (this.peliculaFotos != null && !this.peliculaFotos.isEmpty()) {
+			Optional<PeliculaFoto> aux = this.peliculaFotos.stream().findFirst();
+			if (aux.isPresent()) {
+				PeliculaFoto pf = aux.get();
+				if (pf.isCaratula()) {
+					coverUrl = pf.getUrl();
+				}
+			}
+		}
+		return coverUrl;
+	}
+
 }

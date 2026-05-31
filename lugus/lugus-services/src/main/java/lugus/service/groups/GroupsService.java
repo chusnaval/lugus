@@ -22,8 +22,6 @@ import lugus.repository.groups.GroupRepository;
 @RequiredArgsConstructor
 public class GroupsService {
 
-	private static final int NUM_ELEMENTS_PER_PAGE = 50;
-	
 	private final GroupRepository groupRepository;
 	
 	public Optional<Group> findById(Integer id) {
@@ -40,10 +38,13 @@ public class GroupsService {
 
 
 	public Page<Group> findAllBy(FiltrosDto filter) {
-		
-		Sort sort = Sort.by(Direction.ASC, "name");
+		Optional<String> direccion = filter.getDireccion();
+		if(direccion.isEmpty()) {
+			direccion = Optional.of("asc");
+		}
+		Sort sort = Sort.by(Direction.fromString(direccion.get()), filter.getOrden().orElse("name"));
 
-		Pageable pageable = PageRequest.of(filter.getPagina().get(), NUM_ELEMENTS_PER_PAGE, sort);
+		Pageable pageable = PageRequest.of(filter.getPagina().get(), filter.getPageSize(), sort);
 
 		Specification<Group> spec = Specification.where(null);
 
@@ -52,5 +53,24 @@ public class GroupsService {
 
 	public void delete(Integer id) {
 		groupRepository.deleteById(id);
+	}
+
+	public int incompletedGroups() {
+		return groupRepository.countIncompleteGroups();
+	}
+
+	public long count() {
+		return groupRepository.count();
+	}
+
+	public Page<Group> findAll(
+			Pageable pageable) {
+		Sort sort = Sort.by(Direction.ASC, "name");
+		
+		Pageable pageable2 = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+		Specification<Group> spec = Specification.where(null);
+
+		return groupRepository.findAll(spec, pageable2);
 	}
 }

@@ -1,5 +1,6 @@
 package lugus.service.core;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -17,5 +18,9 @@ public class EstadoService {
 	public Optional<Estado> findEstadoById(Integer estadoCodigo) {
 		
 		return estadoRepo.findById(estadoCodigo);
+	}
+
+	public List<Estado> findAll() {
+		return estadoRepo.findAll();
 	}
 }

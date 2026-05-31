@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import lugus.repository.core.GetPosteriorRepository;
@@ -19,7 +20,7 @@ public class GetPosteriorDao implements GetPosteriorRepository {
 
 	private SimpleJdbcCall call;
 
-	public GetPosteriorDao(DataSource dataSource) {
+	public GetPosteriorDao(@NonNull DataSource dataSource) {
 		this.call = new SimpleJdbcCall(dataSource)
 				.withSchemaName("lugus").withFunctionName("loc_posterior")
 				.withoutProcedureColumnMetaDataAccess()
