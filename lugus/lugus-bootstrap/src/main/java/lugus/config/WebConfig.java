@@ -15,7 +15,7 @@ public class WebConfig {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowCredentials(true);
         
-        cfg.setAllowedOrigins(List.of("http://localhost:5173","http://localhost:9000")); // origen del frontend
+        cfg.setAllowedOrigins(List.of("http://localhost:5173","http://localhost:9000",  "http://192.168.1.61:9000")); // origen del frontend
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         cfg.setAllowedHeaders(List.of("*"));
         cfg.setExposedHeaders(List.of("Set-Cookie"));

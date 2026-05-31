@@ -62,18 +62,7 @@ public class SecurityConfig {
 	    return http.build();
 	}
 	
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-	    return new WebMvcConfigurer() {
-	        @Override
-	        public void addCorsMappings(@NonNull CorsRegistry registry) {
-	            registry.addMapping("/**")
-	                .allowedOrigins("http://localhost:5173","http://localhost:9000")
-	                .allowedMethods("*")
-	                .allowCredentials(true);
-	        }
-	    };
-	}
+	
 
 	@Bean
 	PasswordEncoder passwordEncoder() {

@@ -99,6 +99,7 @@ public class AuthController {
                 .maxAge(0)
                 .httpOnly(true)
                 .secure(false) 
+                .sameSite("None")
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
