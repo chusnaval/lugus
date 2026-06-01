@@ -18,7 +18,10 @@ import lugus.repository.titles.TitleRepository;
 @RequiredArgsConstructor
 public class TitleSearchService {
 
-    private final TitleRepository titleRepo;
+    private static final String INTERNAL = "INTERNAL";
+	private static final String MOVIE = "MOVIE";
+	private static final String SERIES = "SERIES";
+	private final TitleRepository titleRepo;
     private final PeliculaRepository peliculaRepo;
     private final SerieRepository serieRepo;
     private final ImdbTitleBasicsRepository imdbRepo;
@@ -33,7 +36,7 @@ public class TitleSearchService {
         titleRepo.searchByTitleContainingIgnoreCase(query).forEach(t -> {
             SearchTitleResultDto dto = new SearchTitleResultDto();
             dto.setTitleId(t.getId());
-            dto.setSource("INTERNAL");
+            dto.setSource(INTERNAL);
             dto.setTitle(t.getTitle());
             dto.setYear(t.getYear());
             dto.setType(t.getType().name());
@@ -45,10 +48,10 @@ public class TitleSearchService {
         // 2) Películas de colección
         peliculaRepo.findByTituloContainingIgnoreCase(query).forEach(p -> {
             SearchTitleResultDto dto = new SearchTitleResultDto();
-            dto.setSource("MOVIE");
+            dto.setSource(MOVIE);
             dto.setTitle(p.getTitulo());
             dto.setYear(p.getAnyo());
-            dto.setType("MOVIE");
+            dto.setType(MOVIE);
             dto.setPosterUrl(p.getCoverUrl());
             dto.setImdbId(p.getImdbId());
             results.add(dto);
@@ -57,10 +60,10 @@ public class TitleSearchService {
         // 3) Series de colección
         serieRepo.searchByTituloContainingIgnoreCase(query).forEach(s -> {
             SearchTitleResultDto dto = new SearchTitleResultDto();
-            dto.setSource("SERIES");
+            dto.setSource(SERIES);
             dto.setTitle(s.getTitulo());
             dto.setYear(s.getAnyoInicio());
-            dto.setType("SERIES");
+            dto.setType(SERIES);
             dto.setPosterUrl(s.getCoverUrl());
             dto.setImdbId(s.getImdbId());
             results.add(dto);
@@ -77,7 +80,7 @@ public class TitleSearchService {
                 if(!ObjectUtils.isEmpty(imdb.getStartyear())) {
                 	dto.setYear(Integer.valueOf(imdb.getStartyear()));
                 }
-                dto.setType(imdb.getTitletype().equals("tvSeries") ? "SERIES" : "MOVIE");
+                dto.setType(imdb.getTitletype().equals("tvSeries") ? SERIES : MOVIE);
                 dto.setPosterUrl("/covers/placeholder.png"); 
                 dto.setImdbId(imdb.getTconst());
                 results.add(dto);

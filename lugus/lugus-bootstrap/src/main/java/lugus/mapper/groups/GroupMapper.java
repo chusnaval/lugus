@@ -29,6 +29,10 @@ public class GroupMapper {
 		Optional<GroupTitle> gf = group.getFilms().stream().findFirst();
 		if (gf.isPresent() && gf.get().getTitle().getPelicula() != null) {
 			cover = gf.get().getTitle().getPelicula().getCoverUrl();
+		}else if (gf.isPresent() && gf.get().getTitle().getSerie() != null) {
+			cover = gf.get().getTitle().getSerie().getCoverUrl();
+		}else if (gf.isPresent() && gf.get().getTitle().getPosterUrl() != null) {
+			cover = gf.get().getTitle().getPosterUrl();
 		}
 		dto.setPercentageOwned(group.getFilms().stream()
 				.filter(gt -> (gt.getTitle().getPelicula() != null && gt.getTitle().getPelicula().isComprado())

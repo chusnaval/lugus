@@ -42,7 +42,13 @@ public class TitleCreationService {
             t.setTitle(p.getTitulo());
             t.setYear(p.getAnyo());
             t.setPosterUrl(p.getCoverUrl());
-            t.setImdb(imdbRepo.findById(dto.getImdbId()).orElse(null));
+            if(p.getImdbId() != null) {
+            	t.setImdb(imdbRepo.findById(p.getImdbId()).orElse(null));
+            }else if(dto.getImdbId() != null) {
+				t.setImdb(imdbRepo.findById(dto.getImdbId()).orElse(null));
+			}else {
+				System.out.println("No IMDB ID for " + p.getTitulo());
+			}
             return titleRepo.save(t);
         }
 
