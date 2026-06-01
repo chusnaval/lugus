@@ -17,5 +17,7 @@ public class GroupDTO {
 	
 	private Integer filmaffinityId;
 	
-	 private List<GroupTitleDto> titles;
+	private double percentageOwned;
+	
+	private List<GroupTitleDto> titles;
 }

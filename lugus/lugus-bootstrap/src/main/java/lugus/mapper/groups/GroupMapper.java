@@ -16,7 +16,6 @@ import lugus.model.groups.Group;
 import lugus.model.groups.GroupTitle;
 import lugus.model.titles.Title;
 
-
 @Component
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class GroupMapper {
@@ -28,19 +27,23 @@ public class GroupMapper {
 		dto.setMovieCount(group.getFilms().size());
 		String cover = "/covers/placeholder.png";
 		Optional<GroupTitle> gf = group.getFilms().stream().findFirst();
-		if(gf.isPresent() && gf.get().getTitle().getPelicula()!=null) {
+		if (gf.isPresent() && gf.get().getTitle().getPelicula() != null) {
 			cover = gf.get().getTitle().getPelicula().getCoverUrl();
 		}
+		dto.setPercentageOwned(group.getFilms().stream()
+				.filter(gt -> (gt.getTitle().getPelicula() != null && gt.getTitle().getPelicula().isComprado())
+						|| (gt.getTitle().getSerie() != null && gt.getTitle().getSerie().isCompleta()))
+				.count() * 100.0 / group.getFilms().size());
 		dto.setCover(cover);
 		dto.setFilmaffinityId(group.getFilmaffinityId());
 		dto.setTitles(mapChilds(group));
 		return dto;
-		
+
 	}
 
 	private List<GroupTitleDto> mapChilds(Group group) {
 		List<GroupTitleDto> resultado = new ArrayList<>();
-		for(GroupTitle gt: group.getFilms()) {
+		for (GroupTitle gt : group.getFilms()) {
 			GroupTitleDto dto = new GroupTitleDto();
 			dto.setId(gt.getId());
 			dto.setOrden(gt.getOrden());
@@ -57,13 +60,13 @@ public class GroupMapper {
 		dto.setYear(title.getYear());
 		dto.setType(title.getType().name());
 		dto.setPosterUrl(title.getPosterUrl());
-		if(title.getPelicula()!=null) {
+		if (title.getPelicula() != null) {
 			dto.setPeliculaId(title.getPelicula().getId());
 		}
-		if(title.getSerie()!=null) {
+		if (title.getSerie() != null) {
 			dto.setSerieId(title.getSerie().getId());
 		}
-		if(title.getImdb()!=null) {
+		if (title.getImdb() != null) {
 			dto.setImdbId(title.getImdb().getTconst());
 		}
 		return dto;
