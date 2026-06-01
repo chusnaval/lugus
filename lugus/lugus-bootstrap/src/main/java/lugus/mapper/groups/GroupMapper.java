@@ -32,6 +32,7 @@ public class GroupMapper {
 			cover = gf.get().getTitle().getPelicula().getCoverUrl();
 		}
 		dto.setCover(cover);
+		dto.setFilmaffinityId(group.getFilmaffinityId());
 		dto.setTitles(mapChilds(group));
 		return dto;
 		
