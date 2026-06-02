@@ -1,9 +1,11 @@
 package lugus.model.imdb;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -22,7 +24,8 @@ public class OmdbCache {
     @Id
     @Column(name = "imdb_id")
     private String imdbId;
-
-    @Lob
-    private String json;
+    
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "json", columnDefinition = "jsonb")
+    private JsonNode  json;
 }

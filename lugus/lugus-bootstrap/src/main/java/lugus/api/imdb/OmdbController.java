@@ -22,9 +22,9 @@ public class OmdbController {
 	private String apiKey;
 
 	private final OmdbCacheService cacheService;
-	
+
 	private final ObjectMapper mapper;
-	
+
 	public OmdbController(@Value("${omdb.api.key}") String apiKey, OmdbCacheService cacheService, ObjectMapper mapper) {
 		this.apiKey = apiKey;
 		this.cacheService = cacheService;
@@ -32,13 +32,15 @@ public class OmdbController {
 	}
 
 	@GetMapping("/{imdbId}")
-	public ResponseEntity<Map<String, Object>> getFullOmdbJson(@PathVariable String imdbId) throws JsonProcessingException {
+	public ResponseEntity<Map<String, Object>> getFullOmdbJson(@PathVariable String imdbId)
+			throws JsonProcessingException {
 
 		var cached = cacheService.getFromCache(imdbId);
-	    if (cached != null) {
-	        Map<String, Object> json = mapper.readValue(cached.getJson(), Map.class);
-	        return ResponseEntity.ok(json);
-	    }
+		if (cached != null) {
+
+			Map<String, Object> json = mapper.convertValue(cached.getJson(), Map.class);
+			return ResponseEntity.ok(json);
+		}
 		String url = "https://www.omdbapi.com/?i=" + imdbId + "&apikey=" + apiKey + "&plot=full";
 		final RestTemplate rest = new RestTemplate();
 		Map<String, Object> json = rest.getForObject(url, Map.class);
