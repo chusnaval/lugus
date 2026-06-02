@@ -82,7 +82,7 @@ public class FilmDto {
 	private boolean mine;
 	
 	private boolean favorite;
-
+	
 	public void addDirector(DirectorDTO directorDTO) {
 		if (director == null) {
 			director = new ArrayList<>();

@@ -189,7 +189,8 @@ public class Pelicula {
 	@Column(name = "last_seen", nullable = true, columnDefinition = "TIMESTAMP")
 	private Instant lastSeen;
 
-
+	@Column(name = "synopsis")
+	private String synopsis;
 	
 	private transient String situacion;
 

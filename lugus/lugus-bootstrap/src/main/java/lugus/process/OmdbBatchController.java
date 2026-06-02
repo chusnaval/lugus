@@ -24,4 +24,15 @@ public class OmdbBatchController {
     	omdbBatchExecutor.fillCache();
         return ResponseEntity.ok("Batch iniciado");
     }
+    
+    /**
+     * Endpoit para actualizar los datos de pais de las peliculas
+     * a partir de la informacion de OMDB. Esto se hace porque en IMDB
+     * no se tiene la informacion de pais, y se necesita para el proceso de recomendacion.
+     */
+    @PostMapping("/update-country")
+    public ResponseEntity<String> updateCountry() throws JsonProcessingException {
+		omdbBatchExecutor.updateCountry();
+		return ResponseEntity.ok("Batch de actualizacion de pais iniciado");
+	}
 }

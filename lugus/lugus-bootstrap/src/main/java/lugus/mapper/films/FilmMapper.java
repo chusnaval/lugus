@@ -107,7 +107,7 @@ public class FilmMapper {
 		}
 		dto.setCountry(film.getCountry());
 	
-		dto.setSynopsis("");// TODO
+		dto.setSynopsis(film.getSynopsis());
 		dto.setLastSeen(null);// TODO
 
 		return dto;

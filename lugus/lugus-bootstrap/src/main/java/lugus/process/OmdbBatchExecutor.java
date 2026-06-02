@@ -1,5 +1,6 @@
 package lugus.process;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,8 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
+import lugus.dto.core.CountryCode;
 import lugus.model.films.Pelicula;
 import lugus.model.imdb.OmdbCache;
 import lugus.model.series.Serie;
@@ -29,15 +33,17 @@ public class OmdbBatchExecutor {
 	private final TitlesService titlesService;
 	private final String apiKey;
 	private final RestTemplate rest = new RestTemplate();
-
+	private final ObjectMapper mapper;
+	
 	@Autowired
 	public OmdbBatchExecutor(@Value("${omdb.api.key}") String apiKey, PeliculaService peliculaService,
-			SeriesService serieService, TitlesService titlesService, OmdbCacheService cacheService) {
+			SeriesService serieService, TitlesService titlesService, OmdbCacheService cacheService, ObjectMapper mapper) {
 		this.peliculaService = peliculaService;
 		this.serieService = serieService;
 		this.cacheService = cacheService;
 		this.titlesService = titlesService;
 		this.apiKey = apiKey;
+		this.mapper = mapper;
 	}
 	@Transactional
 	public void fillCache() throws JsonProcessingException {
@@ -148,5 +154,38 @@ public class OmdbBatchExecutor {
 
 			index++;
 		}
+	}
+	
+	public void updateCountry() {
+		for (Pelicula p : peliculaService.findAll()) {
+			if (p.getImdbId() == null || p.getImdbId().isBlank()) {
+				System.out.println("Saltando película sin IMDb ID: " + p.getTitulo());
+				continue;
+			}
+			OmdbCache cached = cacheService.getFromCache(p.getImdbId());
+			if (cached != null) {
+				JsonNode node = mapper.valueToTree(cached.getJson());
+				String country = node.get("Country").asText();
+				
+				// puede tener valor o no
+				// o tener uno o varios países separados por coma
+				List<String> values = new ArrayList<>();
+				if(country != null) {	
+					String[] countries = country.split(",");
+					for (int i = 0; i < countries.length; i++) {
+						values.add(CountryCode.fromString(countries[i]).getCode());
+					}
+				}
+				
+				// los guardamosen un campo separados por coma
+				p.setCountry(String.join(",", values));
+				
+				peliculaService.save(p);
+				System.out.println("Actualizada película: " + p.getTitulo() + " con país: " + country);
+			} else {
+				System.out.println("No se encontró en cache, saltando: " + p.getTitulo());
+			}
+		}
+		
 	}
 }
