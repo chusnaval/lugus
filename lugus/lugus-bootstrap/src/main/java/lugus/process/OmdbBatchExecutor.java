@@ -157,9 +157,15 @@ public class OmdbBatchExecutor {
 	}
 	
 	public void updateCountry() {
+		int count = peliculaService.findAll().size();
+		int index = 1;
 		for (Pelicula p : peliculaService.findAll()) {
 			if (p.getImdbId() == null || p.getImdbId().isBlank()) {
 				System.out.println("Saltando película sin IMDb ID: " + p.getTitulo());
+				continue;
+			}
+			if(p.getCountry() != null && !p.getCountry().isBlank()) {
+				System.out.println("Saltando película con país ya seteado: " + p.getTitulo());
 				continue;
 			}
 			OmdbCache cached = cacheService.getFromCache(p.getImdbId());
@@ -181,11 +187,11 @@ public class OmdbBatchExecutor {
 				p.setCountry(String.join(",", values));
 				
 				peliculaService.save(p);
-				System.out.println("Actualizada película: " + p.getTitulo() + " con país: " + country);
+				System.out.println("Actualizada película: " + p.getTitulo() + " con país: " + country + " en posición " + index + "/" + count);
 			} else {
 				System.out.println("No se encontró en cache, saltando: " + p.getTitulo());
 			}
 		}
-		
+		System.out.println("Terminado batch de actualización de país para películas: " + count + " películas procesadas.");
 	}
 }
