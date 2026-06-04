@@ -12,4 +12,5 @@ public class TitleDto {
 	private Integer peliculaId;
 	private Integer serieId;
 	private String imdbId;
+	private boolean owned;
 }

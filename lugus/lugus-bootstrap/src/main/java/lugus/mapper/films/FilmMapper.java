@@ -114,7 +114,7 @@ public class FilmMapper {
 	}
 
 	private void createDirectors(FilmDto dto, Pelicula film) {
-		film.getDirectores().stream().forEach(dir -> dto.addDirector(new DirectorDTO(dir.getId(), dir.getNombre())));
+		film.getDirectores().stream().forEach(dir -> dto.addDirector(new DirectorDTO(dir.getPersona(), dir.getNombre())));
 
 	}
 

@@ -18,15 +18,19 @@ public class TitleMapper {
 		dto.setPeliculaId(title.getPelicula() != null ? title.getPelicula().getId() : null);
 		dto.setSerieId(title.getSerie() != null ? title.getSerie().getId() : null);
 		dto.setImdbId(title.getImdb() != null ? title.getImdb().getTconst() : null);
-		
+			
 		// calcular type
 		if (title.getPelicula() != null) {
+			dto.setOwned(title.getPelicula().isComprado());
 			dto.setType("MOVIES");
 		} else if (title.getSerie() != null) {
+			dto.setOwned(title.getSerie().isCompleta());
 			dto.setType("SERIES");
 		} else if (title.getImdb() != null) {
+			dto.setOwned(false);
 			dto.setType("EXTERNAL");
 		} else {
+			dto.setOwned(false);
 			dto.setType("EXTERNAL");
 		}
 		

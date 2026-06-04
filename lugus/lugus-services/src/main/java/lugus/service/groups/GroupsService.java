@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
+import lugus.infrastructure.repository.films.PeliculaSpecification;
+import lugus.model.films.Pelicula;
 import lugus.model.groups.Group;
 import lugus.repository.groups.GroupRepository;
 
@@ -46,8 +48,10 @@ public class GroupsService {
 
 		Pageable pageable = PageRequest.of(filter.getPagina().get(), filter.getPageSize(), sort);
 
+		
 		Specification<Group> spec = Specification.where(null);
-
+		spec = spec.and(porTitulo(filter.getTitulo()));
+		
 		return groupRepository.findAll(spec, pageable);
 	}
 
@@ -73,4 +77,10 @@ public class GroupsService {
 
 		return groupRepository.findAll(spec, pageable2);
 	}
+	
+	public static Specification<Group> porTitulo(String titulo) {
+		return (root, query, cb) -> (titulo == null || titulo.isBlank()) ? null
+				: cb.like(cb.lower(root.get("name")), "%" + titulo.trim().toLowerCase() + "%");
+	}
+
 }

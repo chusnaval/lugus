@@ -27,6 +27,7 @@ import lugus.service.films.PeliculaService;
 import lugus.service.groups.GroupsService;
 import lugus.service.imdb.ImdbBasicsService;
 import lugus.model.imdb.ImdbBasics;
+import lugus.model.values.Formato;
 @RestController
 @RequestMapping("/v1/api/groups")
 @RequiredArgsConstructor
@@ -53,20 +54,64 @@ public class GroupApiController {
 	}
 
 	@GetMapping("/page")
-	public Page<GroupDTO> getSagas(
-	        @RequestParam Integer page,
-	        @RequestParam Integer size,
-	        @RequestParam(required = false) String title
-	     
-	) {
-		FiltrosDto filtro = new FiltrosDto();
-		filtro.setPagina(Optional.of(page));
-		filtro.setPageSize(size);
-		if(title!=null) {
-			filtro.setTitulo(title);
-		}
+	public Page<GroupDTO> getSagas(@RequestParam Integer page, @RequestParam Integer size,
+			@RequestParam(required = false) Boolean owned, @RequestParam(required = false) String title,
+			@RequestParam(required = false) String casting, @RequestParam(required = false) Integer fromYear,
+			@RequestParam(required = false) Integer toYear, @RequestParam(required = false) String format,
+			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
+			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection) {
+		FiltrosDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+				sortDirection);
 	    return service.findAllBy(filtro).map(mapper::mapToDTO);
 	}
+	
+	private FiltrosDto crearFiltro(Integer page, Integer size, Boolean owned, String title, String casting,
+			Integer fromYear, Integer toYear, String format, String genre, Boolean pack, String sort,
+			String sortDirection) {
+		FiltrosDto filtro = new FiltrosDto();
+		if (page != null) {
+			filtro.setPagina(Optional.of(page));
+		}
+		if (title != null) {
+			filtro.setTitulo(title);
+		}
+		if (casting != null) {
+			filtro.setActor(casting);
+			filtro.setDirector(casting);
+		}
+		if (fromYear != null) {
+			filtro.setFromAnyo(fromYear);
+		}
+		if (toYear != null) {
+			filtro.setToAnyo(toYear);
+		}
+		if (format != null) {
+			filtro.setFormato((int) Formato.getByName(format).getId());
+		}
+		if (genre != null) {
+			filtro.setGenero(genre);
+		}
+		if (pack != null) {
+			filtro.setPack(pack);
+		}
+
+		if (sort != null) {
+			filtro.setOrden(Optional.of(sort));
+		}
+		if (sortDirection != null) {
+			filtro.setDireccion(Optional.of(sortDirection));
+		}
+		if (owned != null) {
+			filtro.setComprado(owned);
+		}
+		int sizeAux = size;
+		if (size == null || size <= 0) {
+			sizeAux = Integer.MAX_VALUE;
+		}
+		filtro.setPageSize(sizeAux);
+		return filtro;
+	}
+
 	
 	@PostMapping
 	GroupDTO newGroup(@RequestBody GroupDTO dto) {

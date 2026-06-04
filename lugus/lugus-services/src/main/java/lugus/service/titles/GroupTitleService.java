@@ -38,11 +38,19 @@ public class GroupTitleService {
 	}
 
 	public void removeTitleFromGroup(int groupId, Long groupTitleId) {
+		
+		// we must to delete the GroupTitle, not the Title, because the same Title can be in multiple groups
+		// but if the title is not in any group, we can delete it from Titles
 		GroupTitle gt = groupTitleRepo.findByIdAndGroupId(groupTitleId, groupId)
 				.orElseThrow(() -> new RuntimeException("GroupTitle not found"));
-
+		Title title = titlesService.findById(gt.getTitle().getId()).orElseThrow(() -> new RuntimeException("Title not found"));
+		List<GroupTitle> anotherGT = groupTitleRepo.findByTitle_Id(title.getId());
+		
 		groupTitleRepo.delete(gt);
-
+		if(anotherGT != null && anotherGT.size() == 1) {
+			titlesService.delete(title.getId());
+		}
+		
 		// Reordenar después de borrar
 		List<GroupTitle> list = groupTitleRepo.findByGroupIdOrderByOrdenAsc(groupId);
 		int order = 1;

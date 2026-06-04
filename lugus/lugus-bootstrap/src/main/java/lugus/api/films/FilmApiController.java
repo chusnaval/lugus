@@ -140,6 +140,7 @@ public class FilmApiController {
 				title.setYear(saved.getAnyo());
 				title.setType(TitleType.MOVIE);
 				title.setPosterUrl(dto.getCoverSrc());
+				title.setPelicula(saved);
 				titlesService.save(title);
 			});
 		}

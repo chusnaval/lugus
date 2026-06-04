@@ -34,4 +34,6 @@ public interface TitleRepository {
 	List<Title> findAll();
 
 	List<Title> findByType(TitleType external);
+	
+	void deleteById(Long id);
 }

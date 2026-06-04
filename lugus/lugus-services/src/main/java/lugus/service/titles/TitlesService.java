@@ -48,4 +48,9 @@ public class TitlesService {
 	   public List<Title> findByType(TitleType external) {
 		return titleRepo.findByType(external);
 	   }
+
+	   public void delete(Long id) {
+		titleRepo.deleteById(id);
+		
+	   }
 }

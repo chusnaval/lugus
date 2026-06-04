@@ -18,4 +18,5 @@ public interface GroupTitleRepository {
 	void delete(GroupTitle gt);
 
 
+	List<GroupTitle> findByTitle_Id(Long titleId);
 }

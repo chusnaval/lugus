@@ -73,6 +73,9 @@ public class GroupMapper {
 		if (title.getImdb() != null) {
 			dto.setImdbId(title.getImdb().getTconst());
 		}
+		dto.setOwned((title.getPelicula() != null && title.getPelicula().isComprado())
+				|| (title.getSerie() != null && title.getSerie().isCompleta()));
+		
 		return dto;
 	}
 
