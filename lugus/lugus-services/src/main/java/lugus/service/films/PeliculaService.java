@@ -20,8 +20,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lugus.dto.core.CountryCode;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.PeliculaChildDto;
@@ -34,13 +38,13 @@ import lugus.model.core.Location;
 import lugus.model.core.Source;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
-import lugus.model.user.Usuario;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.repository.films.PeliculaRepository;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
 import lugus.service.imdb.ImdbTitleBasicsService;
+import lugus.service.imdb.OmdbCacheService;
 import lugus.service.titles.TitlesService;
 import lugus.service.user.CurrentUserProvider;
 
@@ -55,6 +59,8 @@ public class PeliculaService {
 	private final CurrentUserProvider currentUserProvider;
 	private final TitlesService titlesService;
 	private final ImdbTitleBasicsService imdbTitleBasicsService;
+	private final OmdbCacheService cacheService;
+	private final ObjectMapper jsonMapper;
 
 	public List<Pelicula> findAll() {
 		return peliculaRepo.findAll();
@@ -80,9 +86,6 @@ public class PeliculaService {
 		return peliculaRepo.save(p);
 	}
 
-	
-
-	
 	@Transactional
 	public Pelicula crear(PeliculaCreateDto dto) throws IOException, URISyntaxException {
 		Location loc = findLocation(dto);
@@ -118,7 +121,7 @@ public class PeliculaService {
 	}
 
 	@Transactional
-	public Pelicula update(Integer id, FilmDto dto) throws IOException, URISyntaxException {
+	public Pelicula update(Integer id, FilmDto dto, String apiKey) throws IOException, URISyntaxException {
 
 		Pelicula p = peliculaRepo.findById(id).orElseThrow(() -> new RuntimeException("Pelicula no encontrada"));
 		Optional<Location> loc = locService.findById(dto.getLocation());
@@ -140,7 +143,7 @@ public class PeliculaService {
 		p.setSteelbook(dto.isSteelbook());
 		p.setNotas(dto.getNotes());
 		addCaratula(p, dto.getCoverSrc());
-		peliculaRepo.save(p);
+		Pelicula saved = peliculaRepo.save(p);
 
 		// Sincronizar Title si existe
 		titlesService.findByPelicula_Id(id).ifPresent(title -> {
@@ -156,6 +159,27 @@ public class PeliculaService {
 			titlesService.save(title);
 		});
 
+		var cached = cacheService.getFromCache(dto.getImdbId());
+		if (cached != null) {
+
+			JsonNode node = jsonMapper.valueToTree(cached.getJson());
+			String country = node.get("Country").asText();
+
+			// puede tener valor o no
+			// o tener uno o varios países separados por coma
+			List<String> values = new ArrayList<>();
+			if (country != null) {
+				String[] countries = country.split(",");
+				for (int i = 0; i < countries.length; i++) {
+					values.add(CountryCode.fromString(countries[i]).getCode());
+				}
+			}
+
+			// los guardamosen un campo separados por coma
+			saved.setCountry(String.join(",", values));
+			saved.setSynopsis((String) node.get("Plot").asText());
+			save(saved);
+		}
 		return p;
 	}
 
@@ -174,7 +198,6 @@ public class PeliculaService {
 		pelicula.getPeliculaFotos().clear();
 		pelicula.addCaratula(pf);
 	}
-
 
 	private Location findLocation(PeliculaCreateDto dto) {
 		Location loc = null;
@@ -347,7 +370,7 @@ public class PeliculaService {
 
 		return peliculaRepo.findAll(spec, pageable);
 	}
-	
+
 	/**
 	 * Reverse intented order in novelty order, because customers reports this in
 	 * feedback

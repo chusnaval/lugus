@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,8 +25,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lugus.dto.core.CountryCode;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.FilmGenreDto;
@@ -47,19 +53,17 @@ import lugus.service.films.DwFotoServiceI;
 import lugus.service.films.PeliculaService;
 import lugus.service.films.PeliculasUsuarioService;
 import lugus.service.groups.GroupsService;
+import lugus.service.imdb.OmdbCacheService;
 import lugus.service.people.InsertPersonalDataService;
 import lugus.service.titles.TitlesService;
 
 @RestController
 @ResponseBody
 @RequestMapping("/v1/api/films")
-@RequiredArgsConstructor
 public class FilmApiController {
 
 	private final PeliculaService service;
-
 	private final FilmMapper mapper;
-
 	private final GroupsService groupsService;
 	private final LocationService locService;
 	private final SourceService sourceService;
@@ -67,6 +71,30 @@ public class FilmApiController {
 	private final FilmExportService filmExportService;
 	private final TitlesService titlesService;
 	private final PeliculasUsuarioService usuarioPeliculaService;
+	private final String apiKey;
+	private final OmdbCacheService cacheService;
+	private final ObjectMapper jsonMapper;
+
+	@Autowired
+	public FilmApiController(@Value("${omdb.api.key}") String apiKey, PeliculaService service, FilmMapper mapper,
+			GroupsService groupsService, LocationService locService, SourceService sourceService,
+			InsertPersonalDataService insertImdbService, FilmExportService filmExportService,
+			TitlesService titlesService, PeliculasUsuarioService usuarioPeliculaService, OmdbCacheService cacheService,
+			ObjectMapper jsonMapper) {
+		super();
+		this.service = service;
+		this.mapper = mapper;
+		this.groupsService = groupsService;
+		this.locService = locService;
+		this.sourceService = sourceService;
+		this.insertImdbService = insertImdbService;
+		this.filmExportService = filmExportService;
+		this.titlesService = titlesService;
+		this.usuarioPeliculaService = usuarioPeliculaService;
+		this.apiKey = apiKey;
+		this.cacheService = cacheService;
+		this.jsonMapper = jsonMapper;
+	}
 
 	@GetMapping("/{id}")
 	FilmDto one(@PathVariable Integer id, Authentication auth) throws LugusNotFoundException {
@@ -83,15 +111,22 @@ public class FilmApiController {
 
 	@PutMapping("/{id}")
 	public FilmDto update(@PathVariable Integer id, @RequestBody FilmDto dto) throws IOException, URISyntaxException {
-		return mapper.mapToFilmDTO(service.update(id, dto), null);
+		var cached = cacheService.getFromCache(dto.getImdbId());
+
+		if (cached == null) {
+			String url = "https://www.omdbapi.com/?i=" + dto.getImdbId() + "&apikey=" + apiKey + "&plot=full";
+			final RestTemplate rest = new RestTemplate();
+			Map<String, Object> json = rest.getForObject(url, Map.class);
+			cacheService.saveToCache(dto.getImdbId(), json);
+		}
+		return mapper.mapToFilmDTO(service.update(id, dto, apiKey), null);
 	}
-	
+
 	@PostMapping("/{id}/toggle")
 	public ResponseEntity<?> toggleOwned(@PathVariable Integer id, Authentication auth) {
 		usuarioPeliculaService.toggleOwned(auth.getName(), id);
-	    return ResponseEntity.ok().build();
+		return ResponseEntity.ok().build();
 	}
-
 
 	@GetMapping("/page")
 	public Page<FilmDto> getAllFilms(@RequestParam Integer page, @RequestParam Integer size,
@@ -134,7 +169,7 @@ public class FilmApiController {
 
 		if (dto.getImdbId() != null && !dto.getImdbId().isBlank()) {
 			insertImdbService.insert(saved.getId(), dto.getImdbId());
-						
+
 			titlesService.findByImdb_Id(dto.getImdbId()).ifPresent(title -> {
 				title.setTitle(saved.getTitulo());
 				title.setYear(saved.getAnyo());
@@ -144,11 +179,34 @@ public class FilmApiController {
 				titlesService.save(title);
 			});
 		}
-		
-		
 
-		
-		
+		var cached = cacheService.getFromCache(dto.getImdbId());
+
+		if (cached == null) {
+			String url = "https://www.omdbapi.com/?i=" + dto.getImdbId() + "&apikey=" + apiKey + "&plot=full";
+			final RestTemplate rest = new RestTemplate();
+			Map<String, Object> json = rest.getForObject(url, Map.class);
+			cacheService.saveToCache(dto.getImdbId(), json);
+		}
+		cached = cacheService.getFromCache(dto.getImdbId());
+		JsonNode node = jsonMapper.valueToTree(cached.getJson());
+		String country = node.get("Country").asText();
+
+		// puede tener valor o no
+		// o tener uno o varios países separados por coma
+		List<String> values = new ArrayList<>();
+		if (country != null) {
+			String[] countries = country.split(",");
+			for (int i = 0; i < countries.length; i++) {
+				values.add(CountryCode.fromString(countries[i]).getCode());
+			}
+		}
+
+		// los guardamosen un campo separados por coma
+		saved.setCountry(String.join(",", values));
+		saved.setSynopsis((String) node.get("Plot").asText());
+		service.save(saved);
+
 		return ResponseEntity.ok().build();
 	}
 
@@ -203,7 +261,7 @@ public class FilmApiController {
 		stats.setUhd(service.contarPorFormato(Formato.ULTRAHD));
 		stats.setDigital(service.contarPorFormato(Formato.DIGITAL));
 		stats.setNotOwned(service.contarNoCompradas());
-		
+
 		Map<Object, Integer> categorias = service.contarPorCategoria();
 		stats.setGenerosPorCategoria(new FilmGenreDto());
 		stats.getGenerosPorCategoria().setArteEntretenimiento(categorias.get(Categoria.ARTE_ENTRETENIMIENTO));
@@ -214,8 +272,7 @@ public class FilmApiController {
 		stats.getGenerosPorCategoria().setTerror(categorias.get(Categoria.TERROR));
 		stats.getGenerosPorCategoria().setConflicto(categorias.get(Categoria.CONFLICTO));
 		stats.getGenerosPorCategoria().setDocumental(categorias.get(Categoria.DOCUMENTAL));
-		
-		
+
 		return stats;
 	}
 
