@@ -65,7 +65,9 @@ public class FilmographyApiController {
 			ImdbTitlePrincipals first = list.get(0);
 			ImdbTitleBasics itb = imdbTitleBasicsService.findById(first.getId().getTconst()).get();
 			Filmography film = buildNewFilmography(person, first, Optional.of(itb));
-
+			if(film == null) {
+				return null;
+			}
 			list.stream().skip(1).forEach(itp -> film.appendCategory(itp.getId().getCategory()));
 
 			return film;
@@ -102,7 +104,7 @@ public class FilmographyApiController {
 		
 
 		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
-			.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type("SERIES")
+			.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type(itb.get().getTitletype())
 			.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
 		
 		if (isSerieRegister) {
@@ -127,7 +129,7 @@ public class FilmographyApiController {
 		boolean isFilmRegister = peliculaService.isFilmRegistered(itp.getId().getTconst());
 
 		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
-			.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type("MOVIE")
+			.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type(itb.get().getTitletype())
 			.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
 			if (isFilmRegister) {
 				List<Pelicula> pelis = peliculaService.findByImdbId(itp.getId().getTconst());
