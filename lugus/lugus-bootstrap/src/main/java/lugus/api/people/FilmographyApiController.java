@@ -1,5 +1,6 @@
 package lugus.api.people;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -55,17 +56,20 @@ public class FilmographyApiController {
 
 		List<ImdbTitlePrincipals> aux = imdbTitlePrincipalsService.findAllByIdNconst(person.getNconst());
 		
+		
 		List<Filmography> films = aux.stream().filter(itp -> {
 			Optional<ImdbTitleBasics> itb = imdbTitleBasicsService.findById(itp.getId().getTconst());
 			return itb.isPresent() && itb.get().getStartyear() != null && !itb.get().isASerieEpisode();
+			
 		}).collect(Collectors.groupingBy(itp -> itp.getId().getTconst())).values().stream().map(list -> {
 			ImdbTitlePrincipals first = list.get(0);
 			ImdbTitleBasics itb = imdbTitleBasicsService.findById(first.getId().getTconst()).get();
 			Filmography film = buildNewFilmography(person, first, Optional.of(itb));
+
 			list.stream().skip(1).forEach(itp -> film.appendCategory(itp.getId().getCategory()));
 
 			return film;
-		}).collect(Collectors.toList());
+		}).filter(f -> f!=null).collect(Collectors.toList());
 
 		Collections.sort(films, (o1, o2) -> o1.getStartyear().compareTo(o2.getStartyear()));
 		return films;
@@ -84,9 +88,11 @@ public class FilmographyApiController {
 		boolean isMovie = itb.get().isAMovie();
 		if(isMovie) {
 			return buildFilmographyForMovie(person, itp, itb, ita);
-		} else {
+		} else if (itb.get().isASerie()) {
 			return buildFilmographyForSerie(person, itp, itb, ita);
 		}
+		
+		return null;
 		
 	}
 

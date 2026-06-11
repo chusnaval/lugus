@@ -51,7 +51,11 @@ public class ImdbTitleBasics {
 	 * @return
 	 */
 	public boolean isAMovie() {
-		return "movie".equals(this.getTitletype()) || "tvMovie".equals(this.getTitletype());
+		return "movie".equals(this.getTitletype()) || "tvMovie".equals(this.getTitletype()) || "short".equals(this.getTitletype()) || "tvSpecial".equals(this.getTitletype());
+	}
+	
+	public boolean isASerie() {
+		return "tvMiniSeries".equals(this.getTitletype()) || "tvSeries".equals(this.getTitletype());
 	}
 	
 	public boolean isASerieEpisode() {
