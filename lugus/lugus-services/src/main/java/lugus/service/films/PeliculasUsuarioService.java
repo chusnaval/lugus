@@ -47,6 +47,26 @@ public class PeliculasUsuarioService {
 	    }
 	}
     
+    public void toggleFav(String login, Integer peliculaId) {
+   	 Usuario user = userService.findByLogin(login).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+   	  Pelicula pelicula = peliculaService.findById(peliculaId).orElseThrow(() -> new RuntimeException("Película no encontrada"));
+	    Optional<PeliculasUsuario> existing =
+	    		repository.findByUsuarioAndPelicula(user, pelicula);
+
+	    if (existing.isPresent()) {
+	    	existing.get().setFavorita(!existing.get().isFavorita());
+	    	repository.save(existing.get());
+	    } else {
+	        Pelicula p = peliculaService.findById(peliculaId).orElseThrow(() -> new RuntimeException("Película no encontrada"));
+	        PeliculasUsuario up = new PeliculasUsuario();
+	        up.setFavorita(true);
+	        up.setUsuario(user);
+	        up.setPelicula(p);
+	        repository.save(up);
+	    }
+	}
+   
+    
     public List<PeliculasUsuario> findByUsuario(Usuario usuario) {
         return repository.findByUsuario(usuario);
     }

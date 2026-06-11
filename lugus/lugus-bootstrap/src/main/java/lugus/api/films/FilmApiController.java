@@ -127,6 +127,12 @@ public class FilmApiController {
 		return ResponseEntity.ok().build();
 	}
 
+	@PostMapping("/{id}/fav")
+	public ResponseEntity<?> toggleFav(@PathVariable Integer id, Authentication auth) {
+		usuarioPeliculaService.toggleFav(auth.getName(), id);
+		return ResponseEntity.ok().build();
+	}
+	
 	@GetMapping("/page")
 	public Page<FilmDto> getAllFilms(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) Boolean owned, @RequestParam(required = false) String title,
