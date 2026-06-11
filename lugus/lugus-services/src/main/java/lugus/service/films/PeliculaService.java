@@ -29,10 +29,8 @@ import lugus.dto.core.CountryCode;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.PeliculaChildDto;
-import lugus.dto.films.PeliculaCreateDto;
 import lugus.dto.filters.CoversFilter;
 import lugus.dto.filters.CoversSpecs;
-import lugus.exception.LugusNotFoundException;
 import lugus.infrastructure.repository.films.PeliculaSpecification;
 import lugus.model.core.Location;
 import lugus.model.core.Source;
@@ -86,40 +84,7 @@ public class PeliculaService {
 		return peliculaRepo.save(p);
 	}
 
-	@Transactional
-	public Pelicula crear(PeliculaCreateDto dto) throws IOException, URISyntaxException {
-		Location loc = findLocation(dto);
-		String username = currentUserProvider.currentUsername();
-
-		Formato formato = Formato.getById(dto.getFormatoCodigo());
-		Genero genero = Genero.getById(dto.getGeneroCodigo());
-
-		Pelicula p = Pelicula.builder().titulo(dto.getTitulo()).tituloGest(dto.getTituloGest()).anyo(dto.getAnyo())
-				.formato(formato).genero(genero).pack(dto.isPack()).steelbook(dto.isSteelbook()).funda(dto.isFunda())
-				.imdbId(dto.getImdbCodigo()).comprado(dto.isComprado()).notas(dto.getNotas()).location(loc)
-				.usrAlta(username).tsAlta(Instant.now()).tsModif(Instant.now()).build();
-		p.calcularCodigoInicial();
-		calculateCodeSuffix(p);
-		Pelicula saved = peliculaRepo.save(p);
-
-		if (dto.getUrl() != null && !dto.getUrl().isEmpty()) {
-			final DwFotoServiceI dwFotoService = new DwFotoService();
-			Optional<Source> sourceObj = sourceService.findById(dto.getSource());
-			PeliculaFoto pf = new PeliculaFoto();
-			pf.setUrl(dto.getUrl());
-			if (sourceObj.isPresent()) {
-				pf.setSource(sourceObj.get());
-			}
-			pf.setFoto(dwFotoService.descargar(dto.getSource(), dto.getUrl()));
-			pf.setCaratula(true);
-
-			saved.addCaratula(pf);
-			saved = save(saved);
-		}
-
-		return saved;
-	}
-
+	
 	@Transactional
 	public Pelicula update(Integer id, FilmDto dto, String apiKey) throws IOException, URISyntaxException {
 
@@ -199,14 +164,6 @@ public class PeliculaService {
 		pelicula.addCaratula(pf);
 	}
 
-	private Location findLocation(PeliculaCreateDto dto) {
-		Location loc = null;
-		if (dto.getLocationCode() != null && !dto.getLocationCode().isBlank()) {
-			loc = locService.findById(dto.getLocationCode())
-					.orElseThrow(() -> new LugusNotFoundException(dto.getLocationCode()));
-		}
-		return loc;
-	}
 
 	@Transactional
 	public void delete(Integer id) {

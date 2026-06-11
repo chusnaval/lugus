@@ -31,6 +31,8 @@ import lombok.ToString;
 import lugus.converter.FormatoConverter;
 import lugus.converter.GeneroConverter;
 import lugus.model.core.Location;
+import lugus.model.people.Actor;
+import lugus.model.people.SeriesPersonal;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 import lugus.model.values.LangVersion;
@@ -114,6 +116,17 @@ public class Serie {
 	@OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private final Set<Season> seasons = new HashSet<>();
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, orphanRemoval = true)
+	@ToString.Exclude
+	private final Set<SeriesPersonal> seriesPersonal = new HashSet<>();
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "serie", cascade = CascadeType.ALL)
+	@ToString.Exclude
+	private final Set<Actor> actores = new HashSet<>();
+
 	
 	public String getDescLocation() {
 		if (location == null) {

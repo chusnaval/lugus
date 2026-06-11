@@ -37,6 +37,10 @@ public class Persona {
 	@ToString.Exclude
 	private Set<PeliculasPersonal> peliculasPersonal = new HashSet<>();
 	
+	@OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
+	@ToString.Exclude
+	private Set<SeriesPersonal> seriesPersonal = new HashSet<>();
+	
 	@Column
 	private String nconst;
 	

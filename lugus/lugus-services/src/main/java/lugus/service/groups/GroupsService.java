@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
-import lugus.infrastructure.repository.films.PeliculaSpecification;
-import lugus.model.films.Pelicula;
 import lugus.model.groups.Group;
 import lugus.repository.groups.GroupRepository;
 

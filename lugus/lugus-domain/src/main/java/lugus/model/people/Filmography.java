@@ -28,6 +28,8 @@ public class Filmography {
 	private String tconst;
 
 	private String fcharacters;
+	
+	private String type;
 
 	private boolean comprado;
 

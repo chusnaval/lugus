@@ -35,7 +35,6 @@ import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.FilmGenreDto;
 import lugus.dto.films.FilmStatsDto;
-import lugus.dto.films.PeliculaCreateDto;
 import lugus.exception.LugusNotFoundException;
 import lugus.export.FilmExportService;
 import lugus.mapper.films.FilmMapper;
@@ -220,20 +219,20 @@ public class FilmApiController {
 	}
 
 	@GetMapping("/wanted")
-	List<PeliculaCreateDto> wanted() throws LugusNotFoundException {
+	List<FilmDto> wanted() throws LugusNotFoundException {
 		Page<Pelicula> page = service.wanted();
-		List<PeliculaCreateDto> result = new ArrayList<PeliculaCreateDto>();
+		List<FilmDto> result = new ArrayList<FilmDto>();
 		for (Pelicula p : page.getContent()) {
-			result.add(mapper.mapToDTO(p));
+			result.add(mapper.mapToFilmDTO(p));
 		}
 		return result;
 	}
 
 	@GetMapping("/random/wanted")
-	PeliculaCreateDto randomw() throws LugusNotFoundException {
+	FilmDto randomw() throws LugusNotFoundException {
 		Page<Pelicula> page = service.wanted();
 		int number = (int) (Math.random() * page.getNumberOfElements()) + 1;
-		return mapper.mapToDTO(page.getContent().get(number));
+		return mapper.mapToFilmDTO(page.getContent().get(number));
 	}
 
 	@GetMapping(value = "/ultimas", produces = "application/json;charset=UTF-8")

@@ -1,5 +1,8 @@
 package lugus.dto.films;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,5 +41,18 @@ public class SerieDto {
 	private boolean completed;
 	
 	private String coverSrc;
+	
+	private String imdbId;
+	
+	
+	private List<CastDto> casting = new ArrayList<>();
+	
+
+	public void addCast(CastDto castDto) {
+		if (casting == null) {
+			casting = new ArrayList<>();
+		}
+		casting.add(castDto);
+	}
 	
 }

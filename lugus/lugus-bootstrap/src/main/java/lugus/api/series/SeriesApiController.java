@@ -3,7 +3,6 @@ package lugus.api.series;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.SerieDto;
 import lugus.dto.films.SeriesStatsDto;
-import lugus.dto.series.SerieCreateDto;
 import lugus.exception.LugusNotFoundException;
 import lugus.export.SeriesExportService;
 import lugus.mapper.series.SeriesMapper;
@@ -34,11 +32,14 @@ import lugus.model.core.Source;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
 import lugus.model.values.Formato;
+import lugus.model.values.TitleType;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
+import lugus.service.people.InsertPersonalSeriesDataService;
 import lugus.service.series.SeriesService;
+import lugus.service.titles.TitlesService;
 
 @RestController
 @RequestMapping("/v1/api/series")
@@ -55,6 +56,9 @@ public class SeriesApiController {
 	
 	private final SeriesExportService seriesExportService;
 	
+	private final InsertPersonalSeriesDataService insertImdbService;
+	
+	private final TitlesService titlesService;
 	
 	@GetMapping("/{id}")
 	SerieDto one(@PathVariable int id) {
@@ -137,6 +141,7 @@ public class SeriesApiController {
 		serie.setTsAlta(Instant.now());
 		serie.setUsrAlta(auth.getName());
 		Serie saved = service.save(serie);
+		
 		if (dto.getCoverSrc() != null && !dto.getCoverSrc().isEmpty()) {
 			final DwFotoServiceI dwFotoService = new DwFotoService();
 			final int sourceId = sourceService.calcularIdSource(dto.getCoverSrc());
@@ -150,10 +155,21 @@ public class SeriesApiController {
 			pf.setCaratula(true);
 
 			saved.addCaratula(pf);
-			saved = service.save(saved);
+			service.save(saved);
 		}
 
-		
+		if (dto.getImdbId() != null && !dto.getImdbId().isBlank()) {
+			insertImdbService.insert(saved.getId(), dto.getImdbId());
+
+			titlesService.findByImdb_Id(dto.getImdbId()).ifPresent(title -> {
+				title.setTitle(saved.getTitulo());
+				title.setYear(saved.getAnyoInicio());
+				title.setType(TitleType.SERIES);
+				title.setPosterUrl(dto.getCoverSrc());
+				title.setSerie(saved);
+				titlesService.save(title);
+			});
+		}
 		
 		return ResponseEntity.ok().build();
 	}
@@ -166,16 +182,6 @@ public class SeriesApiController {
 					.orElseThrow(() -> new LugusNotFoundException(dto.getLocation()));
 		}
 		return loc;
-	}
-	
-	@GetMapping("/wanted")
-	List<SerieCreateDto> wanted() throws LugusNotFoundException {
-		Page<Serie> page = service.wanted();
-		List<SerieCreateDto> result = new ArrayList<>();
-		for (Serie p : page.getContent()) {
-			result.add(mapper.mapToDTO(p));
-		}
-		return result;
 	}
 	
 	@GetMapping(value="/ultimas", produces = "application/json;charset=UTF-8")

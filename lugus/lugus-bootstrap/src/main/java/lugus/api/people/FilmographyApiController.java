@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lugus.model.films.Pelicula;
+import lugus.model.series.Serie;
 import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.imdb.ImdbTitlePrincipals;
@@ -23,6 +24,7 @@ import lugus.service.imdb.ImdbTitleAkasService;
 import lugus.service.imdb.ImdbTitleBasicsService;
 import lugus.service.imdb.ImdbTitlePrincipalsService;
 import lugus.service.people.PersonaService;
+import lugus.service.series.SeriesService;
 
 @RestController
 @RequestMapping("/v1/api/filmography")
@@ -38,6 +40,8 @@ public class FilmographyApiController {
 	private final ImdbTitleAkasService imdbTitleAkasService;
 
 	private final PeliculaService peliculaService;
+	
+	private final SeriesService seriesService;
 
 	@GetMapping("/{id}")
 	public List<Filmography> findFilmography( @PathVariable Integer id){
@@ -50,9 +54,10 @@ public class FilmographyApiController {
 	private List<Filmography> buildFilmsList(Persona person) {
 
 		List<ImdbTitlePrincipals> aux = imdbTitlePrincipalsService.findAllByIdNconst(person.getNconst());
+		
 		List<Filmography> films = aux.stream().filter(itp -> {
 			Optional<ImdbTitleBasics> itb = imdbTitleBasicsService.findById(itp.getId().getTconst());
-			return itb.isPresent() && itb.get().getStartyear() != null && itb.get().isAMovie();
+			return itb.isPresent() && itb.get().getStartyear() != null && !itb.get().isASerieEpisode();
 		}).collect(Collectors.groupingBy(itp -> itp.getId().getTconst())).values().stream().map(list -> {
 			ImdbTitlePrincipals first = list.get(0);
 			ImdbTitleBasics itb = imdbTitleBasicsService.findById(first.getId().getTconst()).get();
@@ -69,16 +74,55 @@ public class FilmographyApiController {
 	private Filmography buildNewFilmography(Persona person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb) {
 		
 		Optional<ImdbTitleAkas> ita = imdbTitleAkasService.findByTitleId(itp.getId().getTconst());
-		boolean isFilmRegister = peliculaService.isFilmRegistered(itp.getId().getTconst());
-		
 
+		if(itb.isEmpty()) {
+			throw new IllegalArgumentException("No se puede construir Filmography: itb vacío");
+		}
 		if (itb.isEmpty() || itb.get().getStartyear() == null) {
 		    throw new IllegalArgumentException("No se puede construir Filmography: itb vacío o startyear nulo");
 		}
-		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
-			.category(itp.getId().getCategory()).tconst(itp.getId().getTconst())
-			.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
+		boolean isMovie = itb.get().isAMovie();
+		if(isMovie) {
+			return buildFilmographyForMovie(person, itp, itb, ita);
+		} else {
+			return buildFilmographyForSerie(person, itp, itb, ita);
+		}
+		
+	}
 
+	private Filmography buildFilmographyForSerie(Persona person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb,
+			Optional<ImdbTitleAkas> ita) {
+		boolean isSerieRegister = seriesService.isFilmRegistered(itp.getId().getTconst());
+		
+
+		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
+			.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type("SERIES")
+			.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
+		
+		if (isSerieRegister) {
+			Optional<Serie> serie = seriesService.findByImdbId(itp.getId().getTconst());
+			if (!serie.isPresent()) {
+				film.setPeliculaId(serie.get().getId());
+				
+				film.setComprado(serie.get().isComprado());
+				film.setBuscado(!serie.get().isComprado());
+			} else {
+				film.setBuscado(true);
+				film.setComprado(false);
+			}
+		}
+
+
+	return film;
+	}
+
+	private Filmography buildFilmographyForMovie(Persona person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb,
+			Optional<ImdbTitleAkas> ita) {
+		boolean isFilmRegister = peliculaService.isFilmRegistered(itp.getId().getTconst());
+
+		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
+			.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type("MOVIE")
+			.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
 			if (isFilmRegister) {
 				List<Pelicula> pelis = peliculaService.findByImdbId(itp.getId().getTconst());
 				if (!pelis.isEmpty()) {
@@ -91,7 +135,7 @@ public class FilmographyApiController {
 						return p1.getTsModif().compareTo(p2.getTsModif());
 					}).get();
 					film.setPeliculaId(pelicula.getId());
-					
+				
 					// queremos marcar como comprado o buscado el registro de filmografia, asi que si cualquiera de los registros de pelicula con ese tconst esta comprado, se marca como comprado, sino se marca como buscado
 					boolean comprado = pelis.stream().anyMatch(Pelicula::isComprado);
 					film.setComprado(comprado);
@@ -100,6 +144,7 @@ public class FilmographyApiController {
 					film.setBuscado(true);
 					film.setComprado(false);
 				}
+				
 			}
 
 

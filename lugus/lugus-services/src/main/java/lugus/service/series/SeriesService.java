@@ -17,12 +17,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.SerieDto;
-import lugus.dto.series.SerieCreateDto;
-import lugus.exception.LugusNotFoundException;
 import lugus.infrastructure.repository.series.SerieSpecification;
 import lugus.model.core.Location;
 import lugus.model.core.Source;
@@ -35,7 +32,6 @@ import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
-import lugus.service.user.CurrentUserProvider;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +41,6 @@ public class SeriesService {
 	private final SerieRepository serieRepo;
 	private final LocationService locService;
 	private final SourceService sourceService;
-	private final CurrentUserProvider currentUserProvider;
 
 	public List<Serie> findAll() {
 		return serieRepo.findAll();
@@ -189,48 +184,7 @@ public class SeriesService {
 		return serieRepo.findAll(spec, pageable);
 	}
 
-	@Transactional
-	public Serie crear(@Valid SerieCreateDto dto) throws IOException, URISyntaxException {
-		Location loc = findLocation(dto);
-		String username = currentUserProvider.currentUsername();
-
-		Formato formato = Formato.getById(dto.getFormatoCodigo());
-		Genero genero = Genero.getById(dto.getGeneroCodigo());
-
-		Serie p = Serie.builder().titulo(dto.getTitulo()).tituloGest(dto.getTituloGest())
-				.anyoInicio(dto.getAnyoInicio()).anyoFin(dto.getAnyoFin()).formato(formato).genero(genero)
-				.comprado(dto.isComprado()).completa(dto.isCompleta()).notas(dto.getNotas()).location(loc).usrAlta(username).tsAlta(Instant.now())
-				.build();
-		p.calcularCodigo();
-		p.createSeasons();
-		Serie saved = serieRepo.save(p);
-
-		if (dto.getUrl() != null && !dto.getUrl().isEmpty()) {
-			final DwFotoServiceI dwFotoService = new DwFotoService();
-			Optional<Source> sourceObj = sourceService.findById(dto.getSource());
-			SerieFoto pf = new SerieFoto();
-			pf.setUrl(dto.getUrl());
-			if(sourceObj.isPresent()) {
-				pf.setSource(sourceObj.get());
-			}
-			pf.setFoto(dwFotoService.descargar(dto.getSource(), dto.getUrl()));
-			pf.setCaratula(true);
-
-			saved.addCaratula(pf);
-			saved = save(saved);
-		}
-
-		return saved;
-	}
 	
-	private Location findLocation(SerieCreateDto dto) {
-		Location loc = null;
-		if (dto.getLocationCode() != null && !dto.getLocationCode().isBlank()) {
-			loc = locService.findById(dto.getLocationCode())
-					.orElseThrow(() -> new LugusNotFoundException(dto.getLocationCode()));
-		}
-		return loc;
-	}
 
 	public List<Serie> findByTitlesInYear(String title, Integer year) {
 		List<Serie> result = new ArrayList<>();
@@ -255,6 +209,14 @@ public class SeriesService {
 
 	public int countByComprado(boolean value) {
 		return serieRepo.countByComprado(value);
+	}
+
+	public boolean isFilmRegistered(String tconst) {
+		return findByImdbId(tconst).isPresent();
+	}
+
+	public Optional<Serie> findByImdbId(String tconst) {
+		return serieRepo.findByImdbId(tconst);
 	}
 
 }
