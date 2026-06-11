@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lugus.dto.series.SeasonDto;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ import lombok.Setter;
 public class SerieDto {
 
 	private int id;
-	
+
 	private String title;
 
 	private String titleMgmt;
@@ -25,7 +26,7 @@ public class SerieDto {
 	private String location;
 
 	private int startYear;
-	
+
 	private Integer finishYear;
 
 	private String genreCode;
@@ -35,18 +36,17 @@ public class SerieDto {
 	private String mgmtCode;
 
 	private String notes;
-	
+
 	private boolean owned;
 
 	private boolean completed;
-	
+
 	private String coverSrc;
-	
+
 	private String imdbId;
-	
-	
+
 	private List<CastDto> casting = new ArrayList<>();
-	
+	private List<SeasonDto> seasons = new ArrayList<>();
 
 	public void addCast(CastDto castDto) {
 		if (casting == null) {
@@ -54,5 +54,12 @@ public class SerieDto {
 		}
 		casting.add(castDto);
 	}
-	
+
+	public void addSeason(SeasonDto seasonDto) {
+		if (seasons == null) {
+			seasons = new ArrayList<>();
+		}
+		seasons.add(seasonDto);
+	}
+
 }

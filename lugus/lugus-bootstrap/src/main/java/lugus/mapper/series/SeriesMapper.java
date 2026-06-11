@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 
 import lugus.dto.films.CastDto;
 import lugus.dto.films.SerieDto;
+import lugus.dto.series.SeasonDto;
+import lugus.model.series.Season;
 import lugus.model.series.Serie;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
@@ -35,12 +37,20 @@ public class SeriesMapper {
 		}
 
 		createCasting(dto, serie);
+		createSeasons(dto, serie);
 
 		dto.setOwned(serie.isComprado());
 		dto.setCompleted(serie.isCompleta());
 		dto.setNotes(serie.getNotas());
 		dto.setCoverSrc(serie.getCoverUrl());
 		return dto;
+	}
+
+	private void createSeasons(SerieDto dto, Serie serie) {
+		for(Season season  : serie.getSeasons()) {
+			dto.addSeason(new SeasonDto(season.getDesc(), season.getOrder(), season.isPurchased(), season.isWanted()));
+		}
+		
 	}
 
 	public Serie mapToSerie(SerieDto dto) {
