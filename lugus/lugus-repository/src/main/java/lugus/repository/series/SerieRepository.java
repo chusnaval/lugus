@@ -39,4 +39,6 @@ public interface SerieRepository {
 	Optional<Serie> findByImdbId(String imdbId);
 
 	Iterable<Serie> searchByTituloContainingIgnoreCase(String query);
+
+	void flush();
 }

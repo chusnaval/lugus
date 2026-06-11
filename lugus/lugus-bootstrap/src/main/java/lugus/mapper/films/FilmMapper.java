@@ -72,7 +72,6 @@ public class FilmMapper {
 		if (film.getGroups() != null && film.getGroups().isEmpty()) {
 			dto.setGroup(getFirstGroup(film));
 		}
-		dto.setFaId(film.getFaId());
 		dto.setTrailerUrl(film.getTrailerUrl());
 		dto.setWatched(film.getLastSeen() != null);
 		if (film.getImdbId() != null) {

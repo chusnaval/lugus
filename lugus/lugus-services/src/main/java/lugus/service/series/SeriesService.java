@@ -20,13 +20,16 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FiltrosDto;
 import lugus.dto.films.SerieDto;
+import lugus.dto.series.SeasonDto;
 import lugus.infrastructure.repository.series.SerieSpecification;
 import lugus.model.core.Location;
 import lugus.model.core.Source;
+import lugus.model.series.Season;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
+import lugus.model.values.LangVersion;
 import lugus.repository.series.SerieRepository;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
@@ -83,11 +86,9 @@ public class SeriesService {
 		spec = spec.and(SerieSpecification.byLocation(filter.getLocation()));
 		spec = spec.and(SerieSpecification.porNotas(filter.getNotas()));
 		spec = spec.and(SerieSpecification.porTitulo(filter.getTitulo()));
-		
+
 		return serieRepo.findAll(spec, pageable);
 	}
-	
-	
 
 	/**
 	 * Complete movies search with all filters available
@@ -99,7 +100,7 @@ public class SeriesService {
 	 * @return
 	 */
 	public Page<Serie> wanted() {
-		Sort sort = Sort.by(Direction.fromString("ASC"),"tituloGest");
+		Sort sort = Sort.by(Direction.fromString("ASC"), "tituloGest");
 
 		Pageable pageable = PageRequest.of(0, 1000, sort);
 
@@ -107,7 +108,7 @@ public class SeriesService {
 
 		spec = spec.or(SerieSpecification.porComprado(false));
 		spec = spec.or(SerieSpecification.porCompleta(false));
-		
+
 		return serieRepo.findAll(spec, pageable);
 	}
 
@@ -132,46 +133,68 @@ public class SeriesService {
 
 		Serie p = serieRepo.findById(id).orElseThrow(() -> new RuntimeException("Pelicula no encontrada"));
 		Optional<Location> loc = locService.findById(dto.getLocation());
-		
+
 		p.setTitulo(dto.getTitle());
 		p.setTituloGest(dto.getTitleMgmt());
 		p.setAnyoInicio(dto.getStartYear());
 		p.setAnyoFin(dto.getFinishYear());
 		p.setTsModif(Instant.now());
-		if(dto.getFormat()!=null) {
+		if (dto.getFormat() != null) {
 			p.setFormato(Formato.getById(Short.valueOf(dto.getFormat())));
 		}
 		p.setGenero(Genero.getById(dto.getGenreCode()));
-		if(loc.isPresent()) {
+		if (loc.isPresent()) {
 			p.setLocation(loc.get());
 		}
 		p.setCodigo(dto.getMgmtCode());
 		p.setComprado(dto.isOwned());
 		p.setNotas(dto.getNotes());
 		addCaratula(p, dto.getCoverSrc());
+		updateSeasons(p, dto.getSeasons());
 		serieRepo.save(p);
-
-		
 
 		return p;
 	}
 	
+	private void updateSeasons(Serie serie, List<SeasonDto> seasonDtos) {
+
+	    // 1) Borrar temporadas actuales (gracias a orphanRemoval)
+	    serie.getSeasons().clear();
+	    
+	    serieRepo.flush();
+
+	    // 2) Añadir las nuevas
+	    for (SeasonDto dto : seasonDtos) {
+	        Season s = new Season();
+	        s.setOrder(dto.getOrdinal());
+	        s.setDesc(dto.getDesc());
+	        s.setPurchased(dto.isPurchased());
+	        s.setWanted(dto.isWanted());
+	        s.setPublishedVersion(LangVersion.VE);
+	        s.setPurchasedVersion(LangVersion.VE);
+	        s.setSerie(serie);
+
+	        serie.getSeasons().add(s);
+	    }
+	}
+
+
 	public void addCaratula(Serie serie, String url) throws IOException, URISyntaxException {
 
 		final DwFotoServiceI dwFotoService = new DwFotoService();
 		Optional<Source> sourceObj = sourceService.findById(sourceService.calcularIdSource(url));
-		SerieFoto pf = new SerieFoto();
-		pf.setUrl(url);
-		if (sourceObj.isPresent()) {
+		if (sourceObj.isPresent() && url!=null) {
+			SerieFoto pf = new SerieFoto();
+			pf.setUrl(url);
 			pf.setSource(sourceObj.get());
-		}
-		pf.setFoto(dwFotoService.descargar(sourceObj.get().getId(), url));
-		pf.setCaratula(true);
+			pf.setFoto(dwFotoService.descargar(sourceObj.get().getId(), url));
+			pf.setCaratula(true);
 
-		serie.getSerieFotos().clear();
-		serie.addCaratula(pf);
+			serie.getSerieFotos().clear();
+			serie.addCaratula(pf);
+		}
 	}
-	
+
 	public Page<Serie> findForHome() {
 		Sort sort = buildSort(Optional.of("compra"), Optional.of("ASC"));
 
@@ -184,13 +207,11 @@ public class SeriesService {
 		return serieRepo.findAll(spec, pageable);
 	}
 
-	
-
 	public List<Serie> findByTitlesInYear(String title, Integer year) {
 		List<Serie> result = new ArrayList<>();
 		result.addAll(serieRepo.findByTituloAndAnyoInicio(title, year));
 		result.addAll(serieRepo.findByTituloGestAndAnyoInicio(title, year));
-		
+
 		return result;
 	}
 

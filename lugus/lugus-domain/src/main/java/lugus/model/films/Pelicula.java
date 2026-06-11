@@ -177,9 +177,6 @@ public class Pelicula {
 	@Column
 	private Integer votes;
 
-	@Column(name = "fa_id")
-	private String faId;
-
 	@Column(name = "trailer_url")
 	private String trailerUrl;
 
