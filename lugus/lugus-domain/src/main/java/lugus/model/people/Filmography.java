@@ -40,7 +40,9 @@ public class Filmography {
 	 * @param category2
 	 */
 	public void appendCategory(String category2) {
-		this.setCategory(this.category + " - " + category2);
+		if(!hasCategory(category2)) {
+			this.setCategory(this.category + " - " + category2);
+		}
 	}
 
 	/**

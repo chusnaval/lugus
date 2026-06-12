@@ -3,6 +3,8 @@ package lugus.api.imdb;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +56,7 @@ public class OmdbController {
 		final RestTemplate rest = new RestTemplate();
 		Map<String, Object> json = rest.getForObject(url, Map.class);
 		cacheService.saveToCache(imdbId, json);
-		
+		cached = cacheService.getFromCache(imdbId);
 		List<Pelicula> peliculaOpt = peliculaService.findByImdbId(imdbId);
 			if (peliculaOpt.isEmpty()) {
 				for(Pelicula p : peliculaOpt) {
@@ -74,7 +76,14 @@ public class OmdbController {
 						
 						// los guardamosen un campo separados por coma
 						p.setCountry(String.join(",", values));
-						p.setSynopsis((String) node.get("Plot").asText());
+						p.setSynopsis(node.get("Plot").asText());
+						// we have nn min. format, and we uso only int
+						String runtime = node.get("Runtime").asText();
+
+						Matcher m = Pattern.compile("(\\d+)").matcher(runtime);
+						int minutes = m.find() ? Integer.parseInt(m.group(1)) : 0;
+						
+						p.setDuration(minutes);
 						peliculaService.save(p);
 					}
 				}

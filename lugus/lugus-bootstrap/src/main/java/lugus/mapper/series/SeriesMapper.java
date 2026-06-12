@@ -73,7 +73,7 @@ public class SeriesMapper {
 
 	private void createCasting(SerieDto dto, Serie film) {
 		film.getActores().stream()
-				.forEach(act -> dto.addCast(new CastDto(act.getPersona(), act.getNombre(), act.getPersonaje())));
+				.forEach(act -> dto.addCast(new CastDto(act.getPersona(), act.getOrden(),  act.getNombre(), act.getPersonaje())));
 
 	}
 }

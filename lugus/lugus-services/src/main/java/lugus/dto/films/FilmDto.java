@@ -65,7 +65,7 @@ public class FilmDto {
 
 	private String imdbUrl;
 
-	private String lastSeen;
+	private Instant lastSeen;
 
 	private String location;
 
@@ -80,6 +80,8 @@ public class FilmDto {
 	private boolean mine;
 	
 	private boolean favorite;
+	
+	private int duration;
 	
 	public void addDirector(DirectorDTO directorDTO) {
 		if (director == null) {

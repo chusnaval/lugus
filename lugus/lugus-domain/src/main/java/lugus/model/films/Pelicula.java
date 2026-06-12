@@ -149,6 +149,7 @@ public class Pelicula {
 	private final Set<Director> directores = new HashSet<>();
 
 	@JsonIgnore
+	@OrderBy("orden ASC")
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
 	private final Set<Actor> actores = new HashSet<>();
@@ -188,6 +189,9 @@ public class Pelicula {
 
 	@Column(name = "synopsis")
 	private String synopsis;
+	
+	@Column(name = "duration")
+	private int duration;
 	
 	private transient String situacion;
 

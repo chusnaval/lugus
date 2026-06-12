@@ -3,6 +3,8 @@ package lugus.process;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,10 +36,11 @@ public class OmdbBatchExecutor {
 	private final String apiKey;
 	private final RestTemplate rest = new RestTemplate();
 	private final ObjectMapper mapper;
-	
+
 	@Autowired
 	public OmdbBatchExecutor(@Value("${omdb.api.key}") String apiKey, PeliculaService peliculaService,
-			SeriesService serieService, TitlesService titlesService, OmdbCacheService cacheService, ObjectMapper mapper) {
+			SeriesService serieService, TitlesService titlesService, OmdbCacheService cacheService,
+			ObjectMapper mapper) {
 		this.peliculaService = peliculaService;
 		this.serieService = serieService;
 		this.cacheService = cacheService;
@@ -45,6 +48,7 @@ public class OmdbBatchExecutor {
 		this.apiKey = apiKey;
 		this.mapper = mapper;
 	}
+
 	@Transactional
 	public void fillCache() throws JsonProcessingException {
 		updatePeliculas();
@@ -52,7 +56,6 @@ public class OmdbBatchExecutor {
 		updateSeries();
 		System.out.println("✔ Batch series completado");
 		updateTitles();
-
 		System.out.println("✔ Batch todos completado");
 	}
 
@@ -63,7 +66,7 @@ public class OmdbBatchExecutor {
 		int index = 1;
 
 		for (Title s : title) {
-			if(s.getImdb() == null) {
+			if (s.getImdb() == null) {
 				System.out.println("Saltando title sin IMDb: " + s.getTitle());
 				continue;
 			}
@@ -115,6 +118,7 @@ public class OmdbBatchExecutor {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void extraer(int total, int index, String imdbId) {
 		try {
 			System.out.println(index + "/" + total + " — Cacheando: " + imdbId);
@@ -155,7 +159,7 @@ public class OmdbBatchExecutor {
 			index++;
 		}
 	}
-	
+
 	public void updateCountry() {
 		int count = peliculaService.findAll().size();
 		int index = 1;
@@ -164,34 +168,119 @@ public class OmdbBatchExecutor {
 				System.out.println("Saltando película sin IMDb ID: " + p.getTitulo());
 				continue;
 			}
-			if(p.getCountry() != null && !p.getCountry().isBlank()) {
+			if (p.getCountry() != null && !p.getCountry().isBlank()) {
 				System.out.println("Saltando película con país ya seteado: " + p.getTitulo());
 				continue;
 			}
 			OmdbCache cached = cacheService.getFromCache(p.getImdbId());
+			if(cached == null) {
+				extraer(count, index, p.getImdbId());
+				cached = cacheService.getFromCache(p.getImdbId());
+			}
 			if (cached != null) {
 				JsonNode node = mapper.valueToTree(cached.getJson());
 				String country = node.get("Country").asText();
-				
+
 				// puede tener valor o no
 				// o tener uno o varios países separados por coma
 				List<String> values = new ArrayList<>();
-				if(country != null) {	
+				if (country != null) {
 					String[] countries = country.split(",");
 					for (int i = 0; i < countries.length; i++) {
 						values.add(CountryCode.fromString(countries[i]).getCode());
 					}
 				}
-				
+
 				// los guardamosen un campo separados por coma
 				p.setCountry(String.join(",", values));
-				
+
 				peliculaService.save(p);
-				System.out.println("Actualizada película: " + p.getTitulo() + " con país: " + country + " en posición " + index + "/" + count);
+				System.out.println("Actualizada película: " + p.getTitulo() + " con país: " + country + " en posición "
+						+ index + "/" + count);
 			} else {
 				System.out.println("No se encontró en cache, saltando: " + p.getTitulo());
 			}
 		}
-		System.out.println("Terminado batch de actualización de país para películas: " + count + " películas procesadas.");
+		System.out.println(
+				"Terminado batch de actualización de país para películas: " + count + " películas procesadas.");
+	}
+
+	public void updateRuntime() {
+		int count = peliculaService.findAll().size();
+		int index = 1;
+		for (Pelicula p : peliculaService.findAll()) {
+			if (p.getImdbId() == null || p.getImdbId().isBlank()) {
+				System.out.println("Saltando película sin IMDb ID: " + p.getTitulo());
+				continue;
+			}
+			if (p.getDuration() != 0 ) {
+				System.out.println("Saltando película con duracion ya seteado: " + p.getTitulo());
+				continue;
+			}
+			OmdbCache cached = cacheService.getFromCache(p.getImdbId());
+			if(cached == null) {
+				extraer(count, index, p.getImdbId());
+				cached = cacheService.getFromCache(p.getImdbId());
+			}
+			if (cached != null) {
+				JsonNode node = mapper.valueToTree(cached.getJson());
+				String runtime = node.get("Runtime").asText();
+
+				Matcher m = Pattern.compile("(\\d+)").matcher(runtime);
+				int minutes = m.find() ? Integer.parseInt(m.group(1)) : 0;
+				
+				p.setDuration(minutes);
+
+				peliculaService.save(p);
+				System.out.println("Actualizada película: " + p.getTitulo() + " con runtime: " + minutes + " en posición "
+						+ index++ + "/" + count);
+			} else {
+				System.out.println("No se encontró en cache, saltando: " + p.getTitulo());
+			}
+		}
+		System.out.println(
+				"Terminado batch de actualización de duracion para películas: " + count + " películas procesadas.");
+
+	}
+
+	public void updateCovers() {
+		int count = titlesService.findAll().size();
+		int index = 1;
+		for (Title p : titlesService.findAll()) {
+			if (p.getImdb() == null) {
+				System.out.println("Saltando title sin IMDb ID: " + p.getTitle());
+				continue;
+			}
+			if (p.getPosterUrl() != null && !p.getPosterUrl().isBlank() && !"./covers/placeholder.png".equals(p.getPosterUrl())) {
+				System.out.println("Saltando title con poster ya seteado: " + p.getTitle());
+				continue;
+			}
+			OmdbCache cached = cacheService.getFromCache(p.getImdb().getTconst());
+			if(cached == null) {
+				extraer(count, index, p.getImdb().getTconst());
+				cached = cacheService.getFromCache(p.getImdb().getTconst());
+			}
+			
+			if (cached != null) {
+				JsonNode node = mapper.valueToTree(cached.getJson());
+				if(node.get("Poster")==null) {
+					System.out.println("Saltando title sin Poster: " + p.getTitle());
+					continue;
+				}
+				String poster = node.get("Poster").asText();
+				
+				p.setPosterUrl(poster);
+
+				titlesService.save(p);
+				System.out.println("Actualizada title: " + p.getTitle() + " con poster: " + poster + " en posición "
+						+ index++ + "/" + count);
+			} else {
+				System.out.println("No se encontró en cache, saltando: " + p.getTitle());
+			}
+		}
+		System.out.println(
+				"Terminado batch de actualización de posters para titles: " + count + " titles procesadas.");
+
+		
 	}
 }

@@ -35,4 +35,26 @@ public class OmdbBatchController {
 		omdbBatchExecutor.updateCountry();
 		return ResponseEntity.ok("Batch de actualizacion de pais iniciado");
 	}
+    
+    /**
+     * Endpoit para actualizar los datos de duracion de las peliculas
+     * a partir de la informacion de OMDB. Esto se hace porque en IMDB
+     * no se tiene la informacion de pais, y se necesita para el proceso de recomendacion.
+     */
+    @PostMapping("/update-runtime")
+    public ResponseEntity<String> updateRuntime() throws JsonProcessingException {
+		omdbBatchExecutor.updateRuntime();
+		return ResponseEntity.ok("Batch de actualizacion de duración iniciado");
+	}
+    
+    /**
+     * Endpoit para actualizar los datos de duracion de las peliculas
+     * a partir de la informacion de OMDB. Esto se hace porque en IMDB
+     * no se tiene la informacion de pais, y se necesita para el proceso de recomendacion.
+     */
+    @PostMapping("/update-covers")
+    public ResponseEntity<String> updateCovers() throws JsonProcessingException {
+		omdbBatchExecutor.updateCovers();
+		return ResponseEntity.ok("Batch de actualizacion de covers de titles iniciado");
+	}
 }

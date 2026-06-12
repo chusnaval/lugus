@@ -107,6 +107,8 @@ public class PeliculaService {
 		p.setFunda(dto.isSlipcover());
 		p.setSteelbook(dto.isSteelbook());
 		p.setNotas(dto.getNotes());
+		p.setDuration(dto.getDuration());
+		
 		addCaratula(p, dto.getCoverSrc());
 		Pelicula saved = peliculaRepo.save(p);
 
@@ -123,27 +125,30 @@ public class PeliculaService {
 
 			titlesService.save(title);
 		});
-
-		var cached = cacheService.getFromCache(dto.getImdbId());
-		if (cached != null) {
-
-			JsonNode node = jsonMapper.valueToTree(cached.getJson());
-			String country = node.get("Country").asText();
-
-			// puede tener valor o no
-			// o tener uno o varios países separados por coma
-			List<String> values = new ArrayList<>();
-			if (country != null) {
-				String[] countries = country.split(",");
-				for (int i = 0; i < countries.length; i++) {
-					values.add(CountryCode.fromString(countries[i]).getCode());
+		
+		if(!dto.getImdbId().equals(p.getImdbId())) {
+			
+			var cached = cacheService.getFromCache(dto.getImdbId());
+			if (cached != null) {
+				
+				JsonNode node = jsonMapper.valueToTree(cached.getJson());
+				String country = node.get("Country").asText();
+				
+				// puede tener valor o no
+				// o tener uno o varios países separados por coma
+				List<String> values = new ArrayList<>();
+				if (country != null) {
+					String[] countries = country.split(",");
+					for (int i = 0; i < countries.length; i++) {
+						values.add(CountryCode.fromString(countries[i]).getCode());
+					}
 				}
+				
+				// los guardamosen un campo separados por coma
+				saved.setCountry(String.join(",", values));
+				saved.setSynopsis((String) node.get("Plot").asText());
+				save(saved);
 			}
-
-			// los guardamosen un campo separados por coma
-			saved.setCountry(String.join(",", values));
-			saved.setSynopsis((String) node.get("Plot").asText());
-			save(saved);
 		}
 		return p;
 	}

@@ -16,8 +16,6 @@ import lugus.model.values.Genero;
 @Component
 public class FilmMapper {
 
-	
-
 	public FilmDto mapToFilmDTO(Pelicula film, String login) {
 		FilmDto dto = mapToFilmDTO(film);
 		if (login != null) {
@@ -27,7 +25,7 @@ public class FilmMapper {
 
 		return dto;
 	}
-	
+
 	public FilmDto mapToFilmDTO(Pelicula film) {
 		FilmDto dto = new FilmDto();
 		dto.setId(film.getId());
@@ -78,21 +76,23 @@ public class FilmMapper {
 			dto.setImdbUrl("https://www.imdb.com/es-es/title/" + film.getImdbId());
 		}
 		dto.setCountry(film.getCountry());
-	
+
 		dto.setSynopsis(film.getSynopsis());
-		dto.setLastSeen(null);// TODO
+		dto.setDuration(film.getDuration());
+		dto.setLastSeen(film.getLastSeen());
 
 		return dto;
 	}
 
 	private void createDirectors(FilmDto dto, Pelicula film) {
-		film.getDirectores().stream().forEach(dir -> dto.addDirector(new DirectorDTO(dir.getPersona(), dir.getNombre())));
+		film.getDirectores().stream()
+				.forEach(dir -> dto.addDirector(new DirectorDTO(dir.getPersona(), dir.getNombre())));
 
 	}
 
 	private void createCasting(FilmDto dto, Pelicula film) {
 		film.getActores().stream()
-				.forEach(act -> dto.addCast(new CastDto(act.getPersona(), act.getNombre(), act.getPersonaje())));
+				.forEach(act -> dto.addCast(new CastDto(act.getPersona(), act.getOrden(), act.getNombre(), act.getPersonaje())));
 
 	}
 
@@ -128,7 +128,9 @@ public class FilmMapper {
 		pelicula.setImdbId(dto.getImdbId());
 		pelicula.setRating(dto.getRating());
 		pelicula.setVotes(dto.getVotes());
-
+		pelicula.setDuration(dto.getDuration());
+		pelicula.setLastSeen(dto.getLastSeen());
+		
 		return pelicula;
 	}
 }

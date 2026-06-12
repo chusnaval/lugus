@@ -12,6 +12,8 @@ import lombok.Setter;
 public class CastDto {
 	
 	private int id;
+	
+	private int order;
 
 	private String name;
 
