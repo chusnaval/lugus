@@ -85,17 +85,9 @@ public class Pelicula {
 	private String notas;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "padre", cascade = CascadeType.ALL, orphanRemoval = true)
-	@OrderBy("anyo ASC")
-	private final Set<Pelicula> peliculasPack = new HashSet<>();
-
-	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private final Set<PeliculasPersonal> peliculasPersonal = new HashSet<>();
-
-	@Column
-	private boolean pack;
 
 	@Column
 	private boolean steelbook;
@@ -131,7 +123,7 @@ public class Pelicula {
 	@ManyToOne
 	@JoinColumn(name = "padre_id")
 	@ToString.Exclude
-	private Pelicula padre;
+	private Pack pack;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -258,16 +250,6 @@ public class Pelicula {
 		}
 	}
 
-	/**
-	 * Vincula las peliculas
-	 * 
-	 * @param hijo
-	 */
-	public void addHijo(Pelicula hijo) {
-		this.peliculasPack.add(hijo);
-		hijo.setPadre(this);
-
-	}
 
 	public void addCaratula(PeliculaFoto pf) {
 		this.peliculaFotos.add(pf);
@@ -326,11 +308,6 @@ public class Pelicula {
 	public void removeCaratula(PeliculaFoto pf) {
 		this.peliculaFotos.remove(pf);
 		pf.setPelicula(null);
-	}
-
-	public void removeHijo(Pelicula hijo) {
-		this.peliculasPack.remove(hijo);
-		hijo.setPadre(null);
 	}
 
 	public boolean getUsuarioVista(String usuarioLogin) {

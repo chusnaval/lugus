@@ -34,8 +34,6 @@ public class FilmDto {
 
 	private String notes;
 
-	private boolean pack;
-
 	private boolean steelbook;
 
 	private boolean slipcover;
@@ -52,11 +50,12 @@ public class FilmDto {
 
 	private String situation;
 
-	// Relaciones que NO están @JsonIgnore
 	private ConditionDto condition;
-	private FilmDto father;
+	
+	private PackDto pack;
 
 	private List<DirectorDTO> director = new ArrayList<>();
+
 	private List<CastDto> casting = new ArrayList<>();
 
 	private String coverSrc;

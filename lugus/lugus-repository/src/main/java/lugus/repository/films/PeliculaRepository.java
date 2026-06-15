@@ -16,7 +16,7 @@ public interface PeliculaRepository {
 
 	long count();
 	
-	long countByComprado(final boolean value);
+	int countByComprado(final boolean value);
 
 	List<Pelicula> findAll();
 
@@ -48,15 +48,11 @@ public interface PeliculaRepository {
 
 	List<Pelicula> findByTituloContainingIgnoreCase(String query);
 
-	boolean existsByCodigoAndPack(String codigo, boolean pack);
+	boolean existsByCodigo(String codigo);
 
-	int countByFormatoAndPack(Formato format, boolean pack);
+	int countByFormato(Formato format);
 
-	int countByCompradoAndPack(boolean b, boolean c);
-
-	long countByPack(boolean b);
-
-	int countByFormatoAndCompradoAndPack(Formato format, boolean b, boolean c);
+	int countByFormatoAndComprado(Formato format, boolean b);
 
 	@Query("SELECT p.genero, COUNT(p) FROM Pelicula p GROUP BY p.genero")
 	List<Object[]> countByGenero();

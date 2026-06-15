@@ -8,6 +8,7 @@ import lugus.dto.films.ConditionDto;
 import lugus.dto.films.DirectorDTO;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.GroupDto;
+import lugus.dto.films.PackDto;
 import lugus.model.films.Pelicula;
 import lugus.model.groups.GroupFilms;
 import lugus.model.values.Formato;
@@ -36,6 +37,11 @@ public class FilmMapper {
 
 		createDirectors(dto, film);
 		createCasting(dto, film);
+		
+		if(film.getPack()!=null) {
+			dto.setPack(new PackDto(film.getPack().getId(), film.getPack().getTitulo()));
+		}
+		
 
 		if (film.getEstado() != null) {
 			dto.setCondition(new ConditionDto(film.getEstado().getId(), film.getEstado().getName()));
@@ -54,7 +60,6 @@ public class FilmMapper {
 			dto.setLocation(film.getLocation().getDescripcion());
 		}
 
-		dto.setPack(film.isPack());
 		dto.setSteelbook(film.isSteelbook());
 		dto.setSlipcover(film.isFunda());
 		dto.setOwned(film.isComprado());
@@ -119,7 +124,6 @@ public class FilmMapper {
 
 		pelicula.setGenero(Genero.getById(dto.getGenreCode()));
 
-		pelicula.setPack(dto.isPack());
 		pelicula.setSteelbook(dto.isSteelbook());
 		pelicula.setFunda(dto.isSlipcover());
 		pelicula.setComprado(dto.isOwned());

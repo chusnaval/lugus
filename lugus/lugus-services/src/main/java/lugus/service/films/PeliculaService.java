@@ -103,7 +103,6 @@ public class PeliculaService {
 		}
 		p.setCodigo(dto.getMgmtCode());
 		p.setComprado(dto.isOwned());
-		p.setPack(dto.isPack());
 		p.setFunda(dto.isSlipcover());
 		p.setSteelbook(dto.isSteelbook());
 		p.setNotas(dto.getNotes());
@@ -175,32 +174,6 @@ public class PeliculaService {
 		peliculaRepo.deleteById(id);
 	}
 
-	@Transactional
-	public Pelicula addChild(Integer padreId, @Valid PeliculaChildDto dto) {
-		Pelicula padre = peliculaRepo.findById(padreId)
-				.orElseThrow(() -> new IllegalArgumentException("Padre no encontrado"));
-		String username = currentUserProvider.currentUsername();
-		Pelicula hijo = add(padre, dto, username);
-		hijo.setPadre(padre);
-		padre.getPeliculasPack().add(hijo);
-		peliculaRepo.save(padre);
-		return hijo;
-	}
-
-	private Pelicula add(Pelicula padre, PeliculaChildDto dto, String username) {
-
-		Formato formato = Formato.getById(dto.getFormatoCodigo());
-		Genero genero = Genero.getById(dto.getGeneroCodigo());
-		Pelicula p = Pelicula.builder().titulo(dto.getTitulo()).tituloGest(dto.getTitulo()).anyo(dto.getAnyo())
-				.formato(formato).genero(genero).pack(false).steelbook(padre.isSteelbook()).funda(padre.isFunda())
-				.comprado(padre.isComprado()).notas(padre.getNotas()).location(padre.getLocation()).usrAlta(username)
-				.tsAlta(Instant.now()).build();
-		p.calcularCodigoInicial();
-		calculateCodeSuffix(p);
-
-		return peliculaRepo.save(p);
-
-	}
 
 	public void calculateCodeSuffix(Pelicula p) {
 		// we must find if the code starts exists in not pack films,
@@ -210,7 +183,7 @@ public class PeliculaService {
 		int suffix = 1;
 		String baseCode = p.getCodigo();
 		while (codeExists) {
-			if (peliculaRepo.existsByCodigoAndPack(p.getCodigo(), false)) {
+			if (peliculaRepo.existsByCodigo(p.getCodigo())) {
 				p.setCodigo(baseCode + "-" + suffix);
 				suffix++;
 			} else {
@@ -243,7 +216,7 @@ public class PeliculaService {
 	}
 
 	public long contarTodasCompradas() {
-		return peliculaRepo.countByCompradoAndPack(true, false);
+		return peliculaRepo.countByComprado(true);
 	}
 
 	/**
@@ -429,11 +402,11 @@ public class PeliculaService {
 	}
 
 	public int contarPorFormato(Formato format) {
-		return peliculaRepo.countByFormatoAndCompradoAndPack(format, true, false);
+		return peliculaRepo.countByFormatoAndComprado(format, true);
 	}
 
 	public int contarNoCompradas() {
-		return peliculaRepo.countByCompradoAndPack(false, false);
+		return peliculaRepo.countByComprado(false);
 	}
 
 	public Map<Object, Integer> contarPorCategoria() {
