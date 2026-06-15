@@ -193,6 +193,9 @@ public class Pelicula {
 	@Column(name = "duration")
 	private int duration;
 	
+	@Column(name = "synopsis_translated")
+	private boolean synopsisTranslated;
+	
 	private transient String situacion;
 
 	/**
