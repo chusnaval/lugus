@@ -22,7 +22,7 @@ public class FilmMapper {
 		if (login != null) {
 			dto.setFavorite(film.isFavorite(login));
 			dto.setMine(film.isMine(login));
-			dto.setLastSeen(film.getFechaVista(login).toString());
+			dto.setLastSeen(film.getFechaVista(login)!=null?film.getFechaVista(login).toString():null);
 			dto.setWatched(dto.getLastSeen()!=null);
 		}
 
