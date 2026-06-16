@@ -22,6 +22,8 @@ public class FilmMapper {
 		if (login != null) {
 			dto.setFavorite(film.isFavorite(login));
 			dto.setMine(film.isMine(login));
+			dto.setLastSeen(film.getFechaVista(login).toString());
+			dto.setWatched(dto.getLastSeen()!=null);
 		}
 
 		return dto;
@@ -76,7 +78,7 @@ public class FilmMapper {
 			dto.setGroup(getFirstGroup(film));
 		}
 		dto.setTrailerUrl(film.getTrailerUrl());
-		dto.setWatched(film.getLastSeen() != null);
+		
 		if (film.getImdbId() != null) {
 			dto.setImdbUrl("https://www.imdb.com/es-es/title/" + film.getImdbId());
 		}
@@ -84,7 +86,7 @@ public class FilmMapper {
 
 		dto.setSynopsis(film.getSynopsis());
 		dto.setDuration(film.getDuration());
-		dto.setLastSeen(film.getLastSeen());
+
 
 		return dto;
 	}
@@ -133,7 +135,7 @@ public class FilmMapper {
 		pelicula.setRating(dto.getRating());
 		pelicula.setVotes(dto.getVotes());
 		pelicula.setDuration(dto.getDuration());
-		pelicula.setLastSeen(dto.getLastSeen());
+
 		
 		return pelicula;
 	}

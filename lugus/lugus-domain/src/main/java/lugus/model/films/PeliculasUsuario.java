@@ -52,5 +52,5 @@ public class PeliculasUsuario {
     
     private boolean favorita;
 
-
+    private  java.time.LocalDateTime fechaVista;
 }

@@ -2,6 +2,7 @@ package lugus.model.films;
 
 import java.text.NumberFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Optional;
@@ -176,9 +177,6 @@ public class Pelicula {
 	@Column(name = "country")
 	private String country;
 
-	@Column(name = "last_seen", nullable = true, columnDefinition = "TIMESTAMP")
-	private Instant lastSeen;
-
 	@Column(name = "synopsis")
 	private String synopsis;
 	
@@ -215,6 +213,16 @@ public class Pelicula {
 				.isPresent();
 	}
 
+	public LocalDateTime getFechaVista(String login) {
+		Optional<PeliculasUsuario> aux = peliculasUsuario.stream()
+				.filter(up -> up.getUsuario().getLogin().equals(login))
+				.findFirst();
+		if(aux.isPresent()) {
+			return aux.get().getFechaVista();
+		}
+		return null;
+	}
+	
 	public String getDescLocation() {
 		if (location == null) {
 			return "";
