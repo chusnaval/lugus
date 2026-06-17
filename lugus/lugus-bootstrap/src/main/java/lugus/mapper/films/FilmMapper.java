@@ -1,6 +1,9 @@
 package lugus.mapper.films;
 
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import lugus.dto.core.FormatDTO;
 import lugus.dto.films.CastDto;
@@ -16,13 +19,20 @@ import lugus.model.values.Genero;
 
 @Component
 public class FilmMapper {
-
+	
+	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	
 	public FilmDto mapToFilmDTO(Pelicula film, String login) {
 		FilmDto dto = mapToFilmDTO(film);
 		if (login != null) {
 			dto.setFavorite(film.isFavorite(login));
 			dto.setMine(film.isMine(login));
-			dto.setLastSeen(film.getFechaVista(login)!=null?film.getFechaVista(login).toString():null);
+			dto.setLastSeen(film.getFechaVista(login)!=null?film.getFechaVista(login).format(formatter):null);
+			String aux = film.getUsuarioRating(login);
+			if(!ObjectUtils.isEmpty(aux)) {
+				dto.setLbRating(Double.valueOf(aux));
+			}else
+				dto.setLbRating(null);
 			dto.setWatched(dto.getLastSeen()!=null);
 		}
 

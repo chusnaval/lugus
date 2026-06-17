@@ -65,6 +65,8 @@ public class FilmDto {
 	private String imdbUrl;
 
 	private String lastSeen;
+	
+	private Double lbRating;
 
 	private String location;
 
