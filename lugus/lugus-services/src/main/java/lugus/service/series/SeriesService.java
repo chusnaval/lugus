@@ -86,6 +86,7 @@ public class SeriesService {
 		spec = spec.and(SerieSpecification.byLocation(filter.getLocation()));
 		spec = spec.and(SerieSpecification.porNotas(filter.getNotas()));
 		spec = spec.and(SerieSpecification.porTitulo(filter.getTitulo()));
+		spec = spec.and(SerieSpecification.porCompleta(filter.getCompleta()));
 
 		return serieRepo.findAll(spec, pageable);
 	}
