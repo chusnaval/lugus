@@ -191,24 +191,24 @@ public class PeliculaSpecification {
 	public static Specification<Pelicula> ordenarPorUltimaCompra() {
 	    return (root, query, cb) -> {
 
-	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+	    	Join<Pelicula, Edicion> ed = root.join("ediciones", JoinType.LEFT);
 
-	        // Agrupamos por película
-	        query.groupBy(root.get("id"));
+	    	query.groupBy(root.get("id"));
 
-	        // Campo calculado
-	        Expression<Instant> ultimaCompra = cb.greatest(ed.get("tsCompra"));
-	        Expression<Instant> ultimaModif  = cb.greatest(ed.get("tsModif"));
-	        Expression<Instant> ultimaAlta   = cb.greatest(ed.get("tsAlta"));
+	    	Expression<Instant> ultimaCompra = cb.greatest(ed.get("tsCompra").as(Instant.class));
+	    	Expression<Instant> ultimaModif  = cb.greatest(ed.get("tsModif").as(Instant.class));
+	    	Expression<Instant> ultimaAlta   = cb.greatest(ed.get("tsAlta").as(Instant.class));
 
-	        // Orden final
-	        query.orderBy(
-	            cb.desc(ultimaCompra),
-	            cb.desc(ultimaModif),
-	            cb.desc(ultimaAlta)
-	        );
+	    	if (query.getResultType() != Long.class) {
+	    	    query.orderBy(
+	    	        cb.desc(ultimaCompra),
+	    	        cb.desc(ultimaModif),
+	    	        cb.desc(ultimaAlta)
+	    	    );
+	    	}
 
-	        return cb.conjunction();
+	    	return cb.conjunction();
+
 	    };
 	}
 
