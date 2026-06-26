@@ -1,6 +1,5 @@
 package lugus.dto.films;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lugus.dto.core.FormatDTO;
 
 @Getter
 @Setter
@@ -22,25 +20,11 @@ public class FilmDto {
 
 	private String titleMgmt;
 
-	private FormatDTO format;
-
 	private int year;
 
 	private String genreCode;
 
 	private String genreDesc;
-
-	private String mgmtCode;
-
-	private String notes;
-
-	private boolean steelbook;
-
-	private boolean slipcover;
-
-	private boolean owned;
-
-	private boolean watched;
 
 	private String imdbId;
 
@@ -48,15 +32,11 @@ public class FilmDto {
 
 	private Integer votes;
 
-	private String situation;
-
-	private ConditionDto condition;
-	
-	private PackDto pack;
-
 	private List<DirectorDTO> director = new ArrayList<>();
 
 	private List<CastDto> casting = new ArrayList<>();
+	
+	private List<EditionDto> editions  = new ArrayList<>();
 
 	private String coverSrc;
 
@@ -67,16 +47,12 @@ public class FilmDto {
 	private String lastSeen;
 	
 	private Double lbRating;
-
-	private String location;
-
+	
 	private GroupDto group;
 
 	private String country;
 
 	private String trailerUrl;
-	
-	private Instant tsCompra;
 	
 	private boolean mine;
 	
@@ -84,11 +60,20 @@ public class FilmDto {
 	
 	private int duration;
 	
+	private boolean watched;
+	
 	public void addDirector(DirectorDTO directorDTO) {
 		if (director == null) {
 			director = new ArrayList<>();
 		}
 		director.add(directorDTO);
+	}
+	
+	public void addEdition(EditionDto editionDTO) {
+		if(editions == null) {
+			editions = new ArrayList<>();
+		}
+		this.editions.add(editionDTO);
 	}
 
 	public void addCast(CastDto castDto) {

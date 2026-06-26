@@ -1,13 +1,14 @@
 package lugus.infrastructure.repository.films;
 
 import org.springframework.data.jpa.domain.Specification;
-
+import java.time.Instant;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import lugus.model.core.Location;
+import lugus.model.films.Edicion;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
 import lugus.model.people.Actor;
@@ -28,44 +29,100 @@ public class PeliculaSpecification {
 		return (root, query, cb) -> (toAnyo == null) ? null : cb.ge(root.get("anyo"), toAnyo);
 	}
 
-	public static Specification<Pelicula> porPack(Boolean pack) {
-		return (root, query, cb) -> (pack == null) ? null : cb.equal(root.get("pack"), pack);
-	}
-
-	public static Specification<Pelicula> porSteelbook(Boolean steelbook) {
-		return (root, query, cb) -> (steelbook == null) ? null : cb.equal(root.get("steelbook"), steelbook);
-	}
-
-	public static Specification<Pelicula> porFunda(Boolean funda) {
-		return (root, query, cb) -> (funda == null) ? null : cb.equal(root.get("funda"), funda);
-	}
-
-	public static Specification<Pelicula> porComprado(Boolean comprado) {
-		return (root, query, cb) -> (comprado == null) ? null : cb.equal(root.get("comprado"), comprado);
-	}
-
-	public static Specification<Pelicula> porFormato(Integer formato) {
-		return (root, query, cb) -> (formato == null) ? null : cb.equal(root.get("formato"), formato);
-	}
-
 	public static Specification<Pelicula> porGenero(String genero) {
 		return (root, query, cb) -> (genero == null || genero.isBlank()) ? null : cb.equal(root.get("genero"), genero);
 	}
 
+	
 	public static Specification<Pelicula> porNotas(String notas) {
-		return (root, query, cb) -> (notas == null || notas.isBlank()) ? null
-				: cb.like(cb.lower(root.get("notas")), "%" + notas.toLowerCase() + "%");
+	    return (root, query, cb) -> {
+	        if (notas == null || notas.isBlank()) return null;
+
+	        query.distinct(true);
+	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+
+	        return cb.like(cb.lower(ed.get("notas")), "%" + notas.toLowerCase() + "%");
+	    };
 	}
 
-	public static Specification<Pelicula> byLocation(String location) {
-		return (root, query, cb) -> {
-			if (location == null || location.isBlank()) {
-				return null;
-			}
+	public static Specification<Pelicula> porPack(Boolean pack) {
+	    return (root, query, cb) -> {
+	        if (pack == null) return null;
 
-			Join<Pelicula, Location> generoJoin = root.join("localizacion", JoinType.INNER);
-			return cb.equal(generoJoin.get("localizacion"), location);
+	        query.distinct(true);
+	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+
+	        return pack
+	            ? cb.isNotNull(ed.get("pack"))
+	            : cb.isNull(ed.get("pack"));
+	    };
+	}
+
+
+	public static Specification<Pelicula> porSteelbook(Boolean steelbook) {
+	    return (root, query, cb) -> {
+	        if (steelbook == null) return null;
+
+	        query.distinct(true);
+	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+
+	        return cb.equal(ed.get("steelbook"), steelbook);
+	    };
+	}
+
+
+	public static Specification<Pelicula> porFunda(Boolean funda) {
+	    return (root, query, cb) -> {
+	        if (funda == null) return null;
+
+	        query.distinct(true);
+	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+
+	        return cb.equal(ed.get("funda"), funda);
+	    };
+	}
+
+	public static Specification<Pelicula> porComprado(Boolean comprado) {
+	    return (root, query, cb) -> {
+	        if (comprado == null) return null;
+
+	        query.distinct(true);
+	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+
+	        return cb.equal(ed.get("comprado"), comprado);
+	    };
+	}
+
+
+	public static Specification<Pelicula> porFormato(Integer formato) {
+	    return (root, query, cb) -> {
+	        if (formato == null) return null;
+
+	        query.distinct(true);
+	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+
+	        return cb.equal(ed.get("formato"), formato);
+	    };
+	}
+
+	
+	public static Specification<Pelicula> vigentes() {
+		return (root, query, cb) -> {
+			
+			Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+			return cb.isNull(ed.get("tsBaja"));
 		};
+	}
+
+	public static Specification<Pelicula> porLocalizacion(String codigo) {
+	    return (root, query, cb) -> {
+	        if (codigo == null || codigo.isBlank()) return null;
+
+	        query.distinct(true);
+	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+
+	        return cb.equal(ed.get("location").get("codigo"), codigo);
+	    };
 	}
 
 	public static Specification<Pelicula> porActor(String actor) {
@@ -107,10 +164,7 @@ public class PeliculaSpecification {
 		};
 	}
 
-	public static Specification<Pelicula> vigentes() {
-		return (root, query, cb) -> cb.isNull(root.get("tsBaja"));
-	}
-
+	
 	public static Specification<Pelicula> tieneCaratula(boolean tieneCaratula) {
 	    return (root, query, cb) -> {
 
@@ -133,4 +187,29 @@ public class PeliculaSpecification {
 	        }
 	    };
 	}
+	
+	public static Specification<Pelicula> ordenarPorUltimaCompra() {
+	    return (root, query, cb) -> {
+
+	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+
+	        // Agrupamos por película
+	        query.groupBy(root.get("id"));
+
+	        // Campo calculado
+	        Expression<Instant> ultimaCompra = cb.greatest(ed.get("tsCompra"));
+	        Expression<Instant> ultimaModif  = cb.greatest(ed.get("tsModif"));
+	        Expression<Instant> ultimaAlta   = cb.greatest(ed.get("tsAlta"));
+
+	        // Orden final
+	        query.orderBy(
+	            cb.desc(ultimaCompra),
+	            cb.desc(ultimaModif),
+	            cb.desc(ultimaAlta)
+	        );
+
+	        return cb.conjunction();
+	    };
+	}
+
 }

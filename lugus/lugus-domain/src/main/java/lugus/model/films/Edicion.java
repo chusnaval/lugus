@@ -1,14 +1,11 @@
 package lugus.model.films;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -18,38 +15,35 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lugus.converter.FormatoConverter;
 import lugus.model.core.Estado;
 import lugus.model.core.Location;
 import lugus.model.values.Formato;
 
 @Entity
-@Table(name = "packs")
+@Table(name = "peliculas_edicion")
 @Data
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Pack {
+public class Edicion {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@Column(nullable = false)
-	private String titulo;
-
-	@Column(nullable = false, name = "titulo_gest")
-	private String tituloGest;
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "pelicula_id", nullable = true) // FK → estado.id
+	private Pelicula pelicula;
 
 	@Column(nullable = false)
 	@Convert(converter = FormatoConverter.class)
@@ -66,10 +60,10 @@ public class Pack {
 	@Column(nullable = true)
 	private String notas;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "pack", cascade = CascadeType.ALL, orphanRemoval = true)
-	@OrderBy("anyo ASC")
-	private final Set<Edicion> edicionesPack = new HashSet<>();
+	@ManyToOne
+	@JoinColumn(name = "padre_id")
+	@ToString.Exclude
+	private Pack pack;
 
 	@Column
 	private boolean steelbook;
@@ -102,6 +96,15 @@ public class Pack {
 	@JoinColumn(name = "estado_id", nullable = true) // FK → estado.id
 	private Estado estado;
 
+	
+	public void calcularCodigoInicial(String titloGest, String codGenero, int anyo) {
+		// Eliminar artículos del título
+		String procesado = titloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
 
+		// Obtener los primeros tres caracteres del título procesado
+		String prefijo = procesado.length() >= 3 ? procesado.substring(0, 3).toUpperCase() : procesado.toUpperCase();
 
+		codigo = codGenero + "-" + prefijo + "-" + anyo;
+
+	}
 }

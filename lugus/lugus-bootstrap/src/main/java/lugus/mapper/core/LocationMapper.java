@@ -19,7 +19,7 @@ public class LocationMapper {
 		LocationDTO dto = new LocationDTO();
 		dto.setCodigo(loc.getCodigo());
 		dto.setDescripcion(loc.getDescripcion());
-		dto.setCount(loc.getPeliculas().size());
+		dto.setCount(loc.getEdiciones().size());
 		dto.setLocationType(new LocationTypeDTO(loc.getLocationType().getId(), loc.getLocationType().getDescription(), loc.getLocationType().getLocations().size()));
 		return dto;
 		

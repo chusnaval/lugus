@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FormatDTO;
+import lugus.dto.films.EditionDto;
 import lugus.dto.films.FilmDto;
 import lugus.exception.LugusNotFoundException;
 import lugus.model.imdb.ImdbTitleAkas;
@@ -45,21 +46,24 @@ public class ImdbApiController {
 				dto.setTitle(film.getOriginaltitle());
 				dto.setTitleMgmt(film.getOriginaltitle());
 			}
-			dto.setFormat(new FormatDTO(""+Formato.DVD.getId(), Formato.DVD.name()));
 			try {
 				dto.setYear(Integer.parseInt(film.getStartyear()));
 			}catch(Exception e) {
 				
 			}
 			
+			EditionDto edto = new EditionDto();
+			edto.setFormat(new FormatDTO(""+Formato.DVD.getId(), Formato.DVD.name()));
+			
 			if(film.getGenres().length>0) {
 				String firstGenre = translate(film.getGenres()[0]);
 				String genres = String.join(",", film.getGenres());
 				dto.setGenreCode(firstGenre);
 				dto.setGenreDesc(Genero.getById(firstGenre).getDisplayName());
-				dto.setNotes(genres);
-				dto.setMgmtCode(calcularCodigo(dto));
+				edto.setNotes(genres);
+				edto.setMgmtCode(calcularCodigo(dto));
 			}
+			dto.addEdition(edto);
 			
 
 			dto.setImdbId(id);
@@ -135,6 +139,8 @@ public class ImdbApiController {
 		return result;
 	}
 
+	
+	//TODO duplicated
 	public String calcularCodigo(FilmDto dto) {
 		// Eliminar artículos del título
 		String procesado = dto.getTitle().replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");

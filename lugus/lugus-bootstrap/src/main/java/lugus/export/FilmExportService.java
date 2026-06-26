@@ -25,6 +25,7 @@ public class FilmExportService {
 		md.append("|---|---|---:|---|\n");
 		int index = 1;
 		for (Pelicula item : list) {
+			
 			item.calcularSituacion();
 			md.append("| ")
 					.append(escapeMd(index++ + ""))
@@ -33,11 +34,11 @@ public class FilmExportService {
 					.append(" | ")
 					.append(item.getAnyo())
 					.append(" | ")
-					.append(escapeMd(item.getFormato().name()))
+					.append(escapeMd(item.getFormatosConjunto()))
 					.append(" | ")
 					.append(escapeMd(item.getSituacion()))
 					.append(" | ")
-					.append(escapeMd(item.getNotas()))
+					.append(escapeMd(item.getNotasConjuntas()))
 					.append(" |\n");
 		}
 
@@ -124,11 +125,11 @@ public class FilmExportService {
 					content.newLineAtOffset(260, 0);
 					content.showText(String.valueOf(item.getAnyo()));
 					content.newLineAtOffset(70, 0);
-					content.showText(trimForPdf(item.getFormato().name(), 34));
+					content.showText(trimForPdf(item.getFormatosConjunto(), 34));
 					content.newLineAtOffset(70, 0);
 					content.showText(trimForPdf(item.getSituacion(), 42));
 					content.newLineAtOffset(120, 0);
-					content.showText(trimForPdf(item.getNotas(), 50));
+					content.showText(trimForPdf(item.getNotasConjuntas(), 50));
 					content.endText();
 
 					y -= leading;
@@ -168,9 +169,9 @@ public class FilmExportService {
 					String.valueOf(index++),
 					nullSafe(item.getTitulo()),
 					String.valueOf(item.getAnyo()),
-					nullSafe(item.getFormato().name()),
+					nullSafe(item.getFormatosConjunto()),
 					nullSafe(item.getSituacion()),
-					nullSafe(item.getNotas()))
+					nullSafe(item.getNotasConjuntas()))
 			;
 		}
 

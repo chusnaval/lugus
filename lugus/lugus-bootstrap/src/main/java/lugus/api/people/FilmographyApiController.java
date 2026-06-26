@@ -1,6 +1,5 @@
 package lugus.api.people;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -137,11 +136,7 @@ public class FilmographyApiController {
 					// necesitamos poner peliculaId en filmography para que se sepa que pelicula de una forma u otra
 					// la tenemos registrada, asi que si hay varias peliculas con ese tconst, se pone el id de la edicion con mayor fecha de modificacion, asi que se asume que es la edicion mas actualizada
 					// pero tsmodif puede ser nulo, asi que se asume que si es nulo, es la edicion mas antigua, y si no es nulo, se compara con las fechas de modificacion de las otras ediciones para determinar cual es la mas actualizada
-					Pelicula pelicula = pelis.stream().max((p1, p2) -> {
-						if (p1.getTsModif() == null) return -1;
-						if (p2.getTsModif() == null) return 1;
-						return p1.getTsModif().compareTo(p2.getTsModif());
-					}).get();
+					Pelicula pelicula = pelis.getFirst(); // TODO esto va a ser unico en cuanto termine con las eidiciones
 					film.setPeliculaId(pelicula.getId());
 				
 					// queremos marcar como comprado o buscado el registro de filmografia, asi que si cualquiera de los registros de pelicula con ese tconst esta comprado, se marca como comprado, sino se marca como buscado

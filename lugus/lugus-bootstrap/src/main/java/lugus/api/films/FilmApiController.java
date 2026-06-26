@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lugus.dto.core.CountryCode;
 import lugus.dto.core.FiltrosDto;
+import lugus.dto.films.EditionDto;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.FilmGenreDto;
 import lugus.dto.films.FilmStatsDto;
@@ -40,6 +41,7 @@ import lugus.export.FilmExportService;
 import lugus.mapper.films.FilmMapper;
 import lugus.model.core.Location;
 import lugus.model.core.Source;
+import lugus.model.films.Edicion;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
 import lugus.model.values.Categoria;
@@ -49,6 +51,7 @@ import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
 import lugus.service.films.DwFotoService;
 import lugus.service.films.DwFotoServiceI;
+import lugus.service.films.EdicionService;
 import lugus.service.films.PeliculaService;
 import lugus.service.films.PeliculasUsuarioService;
 import lugus.service.groups.GroupsService;
@@ -62,6 +65,7 @@ import lugus.service.titles.TitlesService;
 public class FilmApiController {
 
 	private final PeliculaService service;
+	private final EdicionService edicionService;
 	private final FilmMapper mapper;
 	private final GroupsService groupsService;
 	private final LocationService locService;
@@ -75,13 +79,14 @@ public class FilmApiController {
 	private final ObjectMapper jsonMapper;
 
 	@Autowired
-	public FilmApiController(@Value("${omdb.api.key}") String apiKey, PeliculaService service, FilmMapper mapper,
-			GroupsService groupsService, LocationService locService, SourceService sourceService,
-			InsertPersonalDataService insertImdbService, FilmExportService filmExportService,
-			TitlesService titlesService, PeliculasUsuarioService usuarioPeliculaService, OmdbCacheService cacheService,
-			ObjectMapper jsonMapper) {
+	public FilmApiController(@Value("${omdb.api.key}") String apiKey, PeliculaService service,
+			EdicionService edicionService, FilmMapper mapper, GroupsService groupsService, LocationService locService,
+			SourceService sourceService, InsertPersonalDataService insertImdbService,
+			FilmExportService filmExportService, TitlesService titlesService,
+			PeliculasUsuarioService usuarioPeliculaService, OmdbCacheService cacheService, ObjectMapper jsonMapper) {
 		super();
 		this.service = service;
+		this.edicionService = edicionService;
 		this.mapper = mapper;
 		this.groupsService = groupsService;
 		this.locService = locService;
@@ -132,7 +137,7 @@ public class FilmApiController {
 		usuarioPeliculaService.toggleFav(auth.getName(), id);
 		return ResponseEntity.ok().build();
 	}
-	
+
 	@GetMapping("/page")
 	public Page<FilmDto> getAllFilms(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) Boolean owned, @RequestParam(required = false) String title,
@@ -149,12 +154,34 @@ public class FilmApiController {
 	ResponseEntity<Object> save(@RequestBody FilmDto dto, Authentication auth)
 			throws LugusNotFoundException, IOException, URISyntaxException {
 		Pelicula film = mapper.mapToFilm(dto);
-		Location loc = findLocation(dto);
-		film.setLocation(loc);
-		film.calcularCodigoInicial();
-		service.calculateCodeSuffix(film);
-		film.setTsAlta(Instant.now());
-		film.setUsrAlta(auth.getName());
+
+		for (Edicion edto : film.getEditions()) {
+
+			if(edto.getLocation()!=null && edto.getLocation().getCodigo() != null
+					&& !edto.getLocation().getCodigo().isEmpty()) {
+				Location loc = locService.findById(edto.getLocation().getCodigo())
+						.orElseThrow(() -> new LugusNotFoundException(edto.getLocation().getCodigo()));
+				edto.setLocation(loc);
+			}else {
+				edto.setLocation(null);
+			}
+
+			// TIMESTAMPS
+			edto.setTsAlta(Instant.now());
+			edto.setTsModif(Instant.now());
+			edto.setUsrAlta(auth.getName());
+			edto.setUsrModif(auth.getName());
+
+			if (edto.isComprado()) {
+				edto.setTsCompra(Instant.now());
+			}
+
+			// CÓDIGO
+			edto.calcularCodigoInicial(film.getTituloGest(), film.getGenero().getCodigo(), film.getAnyo());
+			edicionService.calculateCodeSuffix(edto);
+
+		}
+
 		Pelicula saved = service.save(film);
 		if (dto.getCoverSrc() != null && !dto.getCoverSrc().isEmpty()) {
 			final DwFotoServiceI dwFotoService = new DwFotoService();
@@ -183,45 +210,36 @@ public class FilmApiController {
 				title.setPelicula(saved);
 				titlesService.save(title);
 			});
-		}
-
-		var cached = cacheService.getFromCache(dto.getImdbId());
-
-		if (cached == null) {
-			String url = "https://www.omdbapi.com/?i=" + dto.getImdbId() + "&apikey=" + apiKey + "&plot=full";
-			final RestTemplate rest = new RestTemplate();
-			Map<String, Object> json = rest.getForObject(url, Map.class);
-			cacheService.saveToCache(dto.getImdbId(), json);
-		}
-		cached = cacheService.getFromCache(dto.getImdbId());
-		JsonNode node = jsonMapper.valueToTree(cached.getJson());
-		String country = node.get("Country").asText();
-
-		// puede tener valor o no
-		// o tener uno o varios países separados por coma
-		List<String> values = new ArrayList<>();
-		if (country != null) {
-			String[] countries = country.split(",");
-			for (int i = 0; i < countries.length; i++) {
-				values.add(CountryCode.fromString(countries[i]).getCode());
+			var cached = cacheService.getFromCache(dto.getImdbId());
+			
+			if (cached == null) {
+				String url = "https://www.omdbapi.com/?i=" + dto.getImdbId() + "&apikey=" + apiKey + "&plot=full";
+				final RestTemplate rest = new RestTemplate();
+				Map<String, Object> json = rest.getForObject(url, Map.class);
+				cacheService.saveToCache(dto.getImdbId(), json);
 			}
+			cached = cacheService.getFromCache(dto.getImdbId());
+			JsonNode node = jsonMapper.valueToTree(cached.getJson());
+			String country = node.get("Country").asText();
+			// puede tener valor o no
+			// o tener uno o varios países separados por coma
+			List<String> values = new ArrayList<>();
+			if (country != null) {
+				String[] countries = country.split(",");
+				for (int i = 0; i < countries.length; i++) {
+					values.add(CountryCode.fromString(countries[i]).getCode());
+				}
+			}
+			
+			// los guardamosen un campo separados por coma
+			saved.setCountry(String.join(",", values));
+			saved.setSynopsis((String) node.get("Plot").asText());
+			service.save(saved);
 		}
 
-		// los guardamosen un campo separados por coma
-		saved.setCountry(String.join(",", values));
-		saved.setSynopsis((String) node.get("Plot").asText());
-		service.save(saved);
+
 
 		return ResponseEntity.ok().build();
-	}
-
-	private Location findLocation(FilmDto dto) {
-		Location loc = null;
-		if (dto.getLocation() != null && !dto.getLocation().isBlank()) {
-			loc = locService.findById(dto.getLocation())
-					.orElseThrow(() -> new LugusNotFoundException(dto.getLocation()));
-		}
-		return loc;
 	}
 
 	@GetMapping("/wanted")
@@ -256,16 +274,16 @@ public class FilmApiController {
 	@GetMapping(value = "/stats", produces = "application/json;charset=UTF-8")
 	public FilmStatsDto getStats() {
 		FilmStatsDto stats = new FilmStatsDto();
-		stats.setTotalFilms(service.contarTodasCompradas());
-		stats.setRecentFilms(service.addedInLastDays(30));
+		stats.setTotalFilms(edicionService.contarTodasCompradas());
+		stats.setRecentFilms(edicionService.addedInLastDays(30));
 		stats.setIncompleteGroups(groupsService.incompletedGroups());
 		stats.setCompleteGroups((int) (groupsService.count() - groupsService.incompletedGroups()));
-		stats.setVhs(service.contarPorFormato(Formato.VHS));
-		stats.setDvd(service.contarPorFormato(Formato.DVD));
-		stats.setBluray(service.contarPorFormato(Formato.BLURAY));
-		stats.setUhd(service.contarPorFormato(Formato.ULTRAHD));
-		stats.setDigital(service.contarPorFormato(Formato.DIGITAL));
-		stats.setNotOwned(service.contarNoCompradas());
+		stats.setVhs(edicionService.contarPorFormato(Formato.VHS));
+		stats.setDvd(edicionService.contarPorFormato(Formato.DVD));
+		stats.setBluray(edicionService.contarPorFormato(Formato.BLURAY));
+		stats.setUhd(edicionService.contarPorFormato(Formato.ULTRAHD));
+		stats.setDigital(edicionService.contarPorFormato(Formato.DIGITAL));
+		stats.setNotOwned(edicionService.contarNoCompradas());
 
 		Map<Object, Integer> categorias = service.contarPorCategoria();
 		stats.setGenerosPorCategoria(new FilmGenreDto());

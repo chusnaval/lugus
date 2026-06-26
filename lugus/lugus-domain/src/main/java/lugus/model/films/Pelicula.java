@@ -3,10 +3,14 @@ package lugus.model.films;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+
+import org.hibernate.annotations.Formula;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,12 +20,9 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
@@ -31,16 +32,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lugus.converter.FormatoConverter;
 import lugus.converter.GeneroConverter;
-import lugus.model.core.Estado;
-import lugus.model.core.Location;
 import lugus.model.groups.GroupFilms;
 import lugus.model.orders.Order;
 import lugus.model.people.Actor;
 import lugus.model.people.Director;
 import lugus.model.people.PeliculasPersonal;
-import lugus.model.values.Formato;
 import lugus.model.values.Genero;
 
 @Entity
@@ -64,67 +61,16 @@ public class Pelicula {
 	private String tituloGest;
 
 	@Column(nullable = false)
-	@Convert(converter = FormatoConverter.class)
-	private Formato formato;
-
-	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "localizacion_codigo", nullable = true) // FK → location.code
-	private Location location;
-
-	@Column(nullable = false)
 	private int anyo;
 
 	@Column(nullable = false)
 	@Convert(converter = GeneroConverter.class)
 	private Genero genero;
 
-	@Column(nullable = false)
-	private String codigo;
-
-	@Column(nullable = true)
-	private String notas;
-
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private final Set<PeliculasPersonal> peliculasPersonal = new HashSet<>();
-
-	@Column
-	private boolean steelbook;
-
-	@Column
-	private boolean funda;
-
-	@Column
-	private boolean comprado;
-
-	@Column(name = "usr_alta")
-	private String usrAlta;
-
-	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
-	private Instant tsAlta;
-
-	@Column(name = "ts_compra", nullable = true, columnDefinition = "TIMESTAMP")
-	private Instant tsCompra;
-
-	@Column(name = "usr_modif")
-	private String usrModif;
-
-	@Column(name = "ts_modif", columnDefinition = "TIMESTAMP")
-	private Instant tsModif;
-
-	@Column(name = "ts_baja", columnDefinition = "TIMESTAMP")
-	private Instant tsBaja;
-
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "estado_id", nullable = true) // FK → estado.id
-	private Estado estado;
-
-	@ManyToOne
-	@JoinColumn(name = "padre_id")
-	@ToString.Exclude
-	private Pack pack;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -162,6 +108,11 @@ public class Pelicula {
 	@ToString.Exclude
 	private final Set<Order> orders = new HashSet<>();
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@ToString.Exclude
+	private List<Edicion> editions = new ArrayList<>();
+
 	@Column(name = "imdb_id")
 	private String imdbId;
 
@@ -179,13 +130,18 @@ public class Pelicula {
 
 	@Column(name = "synopsis")
 	private String synopsis;
-	
+
 	@Column(name = "duration")
 	private int duration;
-	
+
 	@Column(name = "synopsis_translated")
 	private boolean synopsisTranslated;
+
+	@Formula("(select max(e.ts_compra) from peliculas_edicion e where e.pelicula_id = id)")
+	private Instant ultimaCompra;
+
 	
+	// exports
 	private transient String situacion;
 
 	/**
@@ -197,55 +153,27 @@ public class Pelicula {
 	public Pelicula(Integer peliculaId) {
 		this.id = peliculaId;
 	}
-	
+
 	public boolean isFavorite(String login) {
-		return peliculasUsuario.stream()
-				.filter(up -> up.getUsuario().getLogin().equals(login))
-				.map(PeliculasUsuario::isFavorita)
-				.findFirst()
-				.orElse(false);
+		return peliculasUsuario.stream().filter(up -> up.getUsuario().getLogin().equals(login))
+				.map(PeliculasUsuario::isFavorita).findFirst().orElse(false);
 	}
-	
+
 	public boolean isMine(String login) {
-		return peliculasUsuario.stream()
-				.filter(up -> up.getUsuario().getLogin().equals(login))
-				.findFirst()
-				.isPresent();
+		return peliculasUsuario.stream().filter(up -> up.getUsuario().getLogin().equals(login)).findFirst().isPresent();
 	}
 
 	public LocalDateTime getFechaVista(String login) {
 		Optional<PeliculasUsuario> aux = peliculasUsuario.stream()
-				.filter(up -> up.getUsuario().getLogin().equals(login))
-				.findFirst();
-		if(aux.isPresent()) {
+				.filter(up -> up.getUsuario().getLogin().equals(login)).findFirst();
+		if (aux.isPresent()) {
 			return aux.get().getFechaVista();
 		}
 		return null;
 	}
-	
-	public String getDescLocation() {
-		if (location == null) {
-			return "";
-		}
-		return location.getDescripcion();
-	}
 
 	public boolean tieneCaratula() {
 		return !peliculaFotos.isEmpty();
-	}
-
-	public void calcularCodigoInicial() {
-		// Eliminar artículos del título
-		String procesado = tituloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
-
-		// Obtener los primeros tres caracteres del título procesado
-		String prefijo = procesado.length() >= 3 ? procesado.substring(0, 3).toUpperCase() : procesado.toUpperCase();
-
-		// Obtener la etiqueta del género
-		String parteCodigo = genero.getCodigo();
-
-		codigo = parteCodigo + "-" + prefijo + "-" + anyo;
-
 	}
 
 	public String getRatingFormatted() {
@@ -258,11 +186,15 @@ public class Pelicula {
 		}
 	}
 
-
 	public void addCaratula(PeliculaFoto pf) {
 		this.peliculaFotos.add(pf);
 		pf.setPelicula(this);
 
+	}
+	
+	public void addEdicion(Edicion ed) {
+		this.editions.add(ed);
+		ed.setPelicula(this);
 	}
 
 	public void addDirector(Director d) {
@@ -330,6 +262,8 @@ public class Pelicula {
 
 	public void calcularSituacion() {
 
+		boolean comprado = this.editions.stream().filter(e -> e.isComprado()).findAny().isPresent();
+
 		if (comprado) {
 			this.situacion = "Comprado";
 		} else if (tieneOrdenPendiente()) {
@@ -347,6 +281,10 @@ public class Pelicula {
 		return false;
 	}
 
+	public boolean isComprado() {
+		 return this.editions.stream().filter(e -> e.isComprado()).findAny().isPresent();
+	}
+	
 	public String getCoverUrl() {
 		String coverUrl = null;
 		if (this.peliculaFotos != null && !this.peliculaFotos.isEmpty()) {
@@ -359,6 +297,16 @@ public class Pelicula {
 			}
 		}
 		return coverUrl;
+	}
+
+	public String getFormatosConjunto() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getNotasConjuntas() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

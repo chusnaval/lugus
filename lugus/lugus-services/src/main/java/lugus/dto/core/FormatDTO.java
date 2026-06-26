@@ -12,4 +12,10 @@ public class FormatDTO {
 	private String codigo;
 
 	private String descripcion;
+
+	public FormatDTO(String codigo) {
+		super();
+		this.codigo = codigo;
+	}
+	
 }

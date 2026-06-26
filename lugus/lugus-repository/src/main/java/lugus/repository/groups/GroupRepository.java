@@ -33,7 +33,9 @@ public interface GroupRepository {
 			        WHERE gf.group = g
 			        AND (
 			            gf.pelicula IS NULL
-			            OR gf.pelicula.comprado = false
+			            OR gf.pelicula.id in ( 
+			            select pelicula.id from Edicion where comprado = false
+			            )
 			        )
 			    )
 			""")

@@ -16,8 +16,6 @@ public interface PeliculaRepository {
 
 	long count();
 	
-	int countByComprado(final boolean value);
-
 	List<Pelicula> findAll();
 
 	Optional<Pelicula> findById(Integer id);
@@ -38,21 +36,11 @@ public interface PeliculaRepository {
 
 	List<Pelicula> findByTituloGestAndAnyo(final String titulo, final int anyo);
 
-	int updateLocationByCode(String oldCode, String newCode);
-
 	List<Pelicula> findByImdbId(String tconst);
 
 	List<Pelicula> findAllByOrderByTituloGestAscAnyoAsc();
-	
-	int countByTsAltaAfter(Instant date);
 
 	List<Pelicula> findByTituloContainingIgnoreCase(String query);
-
-	boolean existsByCodigo(String codigo);
-
-	int countByFormato(Formato format);
-
-	int countByFormatoAndComprado(Formato format, boolean b);
 
 	@Query("SELECT p.genero, COUNT(p) FROM Pelicula p GROUP BY p.genero")
 	List<Object[]> countByGenero();
