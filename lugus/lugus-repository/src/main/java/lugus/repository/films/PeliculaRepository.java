@@ -1,6 +1,5 @@
 package lugus.repository.films;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +9,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Query;
 
 import lugus.model.films.Pelicula;
-import lugus.model.values.Formato;
 
 public interface PeliculaRepository {
 

@@ -32,7 +32,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lugus.dto.core.CountryCode;
 import lugus.dto.core.FiltrosDto;
-import lugus.dto.films.EditionDto;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.FilmGenreDto;
 import lugus.dto.films.FilmStatsDto;
@@ -176,9 +175,7 @@ public class FilmApiController {
 				edto.setTsCompra(Instant.now());
 			}
 
-			// CÓDIGO
-			edto.calcularCodigoInicial(film.getTituloGest(), film.getGenero().getCodigo(), film.getAnyo());
-			edicionService.calculateCodeSuffix(edto);
+			edto.setCodigo(edicionService.calculateCompleteCode(edto.getId(), film));
 
 		}
 

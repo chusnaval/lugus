@@ -96,15 +96,7 @@ public class Edicion {
 	@JoinColumn(name = "estado_id", nullable = true) // FK → estado.id
 	private Estado estado;
 
-	
-	public void calcularCodigoInicial(String titloGest, String codGenero, int anyo) {
-		// Eliminar artículos del título
-		String procesado = titloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
-
-		// Obtener los primeros tres caracteres del título procesado
-		String prefijo = procesado.length() >= 3 ? procesado.substring(0, 3).toUpperCase() : procesado.toUpperCase();
-
-		codigo = codGenero + "-" + prefijo + "-" + anyo;
-
+	public String calcularCodigoInicial() {
+		return pelicula.calcularCodigo();
 	}
 }

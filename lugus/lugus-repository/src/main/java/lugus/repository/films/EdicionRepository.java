@@ -7,7 +7,7 @@ import lugus.model.values.Formato;
 
 public interface EdicionRepository {
 
-	boolean existsByCodigo(String codigo);
+	boolean existsByCodigoAndIdNot(String codigo, int id);
 
 	int countByTsAltaAfter(Instant date);
 
@@ -16,5 +16,7 @@ public interface EdicionRepository {
 	int countByFormatoAndComprado(Formato format, boolean b);
 
 	Edicion findById(int id);
+
+	Edicion save(Edicion edicion);
 
 }

@@ -158,18 +158,22 @@ public class PeliculaService {
 
 	public void addCaratula(Pelicula pelicula, String url) throws IOException, URISyntaxException {
 
-		final DwFotoServiceI dwFotoService = new DwFotoService();
-		Optional<Source> sourceObj = sourceService.findById(sourceService.calcularIdSource(url));
-		PeliculaFoto pf = new PeliculaFoto();
-		pf.setUrl(url);
-		if (sourceObj.isPresent()) {
-			pf.setSource(sourceObj.get());
+		try {
+			final DwFotoServiceI dwFotoService = new DwFotoService();
+			Optional<Source> sourceObj = sourceService.findById(sourceService.calcularIdSource(url));
+			PeliculaFoto pf = new PeliculaFoto();
+			pf.setUrl(url);
+			if (sourceObj.isPresent()) {
+				pf.setSource(sourceObj.get());
+			}
+			pf.setFoto(dwFotoService.descargar(sourceObj.get().getId(), url));
+			pf.setCaratula(true);
+			
+			pelicula.getPeliculaFotos().clear();
+			pelicula.addCaratula(pf);
+		}catch (Exception e) {
+			System.err.println("Error al descargar la carátula: " + e.getMessage());
 		}
-		pf.setFoto(dwFotoService.descargar(sourceObj.get().getId(), url));
-		pf.setCaratula(true);
-
-		pelicula.getPeliculaFotos().clear();
-		pelicula.addCaratula(pf);
 	}
 
 	@Transactional

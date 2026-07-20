@@ -309,4 +309,17 @@ public class Pelicula {
 		return null;
 	}
 
+	public String calcularCodigo() {
+		
+		// Eliminar artículos del título
+		String procesado = tituloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
+
+		// Obtener los primeros tres caracteres del título procesado
+		String prefijo = procesado.length() >= 3 ? procesado.substring(0, 3).toUpperCase() : procesado.toUpperCase();
+		
+		String codGenero = genero.getCodigo();
+
+		return codGenero + "-" + prefijo + "-" + anyo;
+
+	}
 }
