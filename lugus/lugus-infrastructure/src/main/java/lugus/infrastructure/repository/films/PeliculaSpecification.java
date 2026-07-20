@@ -84,10 +84,12 @@ public class PeliculaSpecification {
 
 	public static Specification<Pelicula> porComprado(Boolean comprado) {
 	    return (root, query, cb) -> {
-	        if (comprado == null) return null;
+	    	query.distinct(true);
+	    	Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
 
-	        query.distinct(true);
-	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+	    	if (comprado == null) {
+	        	return null;
+	        }
 
 	        return cb.equal(ed.get("comprado"), comprado);
 	    };
