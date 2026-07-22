@@ -11,13 +11,26 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FilmGenreDto {
 
-	private int arteEntretenimiento;
-	private int literaturaNarrativa;
+	private int animacion;
+	private int anime;
+	private int infantil;
+	private int musical;
+	private int navidena;
+	private int drama;
+	private int romantica;
+	private int comedia;
 	private int cienciaFiccion;
 	private int accion;
+	private int aventura;
+	private int fantasia;
+	private int thriller;
 	private int misterio;
+	private int crimen;
 	private int terror;
-	private int conflicto;
+	private int belico;
+	private int western;
 	private int documental;
+	private int deportes;
+	
 
 }

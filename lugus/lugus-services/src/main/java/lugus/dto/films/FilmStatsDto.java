@@ -21,5 +21,7 @@ public class FilmStatsDto {
 	private int digital;
 	private int notOwned;
 	
-    private FilmGenreDto generosPorCategoria;
+    private FilmCategoryDto numerosPorCategoria;
+    
+    private FilmGenreDto numerosPorGenero;
 }

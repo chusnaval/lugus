@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lugus.dto.core.CountryCode;
 import lugus.dto.core.FiltrosDto;
+import lugus.dto.films.FilmCategoryDto;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.FilmGenreDto;
 import lugus.dto.films.FilmStatsDto;
@@ -45,6 +46,7 @@ import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
 import lugus.model.values.Categoria;
 import lugus.model.values.Formato;
+import lugus.model.values.Genero;
 import lugus.model.values.TitleType;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
@@ -283,16 +285,41 @@ public class FilmApiController {
 		stats.setNotOwned(edicionService.contarNoCompradas());
 
 		Map<Object, Integer> categorias = service.contarPorCategoria();
-		stats.setGenerosPorCategoria(new FilmGenreDto());
-		stats.getGenerosPorCategoria().setArteEntretenimiento(categorias.get(Categoria.ARTE_ENTRETENIMIENTO));
-		stats.getGenerosPorCategoria().setLiteraturaNarrativa(categorias.get(Categoria.LITERATURA_NARRATIVA));
-		stats.getGenerosPorCategoria().setCienciaFiccion(categorias.get(Categoria.CIENCIA_FICCION));
-		stats.getGenerosPorCategoria().setAccion(categorias.get(Categoria.ACCION));
-		stats.getGenerosPorCategoria().setMisterio(categorias.get(Categoria.MISTERIO));
-		stats.getGenerosPorCategoria().setTerror(categorias.get(Categoria.TERROR));
-		stats.getGenerosPorCategoria().setConflicto(categorias.get(Categoria.CONFLICTO));
-		stats.getGenerosPorCategoria().setDocumental(categorias.get(Categoria.DOCUMENTAL));
+		stats.setNumerosPorCategoria(new FilmCategoryDto());
+		stats.getNumerosPorCategoria().setArteEntretenimiento(categorias.get(Categoria.ARTE_ENTRETENIMIENTO));
+		stats.getNumerosPorCategoria().setLiteraturaNarrativa(categorias.get(Categoria.LITERATURA_NARRATIVA));
+		stats.getNumerosPorCategoria().setCienciaFiccion(categorias.get(Categoria.CIENCIA_FICCION));
+		stats.getNumerosPorCategoria().setAccion(categorias.get(Categoria.ACCION));
+		stats.getNumerosPorCategoria().setMisterio(categorias.get(Categoria.MISTERIO));
+		stats.getNumerosPorCategoria().setTerror(categorias.get(Categoria.TERROR));
+		stats.getNumerosPorCategoria().setConflicto(categorias.get(Categoria.CONFLICTO));
+		stats.getNumerosPorCategoria().setDocumental(categorias.get(Categoria.DOCUMENTAL));
 
+		Map<Object, Integer> generos = service.contarPorGenero();
+		stats.setNumerosPorGenero(new FilmGenreDto());
+		stats.getNumerosPorGenero().setAnimacion(generos.get(Genero.ANIMACION.getCodigo())!=null?generos.get(Genero.ANIMACION.getCodigo()):0);
+		stats.getNumerosPorGenero().setAnime(generos.get(Genero.ANIME.getCodigo())!=null?generos.get(Genero.ANIME.getCodigo()):0);
+		stats.getNumerosPorGenero().setInfantil(generos.get(Genero.INFANTIL.getCodigo())!=null?generos.get(Genero.INFANTIL.getCodigo()):0);
+		stats.getNumerosPorGenero().setMusical(generos.get(Genero.MUSICAL.getCodigo())!=null?generos.get(Genero.MUSICAL.getCodigo()):0);
+		stats.getNumerosPorGenero().setNavidena(generos.get(Genero.NAVIDENA.getCodigo())!=null?generos.get(Genero.NAVIDENA.getCodigo()):0);
+		stats.getNumerosPorGenero().setDrama(generos.get(Genero.DRAMA.getCodigo())!=null?generos.get(Genero.DRAMA.getCodigo()):0);
+		stats.getNumerosPorGenero().setRomantica(generos.get(Genero.ROMANTICA.getCodigo())!=null?generos.get(Genero.ROMANTICA.getCodigo()):0);
+		stats.getNumerosPorGenero().setComedia(generos.get(Genero.COMEDIA.getCodigo())!=null?generos.get(Genero.COMEDIA.getCodigo()):0);
+		stats.getNumerosPorGenero().setCienciaFiccion(generos.get(Genero.CIENCIA_FICCION.getCodigo())!=null?generos.get(Genero.CIENCIA_FICCION.getCodigo()):0);
+		stats.getNumerosPorGenero().setAccion(generos.get(Genero.ACCION.getCodigo())!=null?generos.get(Genero.ACCION.getCodigo()):0);
+		stats.getNumerosPorGenero().setAventura(generos.get(Genero.AVENTURA.getCodigo())!=null?generos.get(Genero.AVENTURA.getCodigo()):0);
+		stats.getNumerosPorGenero().setFantasia(generos.get(Genero.FANTASIA.getCodigo())!=null?generos.get(Genero.FANTASIA.getCodigo()):0);
+		stats.getNumerosPorGenero().setThriller(generos.get(Genero.THRILLER.getCodigo())!=null?generos.get(Genero.THRILLER.getCodigo()):0);
+		stats.getNumerosPorGenero().setMisterio(generos.get(Genero.MISTERIO.getCodigo())!=null?generos.get(Genero.MISTERIO.getCodigo()):0);
+		stats.getNumerosPorGenero().setCrimen(generos.get(Genero.CRIMEN.getCodigo())!=null?generos.get(Genero.CRIMEN.getCodigo()):0);
+		stats.getNumerosPorGenero().setTerror(generos.get(Genero.TERROR.getCodigo())!=null?generos.get(Genero.TERROR.getCodigo()):0);
+		stats.getNumerosPorGenero().setBelico(generos.get(Genero.BELICO.getCodigo())!=null?generos.get(Genero.BELICO.getCodigo()):0);
+		stats.getNumerosPorGenero().setWestern(generos.get(Genero.WESTERN.getCodigo())!=null?generos.get(Genero.WESTERN.getCodigo()):0);
+		stats.getNumerosPorGenero().setDocumental(generos.get(Genero.DOCUMENTAL.getCodigo())!=null?generos.get(Genero.DOCUMENTAL.getCodigo()):0);
+		
+			
+		
+		
 		return stats;
 	}
 

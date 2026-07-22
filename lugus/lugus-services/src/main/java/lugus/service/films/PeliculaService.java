@@ -386,4 +386,10 @@ public class PeliculaService {
 		return porGenero.entrySet().stream().collect(Collectors.groupingBy(
 				e -> Genero.getById(e.getKey()).getCategoria(), Collectors.summingInt(Map.Entry::getValue)));
 	}
+
+	public Map<Object, Integer> contarPorGenero() {
+		
+		return peliculaRepo.countByGenero().stream()
+				.collect(Collectors.toMap(row -> ((Genero) row[0]).getCodigo(), row -> ((Long) row[1]).intValue()));
+	}
 }
