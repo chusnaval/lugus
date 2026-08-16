@@ -14,6 +14,8 @@ public class EditionDto {
 
 	private FormatDTO format;
 
+	private String locationCode;
+	
 	private String location;
 
 	private String mgmtCode;

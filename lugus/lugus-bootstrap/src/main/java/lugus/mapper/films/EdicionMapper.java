@@ -28,6 +28,7 @@ public class EdicionMapper {
 
 		if (edicion.getLocation() != null) {
 			dto.setLocation(edicion.getLocation().getDescripcion());
+			dto.setLocationCode(edicion.getLocation().getCodigo());
 		}
 
 		dto.setSteelbook(edicion.isSteelbook());
