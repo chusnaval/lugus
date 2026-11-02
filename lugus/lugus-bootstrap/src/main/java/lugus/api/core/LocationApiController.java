@@ -35,8 +35,15 @@ public class LocationApiController {
 	@GetMapping
 	List<LocationDTO> all() {
 		List<Location> sources = service.findAll();
-		
-		return sources.stream().map(mapper::mapToDTO).collect(Collectors.toList());
+		List<LocationDTO> aux = sources.stream().map(mapper::mapToDTO).collect(Collectors.toList());
+		// order by location type and then by description
+		return aux.stream().sorted((l1, l2) -> {
+			int cmp = Integer.compare(l1.getLocationType().getId(), l2.getLocationType().getId());
+			if (cmp == 0) {
+				return l1.getDescripcion().compareTo(l2.getDescripcion());
+			}
+			return cmp;
+		}).collect(Collectors.toList());
 	}
 
 	@PostMapping

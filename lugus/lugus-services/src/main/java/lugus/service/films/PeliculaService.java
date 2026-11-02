@@ -98,31 +98,7 @@ public class PeliculaService {
 		p.setGenero(Genero.getById(dto.getGenreCode()));
 		p.setDuration(dto.getDuration());
 
-		for (EditionDto edto : dto.getEditions()) {
-			Edicion edicion = edicionService.findById(edto.getId());
-
-			Optional<Location> loc = locService.findById(edto.getLocation());
-			edicion.setTsModif(Instant.now());
-			edicion.setFormato(Formato.getById(Short.valueOf(edto.getFormat().getCodigo())));
-			if (loc.isPresent()) {
-				edicion.setLocation(loc.get());
-			}
-			edicion.setCodigo(edto.getMgmtCode());
-			edicion.setComprado(edto.isOwned());
-			edicion.setFunda(edto.isSlipcover());
-			edicion.setSteelbook(edto.isSteelbook());
-			edicion.setNotas(edto.getNotes());
-
-			p.addEdicion(edicion);
-		}
-		
-		if(isDiffInCode)
-		{
-			for (Edicion edicion : p.getEditions()) {
-				String expected = edicionService.calculateCompleteCode(edicion.getId(), p);
-				edicion.setCodigo(expected);
-			}
-		}
+		updateEditions(dto, p, isDiffInCode);
 
 		addCaratula(p, dto.getCoverSrc());
 		Pelicula saved = peliculaRepo.save(p);
@@ -166,6 +142,34 @@ public class PeliculaService {
 			}
 		}
 		return p;
+	}
+
+	private void updateEditions(final FilmDto dto, Pelicula p, boolean updateCode) {
+		for (EditionDto edto : dto.getEditions()) {
+			Edicion edicion = edicionService.findById(edto.getId());
+
+			Optional<Location> loc = locService.findById(edto.getLocation());
+			edicion.setTsModif(Instant.now());
+			edicion.setFormato(Formato.getById(Short.valueOf(edto.getFormat().getCodigo())));
+			if (loc.isPresent()) {
+				edicion.setLocation(loc.get());
+			}
+			edicion.setCodigo(edto.getMgmtCode());
+			edicion.setComprado(edto.isOwned());
+			edicion.setFunda(edto.isSlipcover());
+			edicion.setSteelbook(edto.isSteelbook());
+			edicion.setNotas(edto.getNotes());
+
+			p.addEdicion(edicion);
+		}
+		
+		if(updateCode)
+		{
+			for (Edicion edicion : p.getEditions()) {
+				String expected = edicionService.calculateCompleteCode(edicion.getId(), p);
+				edicion.setCodigo(expected);
+			}
+		}
 	}
 
 	public void addCaratula(Pelicula pelicula, String url) throws IOException, URISyntaxException {
