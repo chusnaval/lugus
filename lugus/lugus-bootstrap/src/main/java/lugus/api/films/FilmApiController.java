@@ -360,7 +360,7 @@ public class FilmApiController {
 			filtro.setToAnyo(toYear);
 		}
 		if (format != null) {
-			filtro.setFormato((int) Formato.getByName(format).getId());
+			filtro.setFormato((int) Formato.getById(Short.valueOf(format)).getId());
 		}
 		if (genre != null) {
 			filtro.setGenero(genre);
