@@ -314,6 +314,26 @@ public class Pelicula {
 		// Eliminar artículos del título
 		String procesado = tituloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
 
+		// reemplazar caracteres acentuados por sus equivalentes sin acento
+		procesado = procesado.replaceAll("[áàäâ]", "a");
+		procesado = procesado.replaceAll("[éèëê]", "e");
+		procesado = procesado.replaceAll("[íìïî]", "i");
+		procesado = procesado.replaceAll("[óòöô]", "o");
+		procesado = procesado.replaceAll("[úùüû]", "u");
+		// y en mayúsculas
+		procesado = procesado.replaceAll("[ÁÀÄÂ]", "A");
+		procesado = procesado.replaceAll("[ÉÈËÊ]", "E");
+		procesado = procesado.replaceAll("[ÍÌÏÎ]", "I");
+		procesado = procesado.replaceAll("[ÓÒÖÔ]", "O");
+		procesado = procesado.replaceAll("[ÚÙÜÛ]", "U");
+		
+		// reemplazar la ñ por n
+		procesado = procesado.replaceAll("[ñ]", "n");
+		procesado = procesado.replaceAll("[Ñ]", "N");
+		
+		// eliminar caracteres especiales y espacios
+		procesado = procesado.replaceAll("[^a-zA-Z0-9]", "");
+		
 		// Obtener los primeros tres caracteres del título procesado
 		String prefijo = procesado.length() >= 3 ? procesado.substring(0, 3).toUpperCase() : procesado.toUpperCase();
 		
@@ -321,5 +341,9 @@ public class Pelicula {
 
 		return codGenero + "-" + prefijo + "-" + anyo;
 
+	}
+
+	public boolean isDiffInCode(String titleMgmt, int year, String genreCode) {
+		return (!this.getTituloGest().equals(titleMgmt) || this.getAnyo() != year || !this.getGenero().getCodigo().equals(genreCode));
 	}
 }

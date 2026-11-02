@@ -386,7 +386,6 @@ public class FilmApiController {
 		return filtro;
 	}
 
-	@SuppressWarnings("null")
 	@GetMapping("/export/md")
 	public ResponseEntity<String> exportMarkdown(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) Boolean owned, @RequestParam(required = false) String title,
@@ -402,7 +401,6 @@ public class FilmApiController {
 				.contentType(MediaType.TEXT_MARKDOWN).body(file);
 	}
 
-	@SuppressWarnings("null")
 	@GetMapping("/export/pdf")
 	public ResponseEntity<byte[]> exportPdf(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) Boolean owned, @RequestParam(required = false) String title,

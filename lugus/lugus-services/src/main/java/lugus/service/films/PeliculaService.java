@@ -83,10 +83,14 @@ public class PeliculaService {
 	}
 
 	@Transactional
-	public Pelicula update(Integer id, FilmDto dto, String apiKey) throws IOException, URISyntaxException {
+	public Pelicula update(final Integer id, final FilmDto dto, final String apiKey) throws IOException, URISyntaxException {
 
 		Pelicula p = peliculaRepo.findById(id).orElseThrow(() -> new RuntimeException("Pelicula no encontrada"));
-
+		
+		// Check if there are differences in the code based on title, year, or genre
+		// TODO dont expose the fields that are used to calculate the code, and use a method in Pelicula to check if the code is different
+		boolean isDiffInCode = p.isDiffInCode(dto.getTitleMgmt(), dto.getYear(), dto.getGenreCode());
+		
 		p.setTitulo(dto.getTitle());
 		p.setTituloGest(dto.getTitleMgmt());
 		p.setAnyo(dto.getYear());
@@ -110,6 +114,14 @@ public class PeliculaService {
 			edicion.setNotas(edto.getNotes());
 
 			p.addEdicion(edicion);
+		}
+		
+		if(isDiffInCode)
+		{
+			for (Edicion edicion : p.getEditions()) {
+				String expected = edicionService.calculateCompleteCode(edicion.getId(), p);
+				edicion.setCodigo(expected);
+			}
 		}
 
 		addCaratula(p, dto.getCoverSrc());
