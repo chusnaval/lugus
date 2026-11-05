@@ -16,6 +16,8 @@ public class Filmography {
 	private String nconst;
 
 	private Integer peliculaId;
+	
+	private Short formatoId;
 
 	private String title;
 

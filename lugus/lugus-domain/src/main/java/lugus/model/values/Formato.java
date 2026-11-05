@@ -83,6 +83,16 @@ public enum Formato {
 		return id;
 	}
 
+	public static List<Formato> prioritizedFormats() {
+		List<Formato> lista = new ArrayList<>();
+		lista.add(ULTRAHD);
+		lista.add(BLURAY);
+		lista.add(DVD);
+		lista.add(DIGITAL);
+		lista.add(VHS);
+		return lista;
+	}
+
 	/*
 	 * 1 "Carpetas" 2 "Estanterias" 3 "Otros" 4 "Cajas"
 	 */
