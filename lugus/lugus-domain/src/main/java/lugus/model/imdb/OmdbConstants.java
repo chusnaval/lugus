@@ -12,4 +12,5 @@ public final class OmdbConstants {
 	
 	public static final String FIELD_PLOT = "Plot";
 	public static final String COUNTRY_PLOT = "Country";
+	public static final String POSTER = "Poster";
 }

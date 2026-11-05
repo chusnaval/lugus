@@ -122,7 +122,8 @@ public class FilmApiController {
 		var cached = cacheService.getFromCache(dto.getImdbId());
 
 		if (cached == null) {
-			String url = OmdbConstants.OMDB_API_URL + dto.getImdbId() + OmdbConstants.API_KEY_PARAM + apiKey + OmdbConstants.PLOT_PARAM;
+			String url = OmdbConstants.OMDB_API_URL + dto.getImdbId() + OmdbConstants.API_KEY_PARAM + apiKey
+					+ OmdbConstants.PLOT_PARAM;
 			final RestTemplate rest = new RestTemplate();
 			Map<String, Object> json = rest.getForObject(url, Map.class);
 			cacheService.saveToCache(dto.getImdbId(), json);
@@ -161,12 +162,12 @@ public class FilmApiController {
 
 		for (Edicion edto : film.getEditions()) {
 
-			if(edto.getLocation()!=null && edto.getLocation().getCodigo() != null
+			if (edto.getLocation() != null && edto.getLocation().getCodigo() != null
 					&& !edto.getLocation().getCodigo().isEmpty()) {
 				Location loc = locService.findById(edto.getLocation().getCodigo())
 						.orElseThrow(() -> new LugusNotFoundException(edto.getLocation().getCodigo()));
 				edto.setLocation(loc);
-			}else {
+			} else {
 				edto.setLocation(null);
 			}
 
@@ -213,27 +214,46 @@ public class FilmApiController {
 				titlesService.save(title);
 			});
 			var cached = cacheService.getFromCache(dto.getImdbId());
-			
+
 			if (cached == null) {
-				String url =  OmdbConstants.OMDB_API_URL + dto.getImdbId() + OmdbConstants.API_KEY_PARAM + apiKey + OmdbConstants.PLOT_PARAM;
+				String url = OmdbConstants.OMDB_API_URL + dto.getImdbId() + OmdbConstants.API_KEY_PARAM + apiKey
+						+ OmdbConstants.PLOT_PARAM;
 				final RestTemplate rest = new RestTemplate();
 				Map<String, Object> json = rest.getForObject(url, Map.class);
+				String posterUrl = (String) json.get(OmdbConstants.POSTER);
 				cacheService.saveToCache(dto.getImdbId(), json);
 			}
 			cached = cacheService.getFromCache(dto.getImdbId());
 			JsonNode node = jsonMapper.valueToTree(cached.getJson());
 			String country = node.get(OmdbConstants.COUNTRY_PLOT).asText();
+
 			// puede tener valor o no
 			// o tener uno o varios países separados por coma
 			List<String> values = getCountries(country);
-			
 			// los guardamosen un campo separados por coma
 			saved.setCountry(String.join(",", values));
 			saved.setSynopsis((String) node.get(OmdbConstants.FIELD_PLOT).asText());
+
 			service.save(saved);
+
+			String posterUrl = node.get(OmdbConstants.POSTER).asText();
+			if (dto.getCoverSrc().isEmpty() || dto.getCoverSrc() == null) {
+				dto.setCoverSrc(posterUrl);
+				final DwFotoServiceI dwFotoService = new DwFotoService();
+				final int sourceId = sourceService.calcularIdSource(dto.getCoverSrc());
+				Optional<Source> sourceObj = sourceService.findById(sourceId);
+				PeliculaFoto pf = new PeliculaFoto();
+				pf.setUrl(dto.getCoverSrc());
+				if (sourceObj.isPresent()) {
+					pf.setSource(sourceObj.get());
+				}
+				pf.setFoto(dwFotoService.descargar(sourceId, dto.getCoverSrc()));
+				pf.setCaratula(true);
+
+				saved.addCaratula(pf);
+				service.save(saved);
+			}
 		}
-
-
 
 		return ResponseEntity.ok().build();
 	}
@@ -281,11 +301,11 @@ public class FilmApiController {
 	@GetMapping(value = "/stats", produces = "application/json;charset=UTF-8")
 	public FilmStatsDto getStats() {
 		FilmStatsDto stats = new FilmStatsDto();
-		
+
 		getBasicStats(stats);
 		getCategoryNumbers(stats);
 		getGenreNumbers(stats);
-		
+
 		return stats;
 	}
 
@@ -329,7 +349,7 @@ public class FilmApiController {
 	private int getNumberFromMap(Map<Object, Integer> generos, Genero genero) {
 		return generos.get(genero.getCodigo()) != null ? generos.get(genero.getCodigo()) : 0;
 	}
-	
+
 	private int getNumberFromMap(Map<Object, Integer> categorias, Categoria categoria) {
 		return categorias.get(categoria) != null ? categorias.get(categoria) : 0;
 	}
@@ -346,7 +366,6 @@ public class FilmApiController {
 		stats.setConflicto(getNumberFromMap(categorias, Categoria.CONFLICTO));
 		stats.setDocumentalCategory(getNumberFromMap(categorias, Categoria.DOCUMENTAL));
 	}
-
 
 	private FiltrosDto crearFiltro(Integer page, Integer size, Boolean owned, String title, String casting,
 			Integer fromYear, Integer toYear, String format, String genre, Boolean pack, String sort,
