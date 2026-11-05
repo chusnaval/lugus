@@ -44,6 +44,7 @@ import lugus.model.core.Source;
 import lugus.model.films.Edicion;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
+import lugus.model.imdb.OmdbConstants;
 import lugus.model.values.Categoria;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
@@ -65,6 +66,7 @@ import lugus.service.titles.TitlesService;
 @RequestMapping("/v1/api/films")
 public class FilmApiController {
 
+	private static final String ATTACHMENT_FILENAME = "attachment; filename=";
 	private final PeliculaService service;
 	private final EdicionService edicionService;
 	private final FilmMapper mapper;
@@ -78,6 +80,7 @@ public class FilmApiController {
 	private final String apiKey;
 	private final OmdbCacheService cacheService;
 	private final ObjectMapper jsonMapper;
+	private static final String FILE_NAME = "peliculas";
 
 	@Autowired
 	public FilmApiController(@Value("${omdb.api.key}") String apiKey, PeliculaService service,
@@ -119,7 +122,7 @@ public class FilmApiController {
 		var cached = cacheService.getFromCache(dto.getImdbId());
 
 		if (cached == null) {
-			String url = "https://www.omdbapi.com/?i=" + dto.getImdbId() + "&apikey=" + apiKey + "&plot=full";
+			String url = OmdbConstants.OMDB_API_URL + dto.getImdbId() + OmdbConstants.API_KEY_PARAM + apiKey + OmdbConstants.PLOT_PARAM;
 			final RestTemplate rest = new RestTemplate();
 			Map<String, Object> json = rest.getForObject(url, Map.class);
 			cacheService.saveToCache(dto.getImdbId(), json);
@@ -212,33 +215,38 @@ public class FilmApiController {
 			var cached = cacheService.getFromCache(dto.getImdbId());
 			
 			if (cached == null) {
-				String url = "https://www.omdbapi.com/?i=" + dto.getImdbId() + "&apikey=" + apiKey + "&plot=full";
+				String url =  OmdbConstants.OMDB_API_URL + dto.getImdbId() + OmdbConstants.API_KEY_PARAM + apiKey + OmdbConstants.PLOT_PARAM;
 				final RestTemplate rest = new RestTemplate();
 				Map<String, Object> json = rest.getForObject(url, Map.class);
 				cacheService.saveToCache(dto.getImdbId(), json);
 			}
 			cached = cacheService.getFromCache(dto.getImdbId());
 			JsonNode node = jsonMapper.valueToTree(cached.getJson());
-			String country = node.get("Country").asText();
+			String country = node.get(OmdbConstants.COUNTRY_PLOT).asText();
 			// puede tener valor o no
 			// o tener uno o varios países separados por coma
-			List<String> values = new ArrayList<>();
-			if (country != null) {
-				String[] countries = country.split(",");
-				for (int i = 0; i < countries.length; i++) {
-					values.add(CountryCode.fromString(countries[i]).getCode());
-				}
-			}
+			List<String> values = getCountries(country);
 			
 			// los guardamosen un campo separados por coma
 			saved.setCountry(String.join(",", values));
-			saved.setSynopsis((String) node.get("Plot").asText());
+			saved.setSynopsis((String) node.get(OmdbConstants.FIELD_PLOT).asText());
 			service.save(saved);
 		}
 
 
 
 		return ResponseEntity.ok().build();
+	}
+
+	private List<String> getCountries(String country) {
+		List<String> values = new ArrayList<>();
+		if (country != null) {
+			String[] countries = country.split(",");
+			for (int i = 0; i < countries.length; i++) {
+				values.add(CountryCode.fromString(countries[i]).getCode());
+			}
+		}
+		return values;
 	}
 
 	@GetMapping("/wanted")
@@ -273,7 +281,17 @@ public class FilmApiController {
 	@GetMapping(value = "/stats", produces = "application/json;charset=UTF-8")
 	public FilmStatsDto getStats() {
 		FilmStatsDto stats = new FilmStatsDto();
+		
+		getBasicStats(stats);
+		getCategoryNumbers(stats);
+		getGenreNumbers(stats);
+		
+		return stats;
+	}
+
+	private void getBasicStats(FilmStatsDto stats) {
 		stats.setTotalFilms(edicionService.contarTodasCompradas());
+		stats.setNotOwned(edicionService.contarNoCompradas());
 		stats.setRecentFilms(edicionService.addedInLastDays(30));
 		stats.setIncompleteGroups(groupsService.incompletedGroups());
 		stats.setCompleteGroups((int) (groupsService.count() - groupsService.incompletedGroups()));
@@ -282,62 +300,53 @@ public class FilmApiController {
 		stats.setBluray(edicionService.contarPorFormato(Formato.BLURAY));
 		stats.setUhd(edicionService.contarPorFormato(Formato.ULTRAHD));
 		stats.setDigital(edicionService.contarPorFormato(Formato.DIGITAL));
-		stats.setNotOwned(edicionService.contarNoCompradas());
+	}
 
-		Map<Object, Integer> categorias = service.contarPorCategoria();
-		stats.setNumerosPorCategoria(new FilmCategoryDto());
-		stats.getNumerosPorCategoria().setArteEntretenimiento(categorias.get(Categoria.ARTE_ENTRETENIMIENTO));
-		stats.getNumerosPorCategoria().setLiteraturaNarrativa(categorias.get(Categoria.LITERATURA_NARRATIVA));
-		stats.getNumerosPorCategoria().setCienciaFiccion(categorias.get(Categoria.CIENCIA_FICCION));
-		stats.getNumerosPorCategoria().setAccion(categorias.get(Categoria.ACCION));
-		stats.getNumerosPorCategoria().setMisterio(categorias.get(Categoria.MISTERIO));
-		stats.getNumerosPorCategoria().setTerror(categorias.get(Categoria.TERROR));
-		stats.getNumerosPorCategoria().setConflicto(categorias.get(Categoria.CONFLICTO));
-		stats.getNumerosPorCategoria().setDocumental(categorias.get(Categoria.DOCUMENTAL));
-
+	private void getGenreNumbers(FilmStatsDto stats) {
 		Map<Object, Integer> generos = service.contarPorGenero();
 		stats.setNumerosPorGenero(new FilmGenreDto());
-		stats.getNumerosPorGenero().setAnimacion(generos.get(Genero.ANIMACION.getCodigo())!=null?generos.get(Genero.ANIMACION.getCodigo()):0);
-		stats.getNumerosPorGenero().setAnime(generos.get(Genero.ANIME.getCodigo())!=null?generos.get(Genero.ANIME.getCodigo()):0);
-		stats.getNumerosPorGenero().setInfantil(generos.get(Genero.INFANTIL.getCodigo())!=null?generos.get(Genero.INFANTIL.getCodigo()):0);
-		stats.getNumerosPorGenero().setMusical(generos.get(Genero.MUSICAL.getCodigo())!=null?generos.get(Genero.MUSICAL.getCodigo()):0);
-		stats.getNumerosPorGenero().setNavidena(generos.get(Genero.NAVIDENA.getCodigo())!=null?generos.get(Genero.NAVIDENA.getCodigo()):0);
-		stats.getNumerosPorGenero().setDrama(generos.get(Genero.DRAMA.getCodigo())!=null?generos.get(Genero.DRAMA.getCodigo()):0);
-		stats.getNumerosPorGenero().setRomantica(generos.get(Genero.ROMANTICA.getCodigo())!=null?generos.get(Genero.ROMANTICA.getCodigo()):0);
-		stats.getNumerosPorGenero().setComedia(generos.get(Genero.COMEDIA.getCodigo())!=null?generos.get(Genero.COMEDIA.getCodigo()):0);
-		stats.getNumerosPorGenero().setCienciaFiccion(generos.get(Genero.CIENCIA_FICCION.getCodigo())!=null?generos.get(Genero.CIENCIA_FICCION.getCodigo()):0);
-		stats.getNumerosPorGenero().setAccion(generos.get(Genero.ACCION.getCodigo())!=null?generos.get(Genero.ACCION.getCodigo()):0);
-		stats.getNumerosPorGenero().setAventura(generos.get(Genero.AVENTURA.getCodigo())!=null?generos.get(Genero.AVENTURA.getCodigo()):0);
-		stats.getNumerosPorGenero().setFantasia(generos.get(Genero.FANTASIA.getCodigo())!=null?generos.get(Genero.FANTASIA.getCodigo()):0);
-		stats.getNumerosPorGenero().setThriller(generos.get(Genero.THRILLER.getCodigo())!=null?generos.get(Genero.THRILLER.getCodigo()):0);
-		stats.getNumerosPorGenero().setMisterio(generos.get(Genero.MISTERIO.getCodigo())!=null?generos.get(Genero.MISTERIO.getCodigo()):0);
-		stats.getNumerosPorGenero().setCrimen(generos.get(Genero.CRIMEN.getCodigo())!=null?generos.get(Genero.CRIMEN.getCodigo()):0);
-		stats.getNumerosPorGenero().setTerror(generos.get(Genero.TERROR.getCodigo())!=null?generos.get(Genero.TERROR.getCodigo()):0);
-		stats.getNumerosPorGenero().setBelico(generos.get(Genero.BELICO.getCodigo())!=null?generos.get(Genero.BELICO.getCodigo()):0);
-		stats.getNumerosPorGenero().setWestern(generos.get(Genero.WESTERN.getCodigo())!=null?generos.get(Genero.WESTERN.getCodigo()):0);
-		stats.getNumerosPorGenero().setDocumental(generos.get(Genero.DOCUMENTAL.getCodigo())!=null?generos.get(Genero.DOCUMENTAL.getCodigo()):0);
-		
-			
-		
-		
-		return stats;
+		stats.setAnimacion(getNumberFromMap(generos, Genero.ANIMACION));
+		stats.setAnime(getNumberFromMap(generos, Genero.ANIME));
+		stats.setInfantil(getNumberFromMap(generos, Genero.INFANTIL));
+		stats.setMusical(getNumberFromMap(generos, Genero.MUSICAL));
+		stats.setNavidena(getNumberFromMap(generos, Genero.NAVIDENA));
+		stats.setDrama(getNumberFromMap(generos, Genero.DRAMA));
+		stats.setRomantica(getNumberFromMap(generos, Genero.ROMANTICA));
+		stats.setComedia(getNumberFromMap(generos, Genero.COMEDIA));
+		stats.setCienciaFiccion(getNumberFromMap(generos, Genero.CIENCIA_FICCION));
+		stats.setAccion(getNumberFromMap(generos, Genero.ACCION));
+		stats.setAventura(getNumberFromMap(generos, Genero.AVENTURA));
+		stats.setFantasia(getNumberFromMap(generos, Genero.FANTASIA));
+		stats.setThriller(getNumberFromMap(generos, Genero.THRILLER));
+		stats.setMisterio(getNumberFromMap(generos, Genero.MISTERIO));
+		stats.setCrimen(getNumberFromMap(generos, Genero.CRIMEN));
+		stats.setTerror(getNumberFromMap(generos, Genero.TERROR));
+		stats.setBelico(getNumberFromMap(generos, Genero.BELICO));
+		stats.setWestern(getNumberFromMap(generos, Genero.WESTERN));
+		stats.setDocumental(getNumberFromMap(generos, Genero.DOCUMENTAL));
 	}
 
-	@GetMapping("/export/ods")
-	public ResponseEntity<byte[]> exportOds(@RequestParam Integer page, @RequestParam Integer size,
-			@RequestParam(required = false) Boolean owned, @RequestParam(required = false) String title,
-			@RequestParam(required = false) String casting, @RequestParam(required = false) Integer fromYear,
-			@RequestParam(required = false) Integer toYear, @RequestParam(required = false) String format,
-			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
-			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection)
-			throws IOException {
-		FiltrosDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
-				sortDirection);
-		byte[] file = filmExportService.toOds(service.findAllBy(filtro).getContent());
-
-		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas.ods")
-				.contentType(MediaType.parseMediaType("application/vnd.oasis.opendocument.spreadsheet")).body(file);
+	private int getNumberFromMap(Map<Object, Integer> generos, Genero genero) {
+		return generos.get(genero.getCodigo()) != null ? generos.get(genero.getCodigo()) : 0;
 	}
+	
+	private int getNumberFromMap(Map<Object, Integer> categorias, Categoria categoria) {
+		return categorias.get(categoria) != null ? categorias.get(categoria) : 0;
+	}
+
+	private void getCategoryNumbers(FilmStatsDto stats) {
+		Map<Object, Integer> categorias = service.contarPorCategoria();
+		stats.setNumerosPorCategoria(new FilmCategoryDto());
+		stats.setArteEntretenimiento(getNumberFromMap(categorias, Categoria.ARTE_ENTRETENIMIENTO));
+		stats.setLiteraturaNarrativa(getNumberFromMap(categorias, Categoria.LITERATURA_NARRATIVA));
+		stats.setCienciaFiccionCategory(getNumberFromMap(categorias, Categoria.CIENCIA_FICCION));
+		stats.setAccionCategory(getNumberFromMap(categorias, Categoria.ACCION));
+		stats.setMisterioCategory(getNumberFromMap(categorias, Categoria.MISTERIO));
+		stats.setTerrorCategory(getNumberFromMap(categorias, Categoria.TERROR));
+		stats.setConflicto(getNumberFromMap(categorias, Categoria.CONFLICTO));
+		stats.setDocumentalCategory(getNumberFromMap(categorias, Categoria.DOCUMENTAL));
+	}
+
 
 	private FiltrosDto crearFiltro(Integer page, Integer size, Boolean owned, String title, String casting,
 			Integer fromYear, Integer toYear, String format, String genre, Boolean pack, String sort,
@@ -397,7 +406,7 @@ public class FilmApiController {
 				sortDirection);
 		String file = filmExportService.toMarkdown(service.findAllBy(filtro).getContent());
 
-		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas.md")
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, ATTACHMENT_FILENAME + FILE_NAME + ".md")
 				.contentType(MediaType.TEXT_MARKDOWN).body(file);
 	}
 
@@ -413,8 +422,23 @@ public class FilmApiController {
 				sortDirection);
 		byte[] file = filmExportService.toPdf(service.findAllBy(filtro).getContent());
 
-		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas.pdf")
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, ATTACHMENT_FILENAME + FILE_NAME + ".pdf")
 				.contentType(MediaType.APPLICATION_PDF).body(file);
 	}
 
+	@GetMapping("/export/ods")
+	public ResponseEntity<byte[]> exportOds(@RequestParam Integer page, @RequestParam Integer size,
+			@RequestParam(required = false) Boolean owned, @RequestParam(required = false) String title,
+			@RequestParam(required = false) String casting, @RequestParam(required = false) Integer fromYear,
+			@RequestParam(required = false) Integer toYear, @RequestParam(required = false) String format,
+			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
+			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection)
+			throws IOException {
+		FiltrosDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+				sortDirection);
+		byte[] file = filmExportService.toOds(service.findAllBy(filtro).getContent());
+
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, ATTACHMENT_FILENAME + FILE_NAME + ".ods")
+				.contentType(MediaType.parseMediaType("application/vnd.oasis.opendocument.spreadsheet")).body(file);
+	}
 }
