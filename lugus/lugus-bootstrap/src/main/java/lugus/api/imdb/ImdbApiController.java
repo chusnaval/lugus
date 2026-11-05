@@ -13,10 +13,12 @@ import lugus.dto.core.FormatDTO;
 import lugus.dto.films.EditionDto;
 import lugus.dto.films.FilmDto;
 import lugus.exception.LugusNotFoundException;
+import lugus.model.films.Pelicula;
 import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.values.Formato;
 import lugus.model.values.Genero;
+import lugus.service.films.EdicionService;
 import lugus.service.imdb.ImdbTitleAkasService;
 import lugus.service.imdb.ImdbTitleBasicsService;
 
@@ -30,6 +32,8 @@ public class ImdbApiController {
 	private final ImdbTitleBasicsService itbService;
 
 	private final ImdbTitleAkasService itaService;
+	
+	private final EdicionService edicionService;
 
 	@GetMapping("/{id}")
 	FilmDto one(@PathVariable String id) throws LugusNotFoundException {
@@ -61,7 +65,7 @@ public class ImdbApiController {
 				dto.setGenreCode(firstGenre);
 				dto.setGenreDesc(Genero.getById(firstGenre).getDisplayName());
 				edto.setNotes(genres);
-				edto.setMgmtCode(calcularCodigo(dto));
+				edto.setMgmtCode(edicionService.calculateCompleteCode(-1, createFakeFilm(dto)));
 			}
 			dto.addEdition(edto);
 			
@@ -72,6 +76,15 @@ public class ImdbApiController {
 
 		}
 		return null;
+	}
+
+	private Pelicula createFakeFilm(FilmDto dto) {
+		Pelicula film = new Pelicula();
+		film.setTituloGest(dto.getTitleMgmt());
+		film.setAnyo(dto.getYear());
+		film.setGenero(Genero.getById(dto.getGenreCode()));
+		
+		return film;
 	}
 
 	private String translate(String firstGenre) {
@@ -140,18 +153,5 @@ public class ImdbApiController {
 	}
 
 	
-	//TODO duplicated
-	public String calcularCodigo(FilmDto dto) {
-		// Eliminar artículos del título
-		String procesado = dto.getTitle().replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
-
-		// Obtener los primeros tres caracteres del título procesado
-		String prefijo = procesado.length() >= 3 ? procesado.substring(0, 3).toUpperCase() : procesado.toUpperCase();
-
-		// Obtener la etiqueta del género
-		String parteCodigo = dto.getGenreCode();
-
-		return (parteCodigo + "-" + prefijo + "-" + dto.getYear());
-
-	}
+	
 }

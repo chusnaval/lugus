@@ -253,6 +253,15 @@ public class FilmApiController {
 				saved.addCaratula(pf);
 				service.save(saved);
 			}
+			
+			try {
+				Integer duration = node.get(OmdbConstants.DURATION).asInt();
+				saved.setDuration(duration);
+				service.save(saved);
+			}catch(Exception e) {
+				// no pasa nada, no tiene duración
+			}
+			
 		}
 
 		return ResponseEntity.ok().build();
