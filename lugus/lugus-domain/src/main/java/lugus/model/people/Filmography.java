@@ -53,6 +53,6 @@ public class Filmography {
 	 * @return
 	 */
 	public boolean hasCategory(String category2) {
-		return this.category != null && !this.category.contains(category2);
+		return this.category != null && this.category.contains(category2);
 	}
 }
