@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import lugus.model.films.Edicion;
 import lugus.model.films.Pelicula;
 import lugus.model.series.Serie;
+import lugus.model.values.Formato;
 import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.imdb.ImdbTitlePrincipals;
@@ -32,85 +34,86 @@ import lugus.service.series.SeriesService;
 public class FilmographyApiController {
 
 	private final PersonaService personaService;
-	
+
 	private final ImdbTitlePrincipalsService imdbTitlePrincipalsService;
-	
+
 	private final ImdbTitleBasicsService imdbTitleBasicsService;
-	
+
 	private final ImdbTitleAkasService imdbTitleAkasService;
 
 	private final PeliculaService peliculaService;
-	
+
 	private final SeriesService seriesService;
 
 	@GetMapping("/{id}")
-	public List<Filmography> findFilmography( @PathVariable Integer id){
+	public List<Filmography> findFilmography(@PathVariable Integer id) {
 		Persona person = personaService.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("Persona no encontrada"));
-		
-		return  buildFilmsList(person);
+
+		return buildFilmsList(person);
 	}
-	
+
 	private List<Filmography> buildFilmsList(Persona person) {
 
 		List<ImdbTitlePrincipals> aux = imdbTitlePrincipalsService.findAllByIdNconst(person.getNconst());
-		
-		
+
 		List<Filmography> films = aux.stream().filter(itp -> {
 			Optional<ImdbTitleBasics> itb = imdbTitleBasicsService.findById(itp.getId().getTconst());
 			return itb.isPresent() && itb.get().getStartyear() != null && !itb.get().isASerieEpisode();
-			
+
 		}).collect(Collectors.groupingBy(itp -> itp.getId().getTconst())).values().stream().map(list -> {
 			ImdbTitlePrincipals first = list.get(0);
 			ImdbTitleBasics itb = imdbTitleBasicsService.findById(first.getId().getTconst()).get();
 			Filmography film = buildNewFilmography(person, first, Optional.of(itb));
-			if(film == null) {
+			if (film == null) {
 				return null;
 			}
 			list.stream().skip(1).forEach(itp -> film.appendCategory(itp.getId().getCategory()));
 
 			return film;
-		}).filter(f -> f!=null).collect(Collectors.toList());
+		}).filter(f -> f != null).collect(Collectors.toList());
 
 		Collections.sort(films, (o1, o2) -> o1.getStartyear().compareTo(o2.getStartyear()));
 		return films;
 	}
 
 	private Filmography buildNewFilmography(Persona person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb) {
-		
+
 		Optional<ImdbTitleAkas> ita = imdbTitleAkasService.findByTitleId(itp.getId().getTconst());
 
-		if(itb.isEmpty()) {
+		if (itb.isEmpty()) {
 			throw new IllegalArgumentException("No se puede construir Filmography: itb vacío");
 		}
 		if (itb.isEmpty() || itb.get().getStartyear() == null) {
-		    throw new IllegalArgumentException("No se puede construir Filmography: itb vacío o startyear nulo");
+			throw new IllegalArgumentException("No se puede construir Filmography: itb vacío o startyear nulo");
 		}
 		boolean isMovie = itb.get().isAMovie();
-		if(isMovie) {
+		if (isMovie) {
 			return buildFilmographyForMovie(person, itp, itb, ita);
 		} else if (itb.get().isASerie()) {
 			return buildFilmographyForSerie(person, itp, itb, ita);
 		}
-		
+
 		return null;
-		
+
 	}
 
 	private Filmography buildFilmographyForSerie(Persona person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb,
 			Optional<ImdbTitleAkas> ita) {
 		boolean isSerieRegister = seriesService.isFilmRegistered(itp.getId().getTconst());
-		
 
 		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
-			.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type(itb.get().getTitletype())
-			.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
-		
+				.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type(itb.get().getTitletype())
+				.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
+
 		if (isSerieRegister) {
 			Optional<Serie> serie = seriesService.findByImdbId(itp.getId().getTconst());
 			if (!serie.isPresent()) {
 				film.setPeliculaId(serie.get().getId());
-				
+
+				if (serie.get().isComprado()) {
+					film.setFormatoId(obtainBestFormatoId(serie.get()));
+				}
 				film.setComprado(serie.get().isComprado());
 				film.setBuscado(!serie.get().isComprado());
 			} else {
@@ -119,8 +122,24 @@ public class FilmographyApiController {
 			}
 		}
 
+		return film;
+	}
 
-	return film;
+	private Short obtainBestFormatoId(Serie serie) {
+		Short bestFormatoId = null;
+		// best format would be the one with the highest priority, so we need to define
+		// a priority order for the formats
+		// in the future, we could have a configuration for this, but for now, we will
+		// hardcode it
+		List<Formato> orderedFormats = Formato.prioritizedFormats();
+
+		for (Formato formato : orderedFormats) {
+			if (serie.getFormato().getId() == formato.getId()) {
+				bestFormatoId = formato.getId();
+				break;
+			}
+		}
+		return bestFormatoId;
 	}
 
 	private Filmography buildFilmographyForMovie(Persona person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb,
@@ -128,30 +147,62 @@ public class FilmographyApiController {
 		boolean isFilmRegister = peliculaService.isFilmRegistered(itp.getId().getTconst());
 
 		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
-			.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type(itb.get().getTitletype())
-			.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
-			if (isFilmRegister) {
-				List<Pelicula> pelis = peliculaService.findByImdbId(itp.getId().getTconst());
-				if (!pelis.isEmpty()) {
-					// necesitamos poner peliculaId en filmography para que se sepa que pelicula de una forma u otra
-					// la tenemos registrada, asi que si hay varias peliculas con ese tconst, se pone el id de la edicion con mayor fecha de modificacion, asi que se asume que es la edicion mas actualizada
-					// pero tsmodif puede ser nulo, asi que se asume que si es nulo, es la edicion mas antigua, y si no es nulo, se compara con las fechas de modificacion de las otras ediciones para determinar cual es la mas actualizada
-					Pelicula pelicula = pelis.getFirst(); // TODO esto va a ser unico en cuanto termine con las eidiciones
-					film.setPeliculaId(pelicula.getId());
-				
-					// queremos marcar como comprado o buscado el registro de filmografia, asi que si cualquiera de los registros de pelicula con ese tconst esta comprado, se marca como comprado, sino se marca como buscado
-					boolean comprado = pelis.stream().anyMatch(Pelicula::isComprado);
-					film.setComprado(comprado);
-					film.setBuscado(!comprado);
-				} else {
-					film.setBuscado(true);
-					film.setComprado(false);
+				.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type(itb.get().getTitletype())
+				.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
+		if (isFilmRegister) {
+			List<Pelicula> pelis = peliculaService.findByImdbId(itp.getId().getTconst());
+			if (!pelis.isEmpty()) {
+				// necesitamos poner peliculaId en filmography para que se sepa que pelicula de
+				// una forma u otra
+				// la tenemos registrada, asi que si hay varias peliculas con ese tconst, se
+				// pone el id de la edicion con mayor fecha de modificacion, asi que se asume
+				// que es la edicion mas actualizada
+				// pero tsmodif puede ser nulo, asi que se asume que si es nulo, es la edicion
+				// mas antigua, y si no es nulo, se compara con las fechas de modificacion de
+				// las otras ediciones para determinar cual es la mas actualizada
+				Pelicula pelicula = pelis.getFirst(); // TODO esto va a ser unico en cuanto termine con las eidiciones
+				film.setPeliculaId(pelicula.getId());
+				// queremos marcar como comprado o buscado el registro de filmografia, asi que
+				// si cualquiera de los registros de pelicula con ese tconst esta comprado, se
+				// marca como comprado, sino se marca como buscado
+				boolean comprado = pelis.stream().anyMatch(Pelicula::isComprado);
+				if (comprado) {
+					film.setFormatoId(obtainBestFormatoId(pelis));
 				}
-				
+				film.setComprado(comprado);
+				film.setBuscado(!comprado);
+			} else {
+				film.setBuscado(true);
+				film.setComprado(false);
 			}
 
+		}
 
 		return film;
+	}
+
+	private Short obtainBestFormatoId(List<Pelicula> pelis) {
+		Short bestFormatoId = null;
+		// best format would be the one with the highest priority, so we need to define
+		// a priority order for the formats
+		// in the future, we could have a configuration for this, but for now, we will
+		// hardcode it
+		List<Formato> orderedFormats = Formato.prioritizedFormats();
+
+		for (Formato formato : orderedFormats) {
+			for (Pelicula pelicula : pelis) {
+				for (Edicion edition : pelicula.getEditions()) {
+					if (edition.getFormato().getId() == formato.getId()) {
+						bestFormatoId = formato.getId();
+						break;
+					}
+				}
+			}
+			if (bestFormatoId != null) {
+				break;
+			}
+		}
+		return bestFormatoId;
 	}
 
 	private String getTitle(Optional<ImdbTitleAkas> ita, Optional<ImdbTitleBasics> itb) {
