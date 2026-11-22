@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.films.ConditionDto;
-import lugus.model.core.Estado;
+import lugus.model.core.Status;
 import lugus.service.core.EstadoService;
 
 @RestController
@@ -22,11 +22,11 @@ public class ConditionApiController {
 	private final EstadoService service;
 	@GetMapping
 	List<ConditionDto> all() {
-		List<Estado> formats = service.findAll();
+		List<Status> formats = service.findAll();
 		return formats.stream().map(d -> convert(d)).collect(Collectors.toList());
 	}
 
-	private ConditionDto convert(Estado d) {
+	private ConditionDto convert(Status d) {
 		ConditionDto dto = new ConditionDto();
 		dto.setId(d.getId());
 		dto.setDesc(d.getName());

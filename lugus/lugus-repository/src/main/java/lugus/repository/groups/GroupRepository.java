@@ -34,7 +34,7 @@ public interface GroupRepository {
 			        AND (
 			            gf.pelicula IS NULL
 			            OR gf.pelicula.id in ( 
-			            select pelicula.id from Edicion where comprado = false
+			            select pelicula.id from Edition where comprado = false
 			            )
 			        )
 			    )

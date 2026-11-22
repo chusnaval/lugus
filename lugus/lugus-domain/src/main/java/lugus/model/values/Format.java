@@ -5,7 +5,7 @@ import java.util.List;
 
 import lombok.Getter;
 
-public enum Formato {
+public enum Format{
 
 	VHS((short) 0), DVD((short) 1), BLURAY((short) 2), ULTRAHD((short) 3), DIGITAL((short) 4);
 
@@ -17,7 +17,7 @@ public enum Formato {
 	 * 
 	 * @param i
 	 */
-	private Formato(short i) {
+	private Format(final short i) {
 		this.id = i;
 	}
 
@@ -27,8 +27,8 @@ public enum Formato {
 	 * @param i
 	 * @return
 	 */
-	public static Formato getById(short i) {
-		for (Formato aux : values()) {
+	public static Format getById(final short i) {
+		for (Format aux : values()) {
 			if (aux.getId() == i) {
 				return aux;
 			}
@@ -43,8 +43,8 @@ public enum Formato {
 	 * @param i
 	 * @return
 	 */
-	public static Formato getByName(String value) {
-		for (Formato aux : values()) {
+	public static Format getByName(final String value) {
+		for (Format aux : values()) {
 			if (aux.name().equalsIgnoreCase(value)) {
 				return aux;
 			}
@@ -53,8 +53,8 @@ public enum Formato {
 		throw new IllegalArgumentException("No existe el formato");
 	}
 
-	public static List<Formato> valoresOrdenados() {
-		List<Formato> lista = new ArrayList<>();
+	public static List<Format> valoresOrdenados() {
+		List<Format> lista = new ArrayList<>();
 		lista.add(DVD);
 		lista.add(BLURAY);
 		lista.add(ULTRAHD);
@@ -83,8 +83,8 @@ public enum Formato {
 		return id;
 	}
 
-	public static List<Formato> prioritizedFormats() {
-		List<Formato> lista = new ArrayList<>();
+	public static List<Format> prioritizedFormats() {
+		List<Format> lista = new ArrayList<>();
 		lista.add(ULTRAHD);
 		lista.add(BLURAY);
 		lista.add(DVD);

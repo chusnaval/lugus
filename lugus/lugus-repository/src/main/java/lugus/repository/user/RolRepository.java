@@ -3,19 +3,19 @@ package lugus.repository.user;
 
 import java.util.Optional;
 
-import lugus.model.user.Rol;
+import lugus.model.user.Role;
 
 
 
 public interface RolRepository {
 
-	Optional<Rol> findById(Long id);
+	Optional<Role> findById(Long id);
 
-	Rol save(Rol rol);
+	Role save(Role rol);
 
 	void deleteById(Long id);
 
-	Optional<Rol> findByLogin(String login);
+	Optional<Role> findByLogin(String login);
 
 
 }

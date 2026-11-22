@@ -2,25 +2,25 @@ package lugus.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import lugus.model.values.Genero;
+import lugus.model.values.Genere;
 
 /**
- * Convierte entre {@link Genero} y su código (String) para la base de datos.
+ * Converter between {@link Genere} and its identifier (String) to database.
  */
 @Converter(autoApply = true)
-public class GeneroConverter implements AttributeConverter<Genero, String> {
+public class GeneroConverter implements AttributeConverter<Genere, String> {
 
 	@Override
-	public String convertToDatabaseColumn(Genero attribute) {
-		return attribute == null ? null : attribute.getCodigo(); // guardamos el código
+	public String convertToDatabaseColumn(final Genere attribute) {
+		return attribute == null ? null : attribute.getCodigo(); 
 	}
 
 	@Override
-	public Genero convertToEntityAttribute(String dbData) {
+	public Genere convertToEntityAttribute(final String dbData) {
 		if (dbData == null) {
 			return null;
 		}
 		// Buscamos el enum cuyo código coincida
-		return Genero.getById(dbData);
+		return Genere.getById(dbData);
 	}
 }

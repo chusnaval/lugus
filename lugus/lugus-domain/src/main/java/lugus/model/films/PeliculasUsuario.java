@@ -16,7 +16,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lugus.model.user.Usuario;
+import lugus.model.user.User;
 
 @Entity
 @Table(name = "peliculas_usuario")
@@ -36,7 +36,7 @@ public class PeliculasUsuario {
     /** Relacion con el usuario */
     @ManyToOne(optional = false)
     @JoinColumn(name = "usuario_login", nullable = false)
-    private Usuario usuario;
+    private User usuario;
 
     /** Relacion con pelicula */
     @ManyToOne(optional = false)

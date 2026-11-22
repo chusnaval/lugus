@@ -38,7 +38,7 @@ import lugus.model.orders.Order;
 import lugus.model.people.Actor;
 import lugus.model.people.Director;
 import lugus.model.people.PeliculasPersonal;
-import lugus.model.values.Genero;
+import lugus.model.values.Genere;
 
 @Entity
 @Table(name = "peliculas")
@@ -65,7 +65,7 @@ public class Pelicula {
 
 	@Column(nullable = false)
 	@Convert(converter = GeneroConverter.class)
-	private Genero genero;
+	private Genere genero;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -111,7 +111,7 @@ public class Pelicula {
 	@JsonIgnore
 	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
 	@ToString.Exclude
-	private List<Edicion> editions = new ArrayList<>();
+	private List<Edition> editions = new ArrayList<>();
 
 	@Column(name = "imdb_id")
 	private String imdbId;
@@ -192,7 +192,7 @@ public class Pelicula {
 
 	}
 	
-	public void addEdicion(Edicion ed) {
+	public void addEdicion(Edition ed) {
 		this.editions.add(ed);
 		ed.setPelicula(this);
 	}
@@ -309,7 +309,7 @@ public class Pelicula {
 		return null;
 	}
 
-	public String calcularCodigo() {
+	public String obtainCode() {
 		
 		// Eliminar artículos del título
 		String procesado = tituloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");

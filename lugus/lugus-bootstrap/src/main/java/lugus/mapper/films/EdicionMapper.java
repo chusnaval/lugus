@@ -4,11 +4,11 @@ import lugus.dto.core.FormatDTO;
 import lugus.dto.films.ConditionDto;
 import lugus.dto.films.EditionDto;
 import lugus.dto.films.PackDto;
-import lugus.model.films.Edicion;
+import lugus.model.films.Edition;
 
 public class EdicionMapper {
 
-	public static EditionDto toDto(Edicion edicion) {
+	public static EditionDto toDto(Edition edicion) {
 		EditionDto dto = new EditionDto();
 		dto.setId(edicion.getId());
 		dto.setMgmtCode(edicion.getCodigo());

@@ -3,7 +3,7 @@ package lugus.api.groups;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,7 +27,7 @@ import lugus.service.films.PeliculaService;
 import lugus.service.groups.GroupsService;
 import lugus.service.imdb.ImdbBasicsService;
 import lugus.model.imdb.ImdbBasics;
-import lugus.model.values.Formato;
+import lugus.model.values.Format;
 @RestController
 @RequestMapping("/v1/api/groups")
 @RequiredArgsConstructor
@@ -44,7 +44,7 @@ public class GroupApiController {
 	@GetMapping
 	List<GroupDTO> all() {
 		List<Group> sources = service.findAll();
-		return sources.stream().map(mapper::mapToDTO).collect(Collectors.toList());
+		return sources.stream().map(mapper::mapToDTO).toList();
 	}
 	
 	@GetMapping("/{id}")
@@ -86,7 +86,7 @@ public class GroupApiController {
 			filtro.setToAnyo(toYear);
 		}
 		if (format != null) {
-			filtro.setFormato((int) Formato.getByName(format).getId());
+			filtro.setFormato((int) Format.getByName(format).getId());
 		}
 		if (genre != null) {
 			filtro.setGenero(genre);
@@ -115,15 +115,15 @@ public class GroupApiController {
 	
 	@PostMapping
 	GroupDTO newGroup(@RequestBody GroupDTO dto) {
-		Group Group = service.saveGroup(mapper.mapToEntity(dto));
-		return mapper.mapToDTO(Group);
+		Group group = service.saveGroup(mapper.mapToEntity(dto));
+		return mapper.mapToDTO(group);
 	}
 	
 	@PutMapping("/{id}")
 	GroupDTO replace(@RequestBody GroupDTO newSource, @PathVariable Integer id) {
-		Optional<Group> Group = service.findById(id);
-		if (Group.isPresent()) {
-			Group obj = Group.get();
+		Optional<Group> group = service.findById(id);
+		if (group.isPresent()) {
+			Group obj = group.get();
 			obj.setName(newSource.getName());
 			obj.setFilmaffinityId(newSource.getFilmaffinityId());
 			obj = service.saveGroup(obj);
@@ -169,7 +169,7 @@ public class GroupApiController {
 				// primero comprobamos si el título de IMDB ya existe en el result
 				// por si acas el título de IMDB no coincide exactamente con el título de Pelicula, comprobamos si el título de IMDB ya existe como Pelicula
 				String imdbTitle = d.getTitleid();
-				if(imdbTitle == null || imdbTitle.isBlank() || !peliculaService.findByImdbId(imdbTitle).isEmpty()) {
+				if(imdbTitle == null || imdbTitle.isBlank() || !peliculaService.isFilmRegistered(imdbTitle)) {
 					continue; // skip this suggestion
 				}
 				if(result.stream().filter(r -> r instanceof SimpleFilm)

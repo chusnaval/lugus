@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.GenreDTO;
-import lugus.model.values.Genero;
+import lugus.model.values.Genere;
 
 @RestController
 @ResponseBody
@@ -20,11 +20,11 @@ public class GenreApiController {
 
 	@GetMapping
 	List<GenreDTO> all() {
-		List<Genero> genres = Genero.valoresOrdenados();
+		List<Genere> genres = Genere.valoresOrdenados();
 		return genres.stream().map(d -> convert(d)).collect(Collectors.toList());
 	}
 
-	private GenreDTO convert(Genero d) {
+	private GenreDTO convert(Genere d) {
 		GenreDTO dto = new GenreDTO();
 		dto.setCodigo(String.valueOf(d.getCodigo()));
 		dto.setDescripcion(d.name());

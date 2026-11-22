@@ -27,9 +27,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lugus.converter.FormatoConverter;
-import lugus.model.core.Estado;
+import lugus.model.core.Status;
 import lugus.model.core.Location;
-import lugus.model.values.Formato;
+import lugus.model.values.Format;
 
 @Entity
 @Table(name = "packs")
@@ -53,7 +53,7 @@ public class Pack {
 
 	@Column(nullable = false)
 	@Convert(converter = FormatoConverter.class)
-	private Formato formato;
+	private Format formato;
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
@@ -69,7 +69,7 @@ public class Pack {
 	@JsonIgnore
 	@OneToMany(mappedBy = "pack", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("anyo ASC")
-	private final Set<Edicion> edicionesPack = new HashSet<>();
+	private final Set<Edition> edicionesPack = new HashSet<>();
 
 	@Column
 	private boolean steelbook;
@@ -100,7 +100,7 @@ public class Pack {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "estado_id", nullable = true) // FK → estado.id
-	private Estado estado;
+	private Status estado;
 
 
 

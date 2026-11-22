@@ -23,9 +23,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lugus.converter.FormatoConverter;
-import lugus.model.core.Estado;
+import lugus.model.core.Status;
 import lugus.model.core.Location;
-import lugus.model.values.Formato;
+import lugus.model.values.Format;
 
 @Entity
 @Table(name = "peliculas_edicion")
@@ -35,7 +35,7 @@ import lugus.model.values.Formato;
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Edicion {
+public class Edition {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +47,7 @@ public class Edicion {
 
 	@Column(nullable = false)
 	@Convert(converter = FormatoConverter.class)
-	private Formato formato;
+	private Format formato;
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
@@ -94,9 +94,9 @@ public class Edicion {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "estado_id", nullable = true) // FK → estado.id
-	private Estado estado;
+	private Status estado;
 
-	public String calcularCodigoInicial() {
-		return pelicula.calcularCodigo();
+	public String obtainInitialCode() {
+		return pelicula.obtainCode();
 	}
 }

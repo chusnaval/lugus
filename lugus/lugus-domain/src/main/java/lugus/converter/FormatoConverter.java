@@ -2,25 +2,24 @@ package lugus.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import lugus.model.values.Formato;
+import lugus.model.values.Format;
 
 /**
- * Convierte entre {@link Formato} y su identificador numérico (short) para la
- * base de datos.
+ * Converter between {@link Format} y and its identifier (short) for database.
  */
 @Converter(autoApply = true) 
-public class FormatoConverter implements AttributeConverter<Formato, Short> {
+public class FormatoConverter implements AttributeConverter<Format, Short> {
 
 	@Override
-	public Short convertToDatabaseColumn(Formato attribute) {
-		return attribute == null ? null : attribute.getId(); // guardamos el short
+	public Short convertToDatabaseColumn(final Format attribute) {
+		return attribute == null ? null : attribute.getId();
 	}
 
 	@Override
-	public Formato convertToEntityAttribute(Short dbData) {
+	public Format convertToEntityAttribute(final Short dbData) {
 		if (dbData == null) {
 			return null;
 		}
-		return Formato.getById(dbData);
+		return Format.getById(dbData);
 	}
 }

@@ -2,14 +2,14 @@ package lugus.repository.user;
 
 import java.util.Optional;
 
-import lugus.model.user.Usuario;
+import lugus.model.user.User;
 
 
 public interface UsuarioRepository {
 
-	Optional<Usuario> findById(String id);
+	Optional<User> findById(String id);
 
-	Usuario save(Usuario usuario);
+	User save(User usuario);
 
 	void deleteById(String id);
 

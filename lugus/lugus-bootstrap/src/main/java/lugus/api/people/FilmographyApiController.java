@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.films.Edicion;
+import lugus.model.films.Edition;
 import lugus.model.films.Pelicula;
 import lugus.model.series.Serie;
-import lugus.model.values.Formato;
+import lugus.model.values.Format;
 import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.imdb.ImdbTitlePrincipals;
@@ -131,9 +131,9 @@ public class FilmographyApiController {
 		// a priority order for the formats
 		// in the future, we could have a configuration for this, but for now, we will
 		// hardcode it
-		List<Formato> orderedFormats = Formato.prioritizedFormats();
+		List<Format> orderedFormats = Format.prioritizedFormats();
 
-		for (Formato formato : orderedFormats) {
+		for (Format formato : orderedFormats) {
 			if (serie.getFormato().getId() == formato.getId()) {
 				bestFormatoId = formato.getId();
 				break;
@@ -150,8 +150,8 @@ public class FilmographyApiController {
 				.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type(itb.get().getTitletype())
 				.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
 		if (isFilmRegister) {
-			List<Pelicula> pelis = peliculaService.findByImdbId(itp.getId().getTconst());
-			if (!pelis.isEmpty()) {
+			Optional<Pelicula> filmOptional = peliculaService.findByImdbId(itp.getId().getTconst());
+			if (filmOptional.isPresent()) {
 				// necesitamos poner peliculaId en filmography para que se sepa que pelicula de
 				// una forma u otra
 				// la tenemos registrada, asi que si hay varias peliculas con ese tconst, se
@@ -160,14 +160,14 @@ public class FilmographyApiController {
 				// pero tsmodif puede ser nulo, asi que se asume que si es nulo, es la edicion
 				// mas antigua, y si no es nulo, se compara con las fechas de modificacion de
 				// las otras ediciones para determinar cual es la mas actualizada
-				Pelicula pelicula = pelis.getFirst(); // TODO esto va a ser unico en cuanto termine con las eidiciones
+				Pelicula pelicula = filmOptional.get();
 				film.setPeliculaId(pelicula.getId());
 				// queremos marcar como comprado o buscado el registro de filmografia, asi que
 				// si cualquiera de los registros de pelicula con ese tconst esta comprado, se
 				// marca como comprado, sino se marca como buscado
-				boolean comprado = pelis.stream().anyMatch(Pelicula::isComprado);
+				boolean comprado = pelicula.isComprado();
 				if (comprado) {
-					film.setFormatoId(obtainBestFormatoId(pelis));
+					film.setFormatoId(obtainBestFormatoId(pelicula));
 				}
 				film.setComprado(comprado);
 				film.setBuscado(!comprado);
@@ -181,23 +181,23 @@ public class FilmographyApiController {
 		return film;
 	}
 
-	private Short obtainBestFormatoId(List<Pelicula> pelis) {
+	private Short obtainBestFormatoId(Pelicula pelicula) {
 		Short bestFormatoId = null;
 		// best format would be the one with the highest priority, so we need to define
 		// a priority order for the formats
 		// in the future, we could have a configuration for this, but for now, we will
 		// hardcode it
-		List<Formato> orderedFormats = Formato.prioritizedFormats();
+		List<Format> orderedFormats = Format.prioritizedFormats();
 
-		for (Formato formato : orderedFormats) {
-			for (Pelicula pelicula : pelis) {
-				for (Edicion edition : pelicula.getEditions()) {
-					if (edition.getFormato().getId() == formato.getId()) {
-						bestFormatoId = formato.getId();
-						break;
-					}
+		for (Format formato : orderedFormats) {
+
+			for (Edition edition : pelicula.getEditions()) {
+				if (edition.getFormato().getId() == formato.getId()) {
+					bestFormatoId = formato.getId();
+					break;
 				}
 			}
+
 			if (bestFormatoId != null) {
 				break;
 			}

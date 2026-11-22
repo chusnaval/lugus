@@ -23,7 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lugus.converter.GeneroConverter;
 import lugus.model.films.PeliculasUsuario;
-import lugus.model.values.Genero;
+import lugus.model.values.Genere;
 
 @Entity
 @Table(name = "usuarios")
@@ -32,7 +32,7 @@ import lugus.model.values.Genero;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Usuario {
+public class User {
 	
 	@Id
 	private String login;
@@ -53,7 +53,7 @@ public class Usuario {
     )
     @Column(name = "genero")
 	@Convert(converter = GeneroConverter.class)
-    private List<Genero> favoritos = new ArrayList<>();
+    private List<Genere> favoritos = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PeliculasUsuario> peliculas = new HashSet<>();

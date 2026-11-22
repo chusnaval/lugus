@@ -11,11 +11,11 @@ import lugus.dto.films.EditionDto;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.GroupDto;
 import lugus.model.core.Location;
-import lugus.model.films.Edicion;
+import lugus.model.films.Edition;
 import lugus.model.films.Pelicula;
 import lugus.model.groups.GroupFilms;
-import lugus.model.values.Formato;
-import lugus.model.values.Genero;
+import lugus.model.values.Format;
+import lugus.model.values.Genere;
 
 @Component
 public class FilmMapper {
@@ -46,7 +46,7 @@ public class FilmMapper {
 		dto.setTitleMgmt(film.getTituloGest());
 		dto.setYear(film.getAnyo());
 		
-		for(Edicion edicion : film.getEditions()) {
+		for(Edition edicion : film.getEditions()) {
 			dto.addEdition(EdicionMapper.toDto(edicion));
 		}
 		
@@ -113,11 +113,11 @@ public class FilmMapper {
 		pelicula.setAnyo(dto.getYear());
 		
 		for(EditionDto dtoEd : dto.getEditions()) {
-			Edicion edicion = new Edicion();
+			Edition edicion = new Edition();
 			edicion.setLocation(new Location());
 			edicion.getLocation().setCodigo(dtoEd.getLocation());
 			edicion.setCodigo(dtoEd.getMgmtCode());
-			edicion.setFormato(Formato.getById(Short.valueOf(dtoEd.getFormat().getCodigo())));
+			edicion.setFormato(Format.getById(Short.valueOf(dtoEd.getFormat().getCodigo())));
 			edicion.setSteelbook(dtoEd.isSteelbook());
 			edicion.setFunda(dtoEd.isSlipcover());
 			edicion.setComprado(dtoEd.isOwned());
@@ -126,7 +126,7 @@ public class FilmMapper {
 			pelicula.addEdicion(edicion);
 		}
 
-		pelicula.setGenero(Genero.getById(dto.getGenreCode()));
+		pelicula.setGenero(Genere.getById(dto.getGenreCode()));
 		pelicula.setImdbId(dto.getImdbId());
 		pelicula.setRating(dto.getRating());
 		pelicula.setVotes(dto.getVotes());

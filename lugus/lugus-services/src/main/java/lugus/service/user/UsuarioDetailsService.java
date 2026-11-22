@@ -4,12 +4,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
-import lugus.model.user.Usuario;
+
 import lugus.repository.user.RolRepository;
 import lugus.repository.user.UsuarioRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class UsuarioDetailsService implements UserDetailsService {
@@ -23,15 +23,14 @@ public class UsuarioDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepo.findById(login)
+    public UserDetails loadUserByUsername(final String login) throws UsernameNotFoundException {
+        lugus.model.user.User usuario = usuarioRepo.findById(login)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + login));
 
         List<SimpleGrantedAuthority> roles = rolRepo.findByLogin(login)
                 .stream()
-                .map(r -> new SimpleGrantedAuthority(r.getRole()))
-                .collect(Collectors.toList());
+                .map(r -> new SimpleGrantedAuthority(r.getRole())).toList();
 
-        return new User(usuario.getLogin(), usuario.getPassword(), true, true, true, true, roles);
+        return new org.springframework.security.core.userdetails.User(usuario.getLogin(), usuario.getPassword(), true, true, true, true, roles);
     }
 }

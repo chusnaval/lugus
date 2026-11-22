@@ -31,7 +31,7 @@ import lugus.model.core.Location;
 import lugus.model.core.Source;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
-import lugus.model.values.Formato;
+import lugus.model.values.Format;
 import lugus.model.values.TitleType;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
@@ -102,7 +102,7 @@ public class SeriesApiController {
 			filtro.setToAnyo(toYear);
 		}
 		if(format!=null) {
-			filtro.setFormato((int) Formato.getByName(format).getId());
+			filtro.setFormato((int) Format.getByName(format).getId());
 		}
 		if(genre!=null) {
 			filtro.setGenero(genre);
@@ -246,7 +246,7 @@ public class SeriesApiController {
 			filtro.setToAnyo(toYear);
 		}
 		if(format!=null) {
-			filtro.setFormato((int) Formato.getByName(format).getId());
+			filtro.setFormato((int) Format.getByName(format).getId());
 		}
 		if(genre!=null) {
 			filtro.setGenero(genre);
@@ -273,7 +273,6 @@ public class SeriesApiController {
 	}
 
 	
-	@SuppressWarnings("null")
 	@GetMapping("/export/md")
 	public ResponseEntity<String> exportMarkdown(	  @RequestParam Integer page,
 	        @RequestParam Integer size,
@@ -298,7 +297,6 @@ public class SeriesApiController {
 	            .body(file);
 	}
 	
-	@SuppressWarnings("null")
 	@GetMapping("/export/pdf")
 	public ResponseEntity<byte[]> exportPdf(  @RequestParam Integer page,
 	        @RequestParam Integer size,

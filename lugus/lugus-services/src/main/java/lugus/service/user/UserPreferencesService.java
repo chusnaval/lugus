@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.user.UserPreferencesDTO;
-import lugus.model.user.Usuario;
+import lugus.model.user.User;
 import lugus.repository.user.UsuarioRepository;
 
 @Service
@@ -21,7 +21,7 @@ public class UserPreferencesService {
 	
 	
     public UserPreferencesDTO getPreferences(String username) {
-    	Usuario user =findCurrentUser(username);
+    	User user =findCurrentUser(username);
         return new UserPreferencesDTO(user.getFavoritos().stream().map(genreMapper::toDTO).toList());
     }
 
@@ -30,7 +30,7 @@ public class UserPreferencesService {
 			throw new IllegalArgumentException("Solo puedes elegir 4 géneros favoritos");
 		}
 
-		Usuario user = findCurrentUser(username);
+		User user = findCurrentUser(username);
 		user.setFavoritos( new ArrayList<>(dto.favoritos().stream().map(genreMapper::toEntity).toList()));
 		usuarioRepository.save(user);
 
@@ -38,7 +38,7 @@ public class UserPreferencesService {
 	}
     
 
-    public Usuario findCurrentUser(String username) {
+    public User findCurrentUser(String username) {
   
 
         return usuarioRepository.findById(username)

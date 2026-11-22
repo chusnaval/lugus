@@ -27,8 +27,8 @@ import lugus.model.core.Source;
 import lugus.model.series.Season;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
-import lugus.model.values.Formato;
-import lugus.model.values.Genero;
+import lugus.model.values.Format;
+import lugus.model.values.Genere;
 import lugus.model.values.LangVersion;
 import lugus.repository.series.SerieRepository;
 import lugus.service.core.LocationService;
@@ -141,9 +141,9 @@ public class SeriesService {
 		p.setAnyoFin(dto.getFinishYear());
 		p.setTsModif(Instant.now());
 		if (dto.getFormat() != null) {
-			p.setFormato(Formato.getById(Short.valueOf(dto.getFormat())));
+			p.setFormato(Format.getById(Short.valueOf(dto.getFormat())));
 		}
-		p.setGenero(Genero.getById(dto.getGenreCode()));
+		p.setGenero(Genere.getById(dto.getGenreCode()));
 		if (loc.isPresent()) {
 			p.setLocation(loc.get());
 		}

@@ -16,7 +16,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lugus.model.films.Edicion;
+import lugus.model.films.Edition;
 
 @Entity
 @Table(name = "localizaciones")
@@ -36,7 +36,7 @@ public class Location {
 	@OrderBy("codigo ASC")
 	@OneToMany(mappedBy = "location")
 	@ToString.Exclude
-	private Set<Edicion> ediciones = new HashSet<>();
+	private Set<Edition> ediciones = new HashSet<>();
 
 	@ManyToOne
 	@JoinColumn(name = "ubicacion_tipo_cod")

@@ -22,7 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lugus.converter.FormatoConverter;
 import lugus.model.films.Pelicula;
-import lugus.model.values.Formato;
+import lugus.model.values.Format;
 
 
 @Entity
@@ -50,7 +50,7 @@ public class Order {
 	
 	@Column(nullable = false)
 	@Convert(converter = FormatoConverter.class)
-	private Formato formato;
+	private Format formato;
 	
 	@Column(nullable = true)
 	private String notas;

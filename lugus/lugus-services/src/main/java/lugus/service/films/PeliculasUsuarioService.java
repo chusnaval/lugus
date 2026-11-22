@@ -1,7 +1,7 @@
 package lugus.service.films;
 
 
-import lugus.model.user.Usuario;
+import lugus.model.user.User;
 import lugus.repository.films.PeliculasUsuarioRepository;
 import lugus.service.user.UsuarioService;
 import lugus.model.films.Pelicula;
@@ -20,7 +20,7 @@ public class PeliculasUsuarioService {
     private final PeliculaService peliculaService;
     
     public void toggleFavorita(String login, Integer peliculaId, boolean favorita) {
-        Usuario user = userService.findByLogin(login).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        User user = userService.findByLogin(login).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         Pelicula pelicula = peliculaService.findById(peliculaId).orElseThrow(() -> new RuntimeException("Película no encontrada"));
         
         PeliculasUsuario up = repository.findByUsuarioAndPelicula(user, pelicula).orElseThrow(() -> new RuntimeException("Relación usuario-película no encontrada"));
@@ -31,7 +31,7 @@ public class PeliculasUsuarioService {
     }
     
     public void toggleOwned(String login, Integer peliculaId) {
-    	 Usuario user = userService.findByLogin(login).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    	 User user = userService.findByLogin(login).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     	  Pelicula pelicula = peliculaService.findById(peliculaId).orElseThrow(() -> new RuntimeException("Película no encontrada"));
 	    Optional<PeliculasUsuario> existing =
 	    		repository.findByUsuarioAndPelicula(user, pelicula);
@@ -48,7 +48,7 @@ public class PeliculasUsuarioService {
 	}
     
     public void toggleFav(String login, Integer peliculaId) {
-   	 Usuario user = userService.findByLogin(login).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+   	 User user = userService.findByLogin(login).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
    	  Pelicula pelicula = peliculaService.findById(peliculaId).orElseThrow(() -> new RuntimeException("Película no encontrada"));
 	    Optional<PeliculasUsuario> existing =
 	    		repository.findByUsuarioAndPelicula(user, pelicula);
@@ -67,7 +67,7 @@ public class PeliculasUsuarioService {
 	}
    
     
-    public List<PeliculasUsuario> findByUsuario(Usuario usuario) {
+    public List<PeliculasUsuario> findByUsuario(User usuario) {
         return repository.findByUsuario(usuario);
     }
 
@@ -75,7 +75,7 @@ public class PeliculasUsuarioService {
         return repository.findByPelicula(pelicula);
     }
 
-    public Optional<PeliculasUsuario> findByUsuarioAndPelicula(Usuario usuario, Pelicula pelicula) {
+    public Optional<PeliculasUsuario> findByUsuarioAndPelicula(User usuario, Pelicula pelicula) {
         return repository.findByUsuarioAndPelicula(usuario, pelicula);
     }
 

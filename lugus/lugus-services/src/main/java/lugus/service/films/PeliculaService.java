@@ -32,11 +32,11 @@ import lugus.dto.filters.CoversSpecs;
 import lugus.infrastructure.repository.films.PeliculaSpecification;
 import lugus.model.core.Location;
 import lugus.model.core.Source;
-import lugus.model.films.Edicion;
+import lugus.model.films.Edition;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
-import lugus.model.values.Formato;
-import lugus.model.values.Genero;
+import lugus.model.values.Format;
+import lugus.model.values.Genere;
 import lugus.repository.films.PeliculaRepository;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
@@ -95,7 +95,7 @@ public class PeliculaService {
 		p.setTituloGest(dto.getTitleMgmt());
 		p.setAnyo(dto.getYear());
 		p.setImdbId(dto.getImdbId());
-		p.setGenero(Genero.getById(dto.getGenreCode()));
+		p.setGenero(Genere.getById(dto.getGenreCode()));
 		p.setDuration(dto.getDuration());
 
 		updateEditions(dto, p, isDiffInCode);
@@ -146,11 +146,11 @@ public class PeliculaService {
 
 	private void updateEditions(final FilmDto dto, Pelicula p, boolean updateCode) {
 		for (EditionDto edto : dto.getEditions()) {
-			Edicion edicion = edicionService.findById(edto.getId());
+			Edition edicion = edicionService.findById(edto.getId());
 
 			Optional<Location> loc = locService.findById(edto.getLocation());
 			edicion.setTsModif(Instant.now());
-			edicion.setFormato(Formato.getById(Short.valueOf(edto.getFormat().getCodigo())));
+			edicion.setFormato(Format.getById(Short.valueOf(edto.getFormat().getCodigo())));
 			if (loc.isPresent()) {
 				edicion.setLocation(loc.get());
 			}
@@ -165,7 +165,7 @@ public class PeliculaService {
 		
 		if(updateCode)
 		{
-			for (Edicion edicion : p.getEditions()) {
+			for (Edition edicion : p.getEditions()) {
 				String expected = edicionService.calculateCompleteCode(edicion.getId(), p);
 				edicion.setCodigo(expected);
 			}
@@ -352,9 +352,7 @@ public class PeliculaService {
 		System.out.println("Comprobando si la película está registrada para imdbId = [" + tconst + "]");
 		return !peliculaRepo.findByImdbId(tconst).isEmpty();
 	}
-
-	@Deprecated
-	public List<Pelicula> findByImdbId(String tconst) {
+	public Optional<Pelicula> findByImdbId(String tconst) {
 		System.out.println("Buscando imdbId = [" + tconst + "]");
 		return peliculaRepo.findByImdbId(tconst);
 	}
@@ -398,14 +396,14 @@ public class PeliculaService {
 	public Map<Object, Integer> contarPorCategoria() {
 
 		Map<String, Integer> porGenero = peliculaRepo.countByGenero().stream()
-				.collect(Collectors.toMap(row -> ((Genero) row[0]).getCodigo(), row -> ((Long) row[1]).intValue()));
+				.collect(Collectors.toMap(row -> ((Genere) row[0]).getCodigo(), row -> ((Long) row[1]).intValue()));
 		return porGenero.entrySet().stream().collect(Collectors.groupingBy(
-				e -> Genero.getById(e.getKey()).getCategoria(), Collectors.summingInt(Map.Entry::getValue)));
+				e -> Genere.getById(e.getKey()).getCategoria(), Collectors.summingInt(Map.Entry::getValue)));
 	}
 
 	public Map<Object, Integer> contarPorGenero() {
 		
 		return peliculaRepo.countByGenero().stream()
-				.collect(Collectors.toMap(row -> ((Genero) row[0]).getCodigo(), row -> ((Long) row[1]).intValue()));
+				.collect(Collectors.toMap(row -> ((Genere) row[0]).getCodigo(), row -> ((Long) row[1]).intValue()));
 	}
 }

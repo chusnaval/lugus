@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import lugus.model.films.Edicion;
+import lugus.model.films.Edition;
 import lugus.model.films.Pelicula;
 import lugus.service.films.EdicionService;
 import lugus.service.films.PeliculaService;
@@ -36,7 +36,7 @@ public class CodeUpdaterController {
 		int correctos = 0;
 		int distintos = 0;
 		for (Pelicula pelicula : peliculas) {
-			for (Edicion edicion : pelicula.getEditions()) {
+			for (Edition edicion : pelicula.getEditions()) {
 				String expected = edicionService.calculateCompleteCode(edicion.getId(), pelicula);
 				String actual = edicion.getCodigo();
 
@@ -62,7 +62,7 @@ public class CodeUpdaterController {
 		int correctos = 0;
 		int distintos = 0;
 		for (Pelicula pelicula : peliculas) {
-			for (Edicion edicion : pelicula.getEditions()) {
+			for (Edition edicion : pelicula.getEditions()) {
 				String expected = edicionService.calculateCompleteCode(edicion.getId(), pelicula);
 				String actual = edicion.getCodigo();
 

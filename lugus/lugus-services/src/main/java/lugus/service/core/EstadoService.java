@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.core.Estado;
+import lugus.model.core.Status;
 import lugus.repository.core.EstadoRepository;
 
 @Service
@@ -15,12 +15,12 @@ public class EstadoService {
 
 	private final EstadoRepository estadoRepo;
 
-	public Optional<Estado> findEstadoById(Integer estadoCodigo) {
+	public Optional<Status> findEstadoById(Integer estadoCodigo) {
 		
 		return estadoRepo.findById(estadoCodigo);
 	}
 
-	public List<Estado> findAll() {
+	public List<Status> findAll() {
 		return estadoRepo.findAll();
 	}
 }

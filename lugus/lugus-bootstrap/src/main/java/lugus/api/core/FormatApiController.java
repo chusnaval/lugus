@@ -1,30 +1,28 @@
 package lugus.api.core;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.core.FormatDTO;
-import lugus.model.values.Formato;
+import lugus.model.values.Format;
 
 @RestController
-@ResponseBody
 @RequestMapping("/v1/api/formats")
 @RequiredArgsConstructor
 public class FormatApiController {
 
 	@GetMapping
 	List<FormatDTO> all() {
-		List<Formato> formats = Formato.valoresOrdenados();
-		return formats.stream().map(d -> convert(d)).collect(Collectors.toList());
+		List<Format> formats = Format.valoresOrdenados();
+		return formats.stream().map(d -> convert(d)).toList();
 	}
 
-	private FormatDTO convert(Formato d) {
+	private FormatDTO convert(final Format d) {
 		FormatDTO dto = new FormatDTO();
 		dto.setCodigo(String.valueOf(d.getId()));
 		dto.setDescripcion(d.name());

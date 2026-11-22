@@ -7,8 +7,8 @@ import lugus.dto.films.SerieDto;
 import lugus.dto.series.SeasonDto;
 import lugus.model.series.Season;
 import lugus.model.series.Serie;
-import lugus.model.values.Formato;
-import lugus.model.values.Genero;
+import lugus.model.values.Format;
+import lugus.model.values.Genere;
 
 @Component
 public class SeriesMapper {
@@ -61,8 +61,8 @@ public class SeriesMapper {
 		serie.setAnyoFin(dto.getFinishYear());
 		serie.setCodigo(dto.getMgmtCode());
 
-		serie.setFormato(Formato.getById(Short.valueOf(dto.getFormat())));
-		serie.setGenero(Genero.getById(dto.getGenreCode()));
+		serie.setFormato(Format.getById(Short.valueOf(dto.getFormat())));
+		serie.setGenero(Genere.getById(dto.getGenreCode()));
 
 		serie.setCompleta(dto.isCompleted());
 		serie.setComprado(dto.isOwned());

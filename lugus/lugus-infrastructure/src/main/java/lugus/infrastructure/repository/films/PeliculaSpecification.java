@@ -8,7 +8,7 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import lugus.model.films.Edicion;
+import lugus.model.films.Edition;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
 import lugus.model.people.Actor;
@@ -39,7 +39,7 @@ public class PeliculaSpecification {
 	        if (notas == null || notas.isBlank()) return null;
 
 	        query.distinct(true);
-	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+	        Join<Pelicula, Edition> ed = root.join("editions", JoinType.LEFT);
 
 	        return cb.like(cb.lower(ed.get("notas")), "%" + notas.toLowerCase() + "%");
 	    };
@@ -50,7 +50,7 @@ public class PeliculaSpecification {
 	        if (pack == null) return null;
 
 	        query.distinct(true);
-	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+	        Join<Pelicula, Edition> ed = root.join("editions", JoinType.LEFT);
 
 	        return pack
 	            ? cb.isNotNull(ed.get("pack"))
@@ -64,7 +64,7 @@ public class PeliculaSpecification {
 	        if (steelbook == null) return null;
 
 	        query.distinct(true);
-	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+	        Join<Pelicula, Edition> ed = root.join("editions", JoinType.LEFT);
 
 	        return cb.equal(ed.get("steelbook"), steelbook);
 	    };
@@ -76,7 +76,7 @@ public class PeliculaSpecification {
 	        if (funda == null) return null;
 
 	        query.distinct(true);
-	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+	        Join<Pelicula, Edition> ed = root.join("editions", JoinType.LEFT);
 
 	        return cb.equal(ed.get("funda"), funda);
 	    };
@@ -85,7 +85,7 @@ public class PeliculaSpecification {
 	public static Specification<Pelicula> porComprado(Boolean comprado) {
 	    return (root, query, cb) -> {
 	    	query.distinct(true);
-	    	Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+	    	Join<Pelicula, Edition> ed = root.join("editions", JoinType.LEFT);
 
 	    	if (comprado == null) {
 	        	return null;
@@ -101,7 +101,7 @@ public class PeliculaSpecification {
 	        if (formato == null) return null;
 
 	        query.distinct(true);
-	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+	        Join<Pelicula, Edition> ed = root.join("editions", JoinType.LEFT);
 
 	        return cb.equal(ed.get("formato"), formato);
 	    };
@@ -111,7 +111,7 @@ public class PeliculaSpecification {
 	public static Specification<Pelicula> vigentes() {
 		return (root, query, cb) -> {
 			
-			Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+			Join<Pelicula, Edition> ed = root.join("editions", JoinType.LEFT);
 			return cb.isNull(ed.get("tsBaja"));
 		};
 	}
@@ -121,7 +121,7 @@ public class PeliculaSpecification {
 	        if (codigo == null || codigo.isBlank()) return null;
 
 	        query.distinct(true);
-	        Join<Pelicula, Edicion> ed = root.join("editions", JoinType.LEFT);
+	        Join<Pelicula, Edition> ed = root.join("editions", JoinType.LEFT);
 
 	        return cb.equal(ed.get("location").get("codigo"), codigo);
 	    };
@@ -193,7 +193,7 @@ public class PeliculaSpecification {
 	public static Specification<Pelicula> ordenarPorUltimaCompra() {
 	    return (root, query, cb) -> {
 
-	    	Join<Pelicula, Edicion> ed = root.join("ediciones", JoinType.LEFT);
+	    	Join<Pelicula, Edition> ed = root.join("ediciones", JoinType.LEFT);
 
 	    	query.groupBy(root.get("id"));
 

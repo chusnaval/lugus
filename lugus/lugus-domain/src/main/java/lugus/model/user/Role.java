@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Rol {
+public class Role {
 
 	@Id
 	@GeneratedValue

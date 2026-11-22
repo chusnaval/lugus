@@ -22,7 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lugus.converter.FormatoConverter;
 import lugus.model.series.Season;
-import lugus.model.values.Formato;
+import lugus.model.values.Format;
 
 @Entity
 @Table(name = "season_orders")
@@ -48,7 +48,7 @@ public class SeasonOrder {
 	
 	@Column(nullable = false)
 	@Convert(converter = FormatoConverter.class)
-	private Formato formato;
+	private Format formato;
 	
 	@Column(nullable = true)
 	private String notas;

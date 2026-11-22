@@ -2,8 +2,8 @@ package lugus.repository.films;
 
 import java.time.Instant;
 
-import lugus.model.films.Edicion;
-import lugus.model.values.Formato;
+import lugus.model.films.Edition;
+import lugus.model.values.Format;
 
 public interface EdicionRepository {
 
@@ -13,10 +13,10 @@ public interface EdicionRepository {
 
 	int countByComprado(final boolean value);
 
-	int countByFormatoAndComprado(Formato format, boolean b);
+	int countByFormatoAndComprado(Format format, boolean b);
 
-	Edicion findById(int id);
+	Edition findById(int id);
 
-	Edicion save(Edicion edicion);
+	Edition save(Edition edicion);
 
 }

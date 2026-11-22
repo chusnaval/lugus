@@ -6,14 +6,14 @@ import java.util.Optional;
 
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculasUsuario;
-import lugus.model.user.Usuario;
+import lugus.model.user.User;
 
 public interface PeliculasUsuarioRepository {
-    List<PeliculasUsuario> findByUsuario(Usuario usuario);
+    List<PeliculasUsuario> findByUsuario(User usuario);
 
     List<PeliculasUsuario> findByPelicula(Pelicula pelicula);
 
-    Optional<PeliculasUsuario> findByUsuarioAndPelicula(Usuario usuario, Pelicula pelicula);
+    Optional<PeliculasUsuario> findByUsuarioAndPelicula(User usuario, Pelicula pelicula);
 
     void delete(PeliculasUsuario entity);
 

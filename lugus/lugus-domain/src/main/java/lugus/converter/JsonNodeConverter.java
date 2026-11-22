@@ -11,7 +11,7 @@ public class JsonNodeConverter implements AttributeConverter<JsonNode, String> {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(JsonNode attribute) {
+    public String convertToDatabaseColumn(final JsonNode attribute) {
         try {
             return attribute == null ? null : mapper.writeValueAsString(attribute);
         } catch (Exception e) {
@@ -20,7 +20,7 @@ public class JsonNodeConverter implements AttributeConverter<JsonNode, String> {
     }
 
     @Override
-    public JsonNode convertToEntityAttribute(String dbData) {
+    public JsonNode convertToEntityAttribute(final String dbData) {
         try {
             return dbData == null ? null : mapper.readTree(dbData);
         } catch (Exception e) {

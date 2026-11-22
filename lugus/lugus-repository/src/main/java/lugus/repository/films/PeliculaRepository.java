@@ -34,7 +34,7 @@ public interface PeliculaRepository {
 
 	List<Pelicula> findByTituloGestAndAnyo(final String titulo, final int anyo);
 
-	List<Pelicula> findByImdbId(String tconst);
+	Optional<Pelicula> findByImdbId(String tconst);
 
 	List<Pelicula> findAllByOrderByTituloGestAscAnyoAsc();
 

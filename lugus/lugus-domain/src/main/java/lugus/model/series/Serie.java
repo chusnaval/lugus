@@ -33,8 +33,8 @@ import lugus.converter.GeneroConverter;
 import lugus.model.core.Location;
 import lugus.model.people.Actor;
 import lugus.model.people.SeriesPersonal;
-import lugus.model.values.Formato;
-import lugus.model.values.Genero;
+import lugus.model.values.Format;
+import lugus.model.values.Genere;
 import lugus.model.values.LangVersion;
 
 @Entity
@@ -59,7 +59,7 @@ public class Serie {
 
 	@Column(nullable = false)
 	@Convert(converter = FormatoConverter.class)
-	private Formato formato;
+	private Format formato;
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
@@ -74,7 +74,7 @@ public class Serie {
 
 	@Column(nullable = false)
 	@Convert(converter = GeneroConverter.class)
-	private Genero genero;
+	private Genere genero;
 
 	@Column(nullable = false)
 	private String codigo;

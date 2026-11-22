@@ -15,7 +15,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lugus.model.films.Edicion;
+import lugus.model.films.Edition;
 
 
 @Entity
@@ -24,7 +24,7 @@ import lugus.model.films.Edicion;
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Estado {
+public class Status {
 	
 	@Id
 	@NotBlank
@@ -36,5 +36,5 @@ public class Estado {
 	@OrderBy("id ASC")
 	@OneToMany(mappedBy = "estado")
 	@ToString.Exclude
-	private Set<Edicion> ediciones = new HashSet<>();
+	private Set<Edition> ediciones = new HashSet<>();
 }

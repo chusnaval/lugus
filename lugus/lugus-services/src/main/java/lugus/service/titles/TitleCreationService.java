@@ -1,6 +1,6 @@
 package lugus.service.titles;
 
-import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -32,10 +32,10 @@ public class TitleCreationService {
                     .orElseThrow(() -> new RuntimeException("Title not found"));
         }
 
-        // 2) Si es película de colección
+        // 2) if is a MOVIE there is a film in DB
         if (dto.getSource().equals("MOVIE")) {
-            List<Pelicula> list = peliculaRepo.findByImdbId(dto.getImdbId());
-            Pelicula p = list.getFirst();
+            Optional<Pelicula> optFilm = peliculaRepo.findByImdbId(dto.getImdbId());
+            Pelicula p = optFilm.get();
             Title t = new Title();
             t.setType(TitleType.MOVIE);
             t.setPelicula(p);

@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.films.Edicion;
+import lugus.model.films.Edition;
 import lugus.model.films.Pelicula;
-import lugus.model.values.Formato;
+import lugus.model.values.Format;
 import lugus.repository.films.EdicionRepository;
 
 
@@ -30,7 +30,7 @@ public class EdicionService {
 	public long contarTodasCompradas() {
 		return edicionRepository.countByComprado(true);
 	}
-	public int contarPorFormato(Formato format) {
+	public int contarPorFormato(Format format) {
 		return edicionRepository.countByFormatoAndComprado(format, true);
 	}
 
@@ -38,13 +38,13 @@ public class EdicionService {
 		return edicionRepository.countByComprado(false);
 	}
 
-	public Edicion findById(int id) {
+	public Edition findById(int id) {
 		return edicionRepository.findById(id);
 	}
 
 
 	public String calculateCompleteCode(int idEdition, Pelicula film) {
-		String filmCode =  film.calcularCodigo();
+		String filmCode =  film.obtainCode();
 		
 		return calculateCodeWithSuffix(idEdition, filmCode);
 	}
@@ -72,7 +72,7 @@ public class EdicionService {
 		return completeCode;
 	}
 
-	public void update(Edicion edicion) {
+	public void update(Edition edicion) {
 		edicionRepository.save(edicion);
 		
 	}

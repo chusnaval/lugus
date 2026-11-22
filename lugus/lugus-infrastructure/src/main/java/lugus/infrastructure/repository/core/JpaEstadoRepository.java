@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import lugus.repository.core.EstadoRepository;
 
-public interface JpaEstadoRepository extends EstadoRepository, JpaRepository<lugus.model.core.Estado, Integer> {
+public interface JpaEstadoRepository extends EstadoRepository, JpaRepository<lugus.model.core.Status, Integer> {
 
 }

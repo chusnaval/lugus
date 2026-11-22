@@ -8,12 +8,12 @@ import lugus.model.values.LangVersion;
 public class LangVersionConverter implements AttributeConverter<LangVersion, String> {
 
 	@Override
-	public String convertToDatabaseColumn(LangVersion attribute) {
+	public String convertToDatabaseColumn(final LangVersion attribute) {
 		return attribute == null ? null : attribute.name();
 	}
 
 	@Override
-	public LangVersion convertToEntityAttribute(String dbData) {
+	public LangVersion convertToEntityAttribute(final String dbData) {
 		if (dbData == null) {
 			return null;
 		}

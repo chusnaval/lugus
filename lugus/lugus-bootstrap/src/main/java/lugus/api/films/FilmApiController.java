@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -41,13 +41,13 @@ import lugus.export.FilmExportService;
 import lugus.mapper.films.FilmMapper;
 import lugus.model.core.Location;
 import lugus.model.core.Source;
-import lugus.model.films.Edicion;
+import lugus.model.films.Edition;
 import lugus.model.films.Pelicula;
 import lugus.model.films.PeliculaFoto;
 import lugus.model.imdb.OmdbConstants;
-import lugus.model.values.Categoria;
-import lugus.model.values.Formato;
-import lugus.model.values.Genero;
+import lugus.model.values.Category;
+import lugus.model.values.Format;
+import lugus.model.values.Genere;
 import lugus.model.values.TitleType;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
@@ -62,7 +62,6 @@ import lugus.service.people.InsertPersonalDataService;
 import lugus.service.titles.TitlesService;
 
 @RestController
-@ResponseBody
 @RequestMapping("/v1/api/films")
 public class FilmApiController {
 
@@ -132,7 +131,7 @@ public class FilmApiController {
 	}
 
 	@PostMapping("/{id}/toggle")
-	public ResponseEntity<?> toggleOwned(@PathVariable Integer id, Authentication auth) {
+	public ResponseEntity<Object> toggleOwned(@PathVariable Integer id, Authentication auth) {
 		usuarioPeliculaService.toggleOwned(auth.getName(), id);
 		return ResponseEntity.ok().build();
 	}
@@ -160,7 +159,7 @@ public class FilmApiController {
 			throws LugusNotFoundException, IOException, URISyntaxException {
 		Pelicula film = mapper.mapToFilm(dto);
 
-		for (Edicion edto : film.getEditions()) {
+		for (Edition edto : film.getEditions()) {
 
 			if (edto.getLocation() != null && edto.getLocation().getCodigo() != null
 					&& !edto.getLocation().getCodigo().isEmpty()) {
@@ -220,7 +219,7 @@ public class FilmApiController {
 						+ OmdbConstants.PLOT_PARAM;
 				final RestTemplate rest = new RestTemplate();
 				Map<String, Object> json = rest.getForObject(url, Map.class);
-				String posterUrl = (String) json.get(OmdbConstants.POSTER);
+
 				cacheService.saveToCache(dto.getImdbId(), json);
 			}
 			cached = cacheService.getFromCache(dto.getImdbId());
@@ -254,17 +253,21 @@ public class FilmApiController {
 				service.save(saved);
 			}
 			
-			try {
-				Integer duration = node.get(OmdbConstants.DURATION).asInt();
-				saved.setDuration(duration);
-				service.save(saved);
-			}catch(Exception e) {
-				// no pasa nada, no tiene duración
-			}
+			getDurationAndUpdate(saved, node);
 			
 		}
 
 		return ResponseEntity.ok().build();
+	}
+
+	private void getDurationAndUpdate(Pelicula saved, JsonNode node) {
+		try {
+			Integer duration = node.get(OmdbConstants.DURATION).asInt();
+			saved.setDuration(duration);
+			service.save(saved);
+		}catch(Exception e) {
+			// no pasa nada, no tiene duración
+		}
 	}
 
 	private List<String> getCountries(String country) {
@@ -291,7 +294,8 @@ public class FilmApiController {
 	@GetMapping("/random/wanted")
 	FilmDto randomw() throws LugusNotFoundException {
 		Page<Pelicula> page = service.wanted();
-		int number = (int) (Math.random() * page.getNumberOfElements()) + 1;
+		Random random = new Random(Instant.now().toEpochMilli());
+		int number = (random.nextInt() * page.getNumberOfElements()) + 1;
 		return mapper.mapToFilmDTO(page.getContent().get(number));
 	}
 
@@ -324,56 +328,56 @@ public class FilmApiController {
 		stats.setRecentFilms(edicionService.addedInLastDays(30));
 		stats.setIncompleteGroups(groupsService.incompletedGroups());
 		stats.setCompleteGroups((int) (groupsService.count() - groupsService.incompletedGroups()));
-		stats.setVhs(edicionService.contarPorFormato(Formato.VHS));
-		stats.setDvd(edicionService.contarPorFormato(Formato.DVD));
-		stats.setBluray(edicionService.contarPorFormato(Formato.BLURAY));
-		stats.setUhd(edicionService.contarPorFormato(Formato.ULTRAHD));
-		stats.setDigital(edicionService.contarPorFormato(Formato.DIGITAL));
+		stats.setVhs(edicionService.contarPorFormato(Format.VHS));
+		stats.setDvd(edicionService.contarPorFormato(Format.DVD));
+		stats.setBluray(edicionService.contarPorFormato(Format.BLURAY));
+		stats.setUhd(edicionService.contarPorFormato(Format.ULTRAHD));
+		stats.setDigital(edicionService.contarPorFormato(Format.DIGITAL));
 	}
 
 	private void getGenreNumbers(FilmStatsDto stats) {
 		Map<Object, Integer> generos = service.contarPorGenero();
 		stats.setNumerosPorGenero(new FilmGenreDto());
-		stats.setAnimacion(getNumberFromMap(generos, Genero.ANIMACION));
-		stats.setAnime(getNumberFromMap(generos, Genero.ANIME));
-		stats.setInfantil(getNumberFromMap(generos, Genero.INFANTIL));
-		stats.setMusical(getNumberFromMap(generos, Genero.MUSICAL));
-		stats.setNavidena(getNumberFromMap(generos, Genero.NAVIDENA));
-		stats.setDrama(getNumberFromMap(generos, Genero.DRAMA));
-		stats.setRomantica(getNumberFromMap(generos, Genero.ROMANTICA));
-		stats.setComedia(getNumberFromMap(generos, Genero.COMEDIA));
-		stats.setCienciaFiccion(getNumberFromMap(generos, Genero.CIENCIA_FICCION));
-		stats.setAccion(getNumberFromMap(generos, Genero.ACCION));
-		stats.setAventura(getNumberFromMap(generos, Genero.AVENTURA));
-		stats.setFantasia(getNumberFromMap(generos, Genero.FANTASIA));
-		stats.setThriller(getNumberFromMap(generos, Genero.THRILLER));
-		stats.setMisterio(getNumberFromMap(generos, Genero.MISTERIO));
-		stats.setCrimen(getNumberFromMap(generos, Genero.CRIMEN));
-		stats.setTerror(getNumberFromMap(generos, Genero.TERROR));
-		stats.setBelico(getNumberFromMap(generos, Genero.BELICO));
-		stats.setWestern(getNumberFromMap(generos, Genero.WESTERN));
-		stats.setDocumental(getNumberFromMap(generos, Genero.DOCUMENTAL));
+		stats.setAnimacion(getNumberFromMap(generos, Genere.ANIMACION));
+		stats.setAnime(getNumberFromMap(generos, Genere.ANIME));
+		stats.setInfantil(getNumberFromMap(generos, Genere.INFANTIL));
+		stats.setMusical(getNumberFromMap(generos, Genere.MUSICAL));
+		stats.setNavidena(getNumberFromMap(generos, Genere.NAVIDENA));
+		stats.setDrama(getNumberFromMap(generos, Genere.DRAMA));
+		stats.setRomantica(getNumberFromMap(generos, Genere.ROMANTICA));
+		stats.setComedia(getNumberFromMap(generos, Genere.COMEDIA));
+		stats.setCienciaFiccion(getNumberFromMap(generos, Genere.CIENCIA_FICCION));
+		stats.setAccion(getNumberFromMap(generos, Genere.ACCION));
+		stats.setAventura(getNumberFromMap(generos, Genere.AVENTURA));
+		stats.setFantasia(getNumberFromMap(generos, Genere.FANTASIA));
+		stats.setThriller(getNumberFromMap(generos, Genere.THRILLER));
+		stats.setMisterio(getNumberFromMap(generos, Genere.MISTERIO));
+		stats.setCrimen(getNumberFromMap(generos, Genere.CRIMEN));
+		stats.setTerror(getNumberFromMap(generos, Genere.TERROR));
+		stats.setBelico(getNumberFromMap(generos, Genere.BELICO));
+		stats.setWestern(getNumberFromMap(generos, Genere.WESTERN));
+		stats.setDocumental(getNumberFromMap(generos, Genere.DOCUMENTAL));
 	}
 
-	private int getNumberFromMap(Map<Object, Integer> generos, Genero genero) {
+	private int getNumberFromMap(Map<Object, Integer> generos, Genere genero) {
 		return generos.get(genero.getCodigo()) != null ? generos.get(genero.getCodigo()) : 0;
 	}
 
-	private int getNumberFromMap(Map<Object, Integer> categorias, Categoria categoria) {
+	private int getNumberFromMap(Map<Object, Integer> categorias, Category categoria) {
 		return categorias.get(categoria) != null ? categorias.get(categoria) : 0;
 	}
 
 	private void getCategoryNumbers(FilmStatsDto stats) {
 		Map<Object, Integer> categorias = service.contarPorCategoria();
 		stats.setNumerosPorCategoria(new FilmCategoryDto());
-		stats.setArteEntretenimiento(getNumberFromMap(categorias, Categoria.ARTE_ENTRETENIMIENTO));
-		stats.setLiteraturaNarrativa(getNumberFromMap(categorias, Categoria.LITERATURA_NARRATIVA));
-		stats.setCienciaFiccionCategory(getNumberFromMap(categorias, Categoria.CIENCIA_FICCION));
-		stats.setAccionCategory(getNumberFromMap(categorias, Categoria.ACCION));
-		stats.setMisterioCategory(getNumberFromMap(categorias, Categoria.MISTERIO));
-		stats.setTerrorCategory(getNumberFromMap(categorias, Categoria.TERROR));
-		stats.setConflicto(getNumberFromMap(categorias, Categoria.CONFLICTO));
-		stats.setDocumentalCategory(getNumberFromMap(categorias, Categoria.DOCUMENTAL));
+		stats.setArteEntretenimiento(getNumberFromMap(categorias, Category.ARTE_ENTRETENIMIENTO));
+		stats.setLiteraturaNarrativa(getNumberFromMap(categorias, Category.LITERATURA_NARRATIVA));
+		stats.setCienciaFiccionCategory(getNumberFromMap(categorias, Category.CIENCIA_FICCION));
+		stats.setAccionCategory(getNumberFromMap(categorias, Category.ACCION));
+		stats.setMisterioCategory(getNumberFromMap(categorias, Category.MISTERIO));
+		stats.setTerrorCategory(getNumberFromMap(categorias, Category.TERROR));
+		stats.setConflicto(getNumberFromMap(categorias, Category.CONFLICTO));
+		stats.setDocumentalCategory(getNumberFromMap(categorias, Category.DOCUMENTAL));
 	}
 
 	private FiltrosDto crearFiltro(Integer page, Integer size, Boolean owned, String title, String casting,
@@ -397,10 +401,10 @@ public class FilmApiController {
 			filtro.setToAnyo(toYear);
 		}
 		if (format != null) {
-			if(Formato.getById(Short.valueOf(format)) == null) {
+			if(Format.getById(Short.valueOf(format)) == null) {
 				throw new IllegalArgumentException("Formato no válido: " + format);
 			}
-			filtro.setFormato((int) Formato.getById(Short.valueOf(format)).getId());
+			filtro.setFormato((int) Format.getById(Short.valueOf(format)).getId());
 		}
 		if (genre != null) {
 			filtro.setGenero(genre);
