@@ -397,6 +397,9 @@ public class FilmApiController {
 			filtro.setToAnyo(toYear);
 		}
 		if (format != null) {
+			if(Formato.getById(Short.valueOf(format)) == null) {
+				throw new IllegalArgumentException("Formato no válido: " + format);
+			}
 			filtro.setFormato((int) Formato.getById(Short.valueOf(format)).getId());
 		}
 		if (genre != null) {

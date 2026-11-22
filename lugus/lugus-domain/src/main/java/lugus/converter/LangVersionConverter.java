@@ -1,4 +1,4 @@
-package lugus.model.converter;
+package lugus.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

@@ -25,7 +25,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lugus.model.converter.LangVersionConverter;
+import lugus.converter.LangVersionConverter;
 import lugus.model.orders.SeasonOrder;
 import lugus.model.values.LangVersion;
 
