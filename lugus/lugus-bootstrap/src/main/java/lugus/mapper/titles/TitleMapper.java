@@ -11,12 +11,12 @@ public class TitleMapper {
 		dto.setTitle(t.getTitle());
 		dto.setYear(t.getYear());
 		dto.setType(t.getType().name());
-		dto.setPosterUrl(t.getPosterUrl());
+		dto.setPosterUrl(t.getUrlCover());
 		dto.setPeliculaId(t.getFilm() != null ? t.getFilm().getId() : null);
-		dto.setSerieId(t.getSerie() != null ? t.getSerie().getId() : null);
+		dto.setSerieId(t.getSeries() != null ? t.getSeries().getId() : null);
 		dto.setImdbId(t.getImdb() != null ? t.getImdb().getTconst() : null);
-		if ((t.getFilm() != null && t.getFilm().isComprado())
-				|| (t.getSerie() != null && t.getSerie().isCompleta())) {
+		if ((t.getFilm() != null && t.getFilm().isPurchased())
+				|| (t.getSeries() != null && t.getSeries().isComplete())) {
 			dto.setOwned(true);
 		} else {
 			dto.setOwned(false);

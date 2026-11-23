@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 
 import lombok.RequiredArgsConstructor;
-import lugus.dto.core.FiltrosDto;
+import lugus.dto.core.FilterDto;
 
 import lugus.model.core.Location;
 import lugus.model.core.LocationType;
@@ -51,12 +51,12 @@ public class LocationService {
 		locRepo.deleteById(id);
 	}
 
-	public Page<Location> findAllBy(FiltrosDto filter) {
+	public Page<Location> findAllBy(FilterDto filter) {
 		Sort sort = Sort.by(Direction.ASC, DESCRIPCION);
 
 		Pageable pageable = PageRequest.of(filter.getPagina().get(), 50, sort);
 
-		Specification<Location> spec = Specification.where(null);
+		Specification<Location> spec = Specification.unrestricted();
 
 		return locRepo.findAll(spec, pageable);
 	}

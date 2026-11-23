@@ -5,7 +5,7 @@ import java.util.Optional;
 import lugus.model.user.User;
 
 
-public interface UsuarioRepository {
+public interface UserRepository {
 
 	Optional<User> findById(final String id);
 

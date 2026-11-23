@@ -19,9 +19,9 @@ import jakarta.transaction.Transactional;
 import lugus.dto.core.CountryCode;
 import lugus.model.films.Film;
 import lugus.model.imdb.OmdbCache;
-import lugus.model.series.Serie;
+import lugus.model.series.Series;
 import lugus.model.titles.Title;
-import lugus.service.films.PeliculaService;
+import lugus.service.films.FilmService;
 import lugus.service.imdb.OmdbCacheService;
 import lugus.service.series.SeriesService;
 import lugus.service.titles.TitlesService;
@@ -29,8 +29,8 @@ import lugus.service.titles.TitlesService;
 @Service
 public class OmdbBatchExecutor {
 
-	private final PeliculaService peliculaService;
-	private final SeriesService serieService;
+	private final FilmService filmService;
+	private final SeriesService seriesService;
 	private final OmdbCacheService cacheService;
 	private final TitlesService titlesService;
 	private final String apiKey;
@@ -38,11 +38,11 @@ public class OmdbBatchExecutor {
 	private final ObjectMapper mapper;
 
 	@Autowired
-	public OmdbBatchExecutor(@Value("${omdb.api.key}") String apiKey, PeliculaService peliculaService,
-			SeriesService serieService, TitlesService titlesService, OmdbCacheService cacheService,
-			ObjectMapper mapper) {
-		this.peliculaService = peliculaService;
-		this.serieService = serieService;
+	public OmdbBatchExecutor(@Value("${omdb.api.key}") final String apiKey, final FilmService filmService,
+			final SeriesService seriesService, final TitlesService titlesService, final OmdbCacheService cacheService,
+			final ObjectMapper mapper) {
+		this.filmService = filmService;
+		this.seriesService = seriesService;
 		this.cacheService = cacheService;
 		this.titlesService = titlesService;
 		this.apiKey = apiKey;
@@ -59,7 +59,7 @@ public class OmdbBatchExecutor {
 		System.out.println("✔ Batch todos completado");
 	}
 
-	private void updateTitles() throws JsonProcessingException {
+	private void updateTitles() {
 		List<Title> title = titlesService.findAll();
 
 		int total = title.size();
@@ -91,17 +91,17 @@ public class OmdbBatchExecutor {
 
 	}
 
-	private void updateSeries() throws JsonProcessingException {
-		List<Serie> series = serieService.findAll();
+	private void updateSeries() {
+		List<Series> series = seriesService.findAll();
 
 		int total = series.size();
 		int index = 1;
 
-		for (Serie s : series) {
+		for (Series s : series) {
 			String imdbId = s.getImdbId();
 
 			if (imdbId == null || imdbId.isBlank()) {
-				System.out.println("Saltando serie sin IMDb ID: " + s.getTitulo());
+				System.out.println("Saltando serie sin IMDb ID: " + s.getTitle());
 				continue;
 			}
 
@@ -133,8 +133,8 @@ public class OmdbBatchExecutor {
 		}
 	}
 
-	private void updatePeliculas() throws JsonProcessingException {
-		List<Film> peliculas = peliculaService.findAll();
+	private void updatePeliculas() {
+		List<Film> peliculas = filmService.findAll();
 
 		int total = peliculas.size();
 		int index = 1;
@@ -161,9 +161,9 @@ public class OmdbBatchExecutor {
 	}
 
 	public void updateCountry() {
-		int count = peliculaService.findAll().size();
+		int count = filmService.findAll().size();
 		int index = 1;
-		for (Film p : peliculaService.findAll()) {
+		for (Film p : filmService.findAll()) {
 			if (p.getImdbId() == null || p.getImdbId().isBlank()) {
 				System.out.println("Saltando película sin IMDb ID: " + p.getTitle());
 				continue;
@@ -181,8 +181,7 @@ public class OmdbBatchExecutor {
 				JsonNode node = mapper.valueToTree(cached.getJson());
 				String country = node.get("Country").asText();
 
-				// puede tener valor o no
-				// o tener uno o varios países separados por coma
+				// Optional info, if there's info, its one or many
 				List<String> values = new ArrayList<>();
 				if (country != null) {
 					String[] countries = country.split(",");
@@ -191,10 +190,10 @@ public class OmdbBatchExecutor {
 					}
 				}
 
-				// los guardamosen un campo separados por coma
+				// we save joined but separated by commas
 				p.setCountry(String.join(",", values));
 
-				peliculaService.save(p);
+				filmService.save(p);
 				System.out.println("Actualizada película: " + p.getTitle() + " con país: " + country + " en posición "
 						+ index + "/" + count);
 			} else {
@@ -206,9 +205,9 @@ public class OmdbBatchExecutor {
 	}
 
 	public void updateRuntime() {
-		int count = peliculaService.findAll().size();
+		int count = filmService.findAll().size();
 		int index = 1;
-		for (Film p : peliculaService.findAll()) {
+		for (Film p : filmService.findAll()) {
 			if (p.getImdbId() == null || p.getImdbId().isBlank()) {
 				System.out.println("Saltando película sin IMDb ID: " + p.getTitle());
 				continue;
@@ -231,7 +230,7 @@ public class OmdbBatchExecutor {
 				
 				p.setDuration(minutes);
 
-				peliculaService.save(p);
+				filmService.save(p);
 				System.out.println("Actualizada película: " + p.getTitle() + " con runtime: " + minutes + " en posición "
 						+ index++ + "/" + count);
 			} else {
@@ -251,7 +250,7 @@ public class OmdbBatchExecutor {
 				System.out.println("Saltando title sin IMDb ID: " + p.getTitle());
 				continue;
 			}
-			if (p.getPosterUrl() != null && !p.getPosterUrl().isBlank() && !"./covers/placeholder.png".equals(p.getPosterUrl())) {
+			if (p.getUrlCover() != null && !p.getUrlCover().isBlank() && !"./covers/placeholder.png".equals(p.getUrlCover())) {
 				System.out.println("Saltando title con poster ya seteado: " + p.getTitle());
 				continue;
 			}
@@ -269,7 +268,7 @@ public class OmdbBatchExecutor {
 				}
 				String poster = node.get("Poster").asText();
 				
-				p.setPosterUrl(poster);
+				p.setUrlCover(poster);
 
 				titlesService.save(p);
 				System.out.println("Actualizada title: " + p.getTitle() + " con poster: " + poster + " en posición "

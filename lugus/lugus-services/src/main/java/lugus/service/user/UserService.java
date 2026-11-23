@@ -8,27 +8,27 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lugus.model.user.User;
-import lugus.repository.user.UsuarioRepository;
+import lugus.repository.user.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class UsuarioService {
+public class UserService {
 	
-	private final UsuarioRepository usuarioRepository;
+	private final UserRepository usuarioRepository;
 
-	public Optional<User> findByLogin(String login) {
+	public Optional<User> findByLogin(final String login) {
 		return usuarioRepository.findById(login);
 	}
 
-	public void save(User usuario) {
-		usuarioRepository.save(usuario);
+	public void save(final User user) {
+		usuarioRepository.save(user);
 	}
 	
-	public void changePassword(String login, String current, String newPass) {
-	    User user = findByLogin(login).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+	public void changePassword(final String login, final String current, final String newPass) {
+	    User user = findByLogin(login).orElseThrow(() -> new RuntimeException("Not founded user"));
 		PasswordEncoder encoder = new BCryptPasswordEncoder();
 	    if (!encoder.matches(current, user.getPassword())) {
-	        throw new RuntimeException("La contraseña actual no es correcta");
+	        throw new RuntimeException("Incorrect password");
 	    }
 
 	    user.setPassword(encoder.encode(newPass));

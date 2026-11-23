@@ -7,7 +7,10 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class SerWanted {
-    private String titulo;
-    private int anyoInicio;
+
+    private String title;
+
+    private int startYear;
+    
     private String seasonDesc;
 }

@@ -32,7 +32,7 @@ import lugus.converter.FormatConverter;
 import lugus.converter.GenreConverter;
 import lugus.model.core.Location;
 import lugus.model.people.Actor;
-import lugus.model.people.SeriesPersonal;
+import lugus.model.people.SeriesStaff;
 import lugus.model.values.Format;
 import lugus.model.values.Genre;
 import lugus.model.values.LangVersion;
@@ -45,51 +45,51 @@ import lugus.model.values.LangVersion;
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Serie {
+public class Series {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@Column(nullable = false)
-	private String titulo;
+	@Column(name="titulo", nullable = false)
+	private String title;
 
-	@Column(nullable = false, name = "titulo_gest")
-	private String tituloGest;
+	@Column(name = "titulo_gest", nullable = false)
+	private String mgmtTitle;
 
-	@Column(nullable = false)
+	@Column(name="formato", nullable = false)
 	@Convert(converter = FormatConverter.class)
-	private Format formato;
+	private Format format;
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "localizacion_codigo", nullable = true) // FK → location.code
 	private Location location;
 
-	@Column(nullable = false, name="anyo_inicio")
-	private int anyoInicio;
+	@Column(name="anyo_inicio", nullable = false)
+	private int startYear;
 	
-	@Column(nullable = false, name="anyo_fin")
-	private Integer anyoFin;
+	@Column(name="anyo_fin", nullable = false)
+	private Integer endYear;
 
-	@Column(nullable = false)
+	@Column(name="genero", nullable = false)
 	@Convert(converter = GenreConverter.class)
-	private Genre genero;
+	private Genre genre;
 
-	@Column(nullable = false)
-	private String codigo;
+	@Column(name="codigo", nullable = false)
+	private String code;
 
-	@Column(nullable = true)
-	private String notas;
+	@Column(name="notas", nullable = true)
+	private String notes;
 	
 	@Column(name="comprado")
 	private boolean purchased;
 	
 	@Column(name = "usr_alta")
-	private String usrAlta;
+	private String usrCreation;
 
 	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
-	private Instant tsAlta;
+	private Instant tsCreation;
 
 	@Column(name = "usr_modif")
 	private String usrModif;
@@ -98,32 +98,32 @@ public class Serie {
 	private Instant tsModif;
 
 	@Column(name = "ts_baja", columnDefinition = "TIMESTAMP")
-	private Instant tsBaja;
+	private Instant tsDeletion;
 	
 	@Column(name = "imdb_id")
 	private String imdbId;
 	
-	@Column
-	private boolean completa;
+	@Column(name="completa")
+	private boolean complete;
 	
 	@JsonIgnore
-	@OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "series", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private final Set<SerieFoto> serieFotos = new HashSet<>();
+	private final Set<SeriesImage> images = new HashSet<>();
 	
 	@JsonIgnore
 	@OrderBy("order ASC")
-	@OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "series", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
 	private final Set<Season> seasons = new HashSet<>();
 	
 	@JsonIgnore
-	@OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "series", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private final Set<SeriesPersonal> seriesPersonal = new HashSet<>();
+	private final Set<SeriesStaff> staff = new HashSet<>();
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "serie", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "series", cascade = CascadeType.ALL)
 	@ToString.Exclude
 	private final Set<Actor> actores = new HashSet<>();
 
@@ -135,35 +135,35 @@ public class Serie {
 		return location.getDescription();
 	}
 
-	public boolean tieneCaratula() {
-		return this.serieFotos != null && !serieFotos.isEmpty();
+	public boolean hasCover() {
+		return this.images != null && !images.isEmpty();
 	}
 
 	
-	public void calcularCodigo() {
+	public void obtainCode() {
 		// Eliminar artículos del título
-		String procesado = tituloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
+		String processed = mgmtTitle.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
 
 		// Obtener los primeros tres caracteres del título procesado
-		String prefijo = procesado.length() >= 3 ? procesado.substring(0, 3).toUpperCase() : procesado.toUpperCase();
+		String prefix = processed.length() >= 3 ? processed.substring(0, 3).toUpperCase() : processed.toUpperCase();
 
 		// Obtener la etiqueta del género
-		String parteCodigo = genero.getCodigo();
+		String genreCode = genre.getCode();
 
-		codigo = parteCodigo + "-" + prefijo + "-" + anyoInicio;
+		code = genreCode + "-" + prefix + "-" + startYear;
 
 	}
 	
-	public void addCaratula(SerieFoto pf) {
-		this.serieFotos.add(pf);
-		pf.setSerie(this);
+	public void addCover(SeriesImage pf) {
+		this.images.add(pf);
+		pf.setSeries(this);
 
 	}
 
 	public void createSeasons() {
 		if(this.seasons == null || this.seasons.isEmpty()) {
 			int index = 1;
-			for(int from = anyoInicio; from <= (anyoFin != null ? anyoFin-1 : anyoInicio); from++) {
+			for(int from = startYear; from <= (endYear != null ? endYear-1 : startYear); from++) {
 				Season season = new Season();
 				season.setOrder(index++);
 				season.setYear(from);
@@ -171,7 +171,7 @@ public class Serie {
 				season.setWanted(true);
 				season.setPublishedVersion(LangVersion.VE);
 				season.setPurchasedVersion(LangVersion.VE);
-				season.setSerie(this);
+				season.setSeries(this);
 				this.seasons.add(season);
 			}
 		}
@@ -180,11 +180,11 @@ public class Serie {
 
 	public String getCoverUrl() {
 		String coverUrl = null;
-		if (this.serieFotos != null && !this.serieFotos.isEmpty()) {
-			Optional<SerieFoto> aux = this.serieFotos.stream().findFirst();
+		if (this.images != null && !this.images.isEmpty()) {
+			Optional<SeriesImage> aux = this.images.stream().findFirst();
 			if (aux.isPresent()) {
-				SerieFoto pf = aux.get();
-				if (pf.isCaratula()) {
+				SeriesImage pf = aux.get();
+				if (pf.isCover()) {
 					coverUrl = pf.getUrl();
 				}
 			}

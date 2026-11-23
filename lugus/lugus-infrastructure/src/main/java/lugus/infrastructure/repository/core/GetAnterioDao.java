@@ -5,12 +5,12 @@ import java.sql.Types;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import lugus.repository.core.GetAnteriorRepository;
+import lugus.repository.core.GetPreviousRepository;
 
 
 
 @Component
-public class GetAnterioDao implements GetAnteriorRepository {
+public class GetAnterioDao implements GetPreviousRepository {
 
 	private final JdbcTemplate jdbcTemplate;
 
@@ -19,7 +19,7 @@ public class GetAnterioDao implements GetAnteriorRepository {
 	}
 
 	@Override
-	public String getAnterior(String codigo) {
+	public String getPrevious(String codigo) {
 
 		String sql = "SELECT lugus.loc_anterior(?)";
 		Object[] args = new Object[] { codigo };

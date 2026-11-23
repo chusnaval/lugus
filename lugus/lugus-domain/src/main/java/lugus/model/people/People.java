@@ -33,13 +33,13 @@ public class People {
 	@Column(name="nombre")
 	private String name;
 	
-	@OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "people", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private Set<Staff> filmStaff = new HashSet<>();
+	private Set<FilmStaff> filmStaff = new HashSet<>();
 	
-	@OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "people", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private Set<SeriesPersonal> seriesStaff = new HashSet<>();
+	private Set<SeriesStaff> seriesStaff = new HashSet<>();
 	
 	@Column
 	private String nconst;

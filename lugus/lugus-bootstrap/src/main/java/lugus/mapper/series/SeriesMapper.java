@@ -6,30 +6,30 @@ import lugus.dto.films.CastDto;
 import lugus.dto.films.SerieDto;
 import lugus.dto.series.SeasonDto;
 import lugus.model.series.Season;
-import lugus.model.series.Serie;
+import lugus.model.series.Series;
 import lugus.model.values.Format;
 import lugus.model.values.Genre;
 
 @Component
 public class SeriesMapper {
 
-	public SerieDto mapToSerieDTO(Serie serie) {
+	public SerieDto mapToSerieDTO(Series serie) {
 
 		SerieDto dto = new SerieDto();
 		dto.setId(serie.getId());
-		dto.setTitle(serie.getTitulo());
-		dto.setTitleMgmt(serie.getTituloGest());
-		dto.setStartYear(serie.getAnyoInicio());
-		dto.setFinishYear(serie.getAnyoFin());
-		dto.setMgmtCode(serie.getCodigo());
+		dto.setTitle(serie.getTitle());
+		dto.setTitleMgmt(serie.getMgmtTitle());
+		dto.setStartYear(serie.getStartYear());
+		dto.setFinishYear(serie.getEndYear());
+		dto.setMgmtCode(serie.getCode());
 
-		if (serie.getFormato() != null) {
-			dto.setFormat(serie.getFormato().name());
+		if (serie.getFormat() != null) {
+			dto.setFormat(serie.getFormat().name());
 		}
 
-		if (serie.getGenero() != null) {
-			dto.setGenreCode(serie.getGenero().getCodigo());
-			dto.setGenreDesc(serie.getGenero().getDisplayName());
+		if (serie.getGenre() != null) {
+			dto.setGenreCode(serie.getGenre().getCode());
+			dto.setGenreDesc(serie.getGenre().getDisplayName());
 		}
 
 		if (serie.getLocation() != null) {
@@ -40,40 +40,41 @@ public class SeriesMapper {
 		createSeasons(dto, serie);
 
 		dto.setOwned(serie.isPurchased());
-		dto.setCompleted(serie.isCompleta());
-		dto.setNotes(serie.getNotas());
+		dto.setCompleted(serie.isComplete());
+		dto.setNotes(serie.getNotes());
 		dto.setCoverSrc(serie.getCoverUrl());
 		return dto;
 	}
 
-	private void createSeasons(SerieDto dto, Serie serie) {
-		for(Season season  : serie.getSeasons()) {
+	private void createSeasons(SerieDto dto, Series serie) {
+		for (Season season : serie.getSeasons()) {
 			dto.addSeason(new SeasonDto(season.getDesc(), season.getOrder(), season.isPurchased(), season.isWanted()));
 		}
-		
+
 	}
 
-	public Serie mapToSerie(SerieDto dto) {
-		Serie serie = new Serie();
-		serie.setTitulo(dto.getTitle());
-		serie.setTituloGest(dto.getTitleMgmt());
-		serie.setAnyoInicio(dto.getStartYear());
-		serie.setAnyoFin(dto.getFinishYear());
-		serie.setCodigo(dto.getMgmtCode());
+	public Series mapToSerie(SerieDto dto) {
+		Series serie = new Series();
+		serie.setTitle(dto.getTitle());
+		serie.setMgmtTitle(dto.getTitleMgmt());
+		serie.setStartYear(dto.getStartYear());
+		serie.setEndYear(dto.getFinishYear());
+		serie.setCode(dto.getMgmtCode());
 
-		serie.setFormato(Format.getById(Short.valueOf(dto.getFormat())));
-		serie.setGenero(Genre.getById(dto.getGenreCode()));
+		serie.setFormat(Format.getById(Short.valueOf(dto.getFormat())));
+		serie.setGenre(Genre.getById(dto.getGenreCode()));
 
-		serie.setCompleta(dto.isCompleted());
+		serie.setComplete(dto.isCompleted());
 		serie.setPurchased(dto.isOwned());
-		serie.setNotas(dto.getNotes());
+		serie.setNotes(dto.getNotes());
 
 		return serie;
 	}
 
-	private void createCasting(SerieDto dto, Serie film) {
-		film.getActores().stream()
-				.forEach(act -> dto.addCast(new CastDto(act.getPeople(), act.getOrder(),  act.getName(), act.getCharacter())));
+	private void createCasting(SerieDto dto, Series film) {
+		film.getActores()
+				.forEach(act -> dto
+						.addCast(new CastDto(act.getPeople(), act.getOrder(), act.getName(), act.getCharacter())));
 
 	}
 }

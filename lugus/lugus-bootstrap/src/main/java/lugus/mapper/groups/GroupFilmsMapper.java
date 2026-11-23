@@ -18,7 +18,7 @@ public class GroupFilmsMapper {
 		dto.setId(gp.getId());
 		dto.setOrden(gp.getOrder());
 		dto.setTitle(gp.getTitle());
-		dto.setStatus(gp.getFilm()!=null? (gp.getFilm().isComprado()?"OWNED":"WISHLIST"):"NONE");
+		dto.setStatus(gp.getFilm()!=null? (gp.getFilm().isPurchased()?"OWNED":"WISHLIST"):"NONE");
 		dto.setFilm(gp.getFilm()!=null?gp.getFilm().getId():-1);
 		dto.setYear(gp.getFilm()!=null?gp.getFilm().getYear():Integer.parseInt(gp.getItb().getStartyear()));
 		dto.setCover(gp.getFilm()!=null?gp.getFilm().getCoverUrl():"/covers/placeholder.png");

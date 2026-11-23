@@ -29,7 +29,7 @@ public interface TitleRepository {
 
 	Optional<Title> findByFilm_Id(final Integer id);
 
-	Optional<Title> findBySerie_Id(final Integer id);
+	Optional<Title> findBySeries_Id(final Integer id);
 
 	List<Title> findAll();
 

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import lugus.dto.core.FiltrosDto;
+import lugus.dto.core.FilterDto;
 import lugus.dto.films.SerieDto;
 import lugus.dto.films.SeriesStatsDto;
 import lugus.exception.LugusNotFoundException;
@@ -29,14 +29,14 @@ import lugus.export.SeriesExportService;
 import lugus.mapper.series.SeriesMapper;
 import lugus.model.core.Location;
 import lugus.model.core.Source;
-import lugus.model.series.Serie;
-import lugus.model.series.SerieFoto;
+import lugus.model.series.Series;
+import lugus.model.series.SeriesImage;
 import lugus.model.values.Format;
 import lugus.model.values.TitleType;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
-import lugus.service.films.DwFotoService;
-import lugus.service.films.DwFotoServiceI;
+import lugus.service.films.DwImageService;
+import lugus.service.films.DwImageServiceI;
 import lugus.service.people.InsertPersonalSeriesDataService;
 import lugus.service.series.SeriesService;
 import lugus.service.titles.TitlesService;
@@ -62,7 +62,7 @@ public class SeriesApiController {
 	
 	@GetMapping("/{id}")
 	SerieDto one(@PathVariable int id) {
-		Serie serie = service.findById(id).orElse(null);
+		Series serie = service.findById(id).orElse(null);
 		if(serie!=null) {
 			return mapper.mapToSerieDTO(serie);
 		}
@@ -84,7 +84,7 @@ public class SeriesApiController {
 	        @RequestParam(required = false) String sort,
 	        @RequestParam(required = false) String sortDirection
 	) {
-		FiltrosDto filtro = new FiltrosDto();
+		FilterDto filtro = new FilterDto();
 		if(page!=null) {
 			filtro.setPagina(Optional.of(page));
 		}
@@ -134,27 +134,27 @@ public class SeriesApiController {
 	
 	@PostMapping("new")
 	ResponseEntity<Object> save(@RequestBody SerieDto dto, Authentication auth) throws LugusNotFoundException, IOException, URISyntaxException {
-		Serie serie = mapper.mapToSerie(dto);
+		Series serie = mapper.mapToSerie(dto);
 		Location loc = findLocation(dto);
 		serie.setLocation(loc);
-		serie.calcularCodigo();
-		serie.setTsAlta(Instant.now());
-		serie.setUsrAlta(auth.getName());
-		Serie saved = service.save(serie);
+		serie.obtainCode();
+		serie.setTsCreation(Instant.now());
+		serie.setUsrCreation(auth.getName());
+		Series saved = service.save(serie);
 		
 		if (dto.getCoverSrc() != null && !dto.getCoverSrc().isEmpty()) {
-			final DwFotoServiceI dwFotoService = new DwFotoService();
+			final DwImageServiceI dwFotoService = new DwImageService();
 			final int sourceId = sourceService.calcularIdSource(dto.getCoverSrc());
 			Optional<Source> sourceObj = sourceService.findById(sourceId);
-			SerieFoto pf = new SerieFoto();
+			SeriesImage pf = new SeriesImage();
 			pf.setUrl(dto.getCoverSrc());
 			if (sourceObj.isPresent()) {
 				pf.setSource(sourceObj.get());
 			}
-			pf.setFoto(dwFotoService.descargar(sourceId, dto.getCoverSrc()));
-			pf.setCaratula(true);
+			pf.setContent(dwFotoService.download(sourceId, dto.getCoverSrc()));
+			pf.setCover(true);
 
-			saved.addCaratula(pf);
+			saved.addCover(pf);
 			service.save(saved);
 		}
 
@@ -162,11 +162,11 @@ public class SeriesApiController {
 			insertImdbService.insert(saved.getId(), dto.getImdbId());
 
 			titlesService.findByImdb_Id(dto.getImdbId()).ifPresent(title -> {
-				title.setTitle(saved.getTitulo());
-				title.setYear(saved.getAnyoInicio());
+				title.setTitle(saved.getTitle());
+				title.setYear(saved.getStartYear());
 				title.setType(TitleType.SERIES);
-				title.setPosterUrl(dto.getCoverSrc());
-				title.setSerie(saved);
+				title.setUrlCover(dto.getCoverSrc());
+				title.setSeries(saved);
 				titlesService.save(title);
 			});
 		}
@@ -215,7 +215,7 @@ public class SeriesApiController {
 	        @RequestParam(required = false) Boolean complete,
 	        @RequestParam(required = false) String sort,
 	        @RequestParam(required = false) String sortDirection) throws IOException {
-		FiltrosDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, false, sort,
+		FilterDto filtro = createFilter(page, size, owned, title, casting, fromYear, toYear, format, genre, false, sort,
 				sortDirection);
 	    byte[] file = seriesExportService.toOds(service.findAllBy(filtro).getContent());
 
@@ -225,10 +225,10 @@ public class SeriesApiController {
 	            .body(file);
 	}
 
-	private FiltrosDto crearFiltro(Integer page, Integer size, Boolean owned, String title, String casting,
+	private FilterDto createFilter(Integer page, Integer size, Boolean owned, String title, String casting,
 			Integer fromYear, Integer toYear, String format, String genre, Boolean pack, String sort,
 			String sortDirection) {
-		FiltrosDto filtro = new FiltrosDto();
+		FilterDto filtro = new FilterDto();
 		if(page!=null) {
 			filtro.setPagina(Optional.of(page));
 		}
@@ -286,7 +286,7 @@ public class SeriesApiController {
 	        @RequestParam(required = false) Boolean complete,
 	        @RequestParam(required = false) String sort,
 	        @RequestParam(required = false) String sortDirection) {
-		FiltrosDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, false, sort,
+		FilterDto filtro = createFilter(page, size, owned, title, casting, fromYear, toYear, format, genre, false, sort,
 				sortDirection);
 	    String file = seriesExportService.toMarkdown(service.findAllBy(filtro).getContent());
 	    
@@ -310,7 +310,7 @@ public class SeriesApiController {
 	        @RequestParam(required = false) Boolean complete,
 	        @RequestParam(required = false) String sort,
 	        @RequestParam(required = false) String sortDirection) throws IOException {
-		FiltrosDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, false, sort,
+		FilterDto filtro = createFilter(page, size, owned, title, casting, fromYear, toYear, format, genre, false, sort,
 				sortDirection);
 		byte[] file = seriesExportService.toPdf(service.findAllBy(filtro).getContent());
 

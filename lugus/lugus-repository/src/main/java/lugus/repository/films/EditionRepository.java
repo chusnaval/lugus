@@ -1,6 +1,7 @@
 package lugus.repository.films;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import lugus.model.films.Edition;
 import lugus.model.values.Format;
@@ -15,7 +16,7 @@ public interface EditionRepository {
 
 	int countByFormatAndPurchased(final Format format, final boolean b);
 
-	Edition findById(final int id);
+	Optional<Edition> findById(final int id);
 
 	Edition save(final Edition edition);
 

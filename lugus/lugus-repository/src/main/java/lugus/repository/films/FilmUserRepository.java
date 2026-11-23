@@ -15,7 +15,7 @@ public interface FilmUserRepository {
 
     Optional<FilmUser> findByUserAndFilm(final User user, final Film film);
 
-    void delete(FilmUser entity);
+    void delete(final FilmUser entity);
 
-    FilmUser save(FilmUser entity);
+    FilmUser save(final FilmUser entity);
 }

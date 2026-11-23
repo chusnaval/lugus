@@ -27,7 +27,7 @@ import lugus.model.films.Film;
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Staff {
+public class FilmStaff {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +39,7 @@ public class Staff {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "persona_id", nullable = true) // FK → people.id
-	private People persona;
+	private People people;
 	
 	@Column
 	private String notas;

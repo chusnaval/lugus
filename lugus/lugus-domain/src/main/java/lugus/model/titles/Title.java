@@ -16,7 +16,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lugus.model.films.Film;
 import lugus.model.imdb.ImdbTitleBasics;
-import lugus.model.series.Serie;
+import lugus.model.series.Series;
 import lugus.model.values.TitleType;
 
 @Entity
@@ -30,7 +30,6 @@ public class Title {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Nombre del título (película, serie o externo)
     @Column(nullable = false)
     private String title;
 
@@ -51,7 +50,7 @@ public class Title {
     // Si es una serie de tu colección
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "serie_id")
-    private Serie serie;
+    private Series series;
 
     // Si es un título externo (IMDB)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -59,8 +58,8 @@ public class Title {
     private ImdbTitleBasics imdb;
 
     // URL de portada (opcional)
-    @Column(nullable = true)
-    private String posterUrl;
+    @Column(name="poster_url", nullable = true)
+    private String urlCover;
     
 
 }

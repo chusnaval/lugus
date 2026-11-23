@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import lugus.service.imdb.ImdbTitleAkasService;
 import lugus.service.imdb.ImdbTitleBasicsService;
 
 @RestController
-@ResponseBody
 @RequestMapping("/v1/api/imdb")
 @RequiredArgsConstructor
 public class ImdbApiController {
@@ -53,7 +51,7 @@ public class ImdbApiController {
 			try {
 				dto.setYear(Integer.parseInt(film.getStartyear()));
 			}catch(Exception e) {
-				
+				// we don't stop in case of a problem with start year info
 			}
 			
 			EditionDto edto = new EditionDto();
@@ -80,7 +78,7 @@ public class ImdbApiController {
 
 	private Film createFakeFilm(FilmDto dto) {
 		Film film = new Film();
-		film.setMgmntTitle(dto.getTitleMgmt());
+		film.setMgmtTitle(dto.getTitleMgmt());
 		film.setYear(dto.getYear());
 		film.setGenre(Genre.getById(dto.getGenreCode()));
 		
@@ -91,58 +89,58 @@ public class ImdbApiController {
 		String result = null;
 		switch(firstGenre){
 		case "Action":
-			result = Genre.ACCION.getCodigo();
+			result = Genre.ACCION.getCode();
 			break;
 		case "Adventure":
-			result = Genre.AVENTURA.getCodigo();
+			result = Genre.AVENTURA.getCode();
 			break;
 		case "Animation":
-			result = Genre.ANIMACION.getCodigo();
+			result = Genre.ANIMACION.getCode();
 			break;
 		case "Biography", "Drama", "History":
-			result = Genre.DRAMA.getCodigo();
+			result = Genre.DRAMA.getCode();
 			break;
 		case "Comedy":
-			result = Genre.COMEDIA.getCodigo();
+			result = Genre.COMEDIA.getCode();
 			break;
 		case "Crime", "Film-Noir":
-			result = Genre.CRIMEN.getCodigo();
+			result = Genre.CRIMEN.getCode();
 			break;
 		case "Documentary":
-			result = Genre.DOCUMENTAL.getCodigo();
+			result = Genre.DOCUMENTAL.getCode();
 			break;
 		case "Family":
-			result = Genre.INFANTIL.getCodigo();
+			result = Genre.INFANTIL.getCode();
 			break;
 		case "Fantasy":
-			result = Genre.FANTASIA.getCodigo();
+			result = Genre.FANTASIA.getCode();
 			break;
 		case "Horror":
-			result = Genre.TERROR.getCodigo();
+			result = Genre.TERROR.getCode();
 			break;
 		case "Music", "Musical":
-			result = Genre.MUSICAL.getCodigo();
+			result = Genre.MUSICAL.getCode();
 			break;
 		case "Mystery":
-			result = Genre.MISTERIO.getCodigo();
+			result = Genre.MISTERIO.getCode();
 			break;
 		case "Romance":
-			result = Genre.ROMANTICA.getCodigo();
+			result = Genre.ROMANTICA.getCode();
 			break;
 		case "Sci-Fi":
-			result = Genre.CIENCIA_FICCION.getCodigo();
+			result = Genre.CIENCIA_FICCION.getCode();
 			break;
 		case "Sport":
-			result = Genre.DEPORTES.getCodigo();
+			result = Genre.DEPORTES.getCode();
 			break;
 		case "Thriller":
-			result = Genre.THRILLER.getCodigo();
+			result = Genre.THRILLER.getCode();
 			break;
 		case "War":
-			result = Genre.BELICO.getCodigo();
+			result = Genre.BELICO.getCode();
 			break;
 		case "Western":
-			result = Genre.WESTERN.getCodigo();
+			result = Genre.WESTERN.getCode();
 			break;
 		default:
 			result = null;

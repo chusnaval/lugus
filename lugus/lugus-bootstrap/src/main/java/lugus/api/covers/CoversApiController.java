@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lugus.dto.films.FilmDto;
 import lugus.dto.filters.CoversFilter;
 import lugus.mapper.films.FilmMapper;
-import lugus.service.films.PeliculaService;
+import lugus.service.films.FilmService;
 
 @RestController
 @ResponseBody
@@ -19,7 +19,7 @@ import lugus.service.films.PeliculaService;
 @RequiredArgsConstructor
 public class CoversApiController {
 
-	private final PeliculaService service;
+	private final FilmService service;
 
 	private final FilmMapper mapper;
 

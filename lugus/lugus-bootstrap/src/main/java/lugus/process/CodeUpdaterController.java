@@ -14,17 +14,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lugus.model.films.Edition;
 import lugus.model.films.Film;
 import lugus.service.films.EdicionService;
-import lugus.service.films.PeliculaService;
+import lugus.service.films.FilmService;
 
 @RestController
 @RequestMapping("/api/code")
 public class CodeUpdaterController {
 
-	private final PeliculaService peliculaService;
+	private final FilmService peliculaService;
 	private final EdicionService edicionService;
 
 	@Autowired
-	public CodeUpdaterController(PeliculaService peliculaService, EdicionService edicionService) {
+	public CodeUpdaterController(FilmService peliculaService, EdicionService edicionService) {
 		this.peliculaService = peliculaService;
 		this.edicionService = edicionService;
 	}

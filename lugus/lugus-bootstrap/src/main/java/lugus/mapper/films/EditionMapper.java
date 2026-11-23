@@ -6,7 +6,10 @@ import lugus.dto.films.EditionDto;
 import lugus.dto.films.PackDto;
 import lugus.model.films.Edition;
 
-public class EdicionMapper {
+public class EditionMapper {
+
+	private EditionMapper(){// util class
+	}
 
 	public static EditionDto toDto(Edition edicion) {
 		EditionDto dto = new EditionDto();

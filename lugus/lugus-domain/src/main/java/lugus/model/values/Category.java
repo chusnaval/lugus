@@ -8,13 +8,13 @@ public enum Category {
 	ACCION(4, "ROJO"), MISTERIO(5, "MORADO"), TERROR(6, "NEGRO"), CONFLICTO(7, "NARANJA"), DOCUMENTAL(8, "VERDE");
 
 	@Getter
-	private int codigo;
+	private int code;
 
 	@Getter
 	private String color;
 
 	private Category(int codigo, String color) {
-		this.codigo = codigo;
+		this.code = codigo;
 		this.color = color;
 	}
 }

@@ -9,36 +9,36 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import lugus.model.series.Serie;
+import lugus.model.series.Series;
 
 
 public interface SerieRepository {
 
-	List<Serie> findAll();
+	List<Series> findAll();
 
-	Optional<Serie> findById(Integer id);
+	Optional<Series> findById(final Integer id);
 
-	Serie save(Serie serie);
+	Series save(Series serie);
 
 	void deleteById(Integer id);
 
 	long count();
 
-	Page<Serie> findAll(Specification<Serie> spec, Pageable pageable);
+	Page<Series> findAll(Specification<Series> spec, Pageable pageable);
 
-	Collection<? extends Serie> findByTituloAndAnyoInicio(String title, Integer year);
+	Collection<? extends Series> findByTitleAndStartYear(final String title, final Integer year);
 
-	Collection<? extends Serie> findByTituloGestAndAnyoInicio(String title, Integer year);
+	Collection<? extends Series> findByMgmtTitleAndStartYear(final String title, final Integer year);
 
-	List<Serie> findAllByOrderByTituloGestAscAnyoInicioAsc();
+	List<Series> findAllByOrderByMgmtTitleAscStartYearAsc();
 
-	int countByTsAltaAfter(Instant limit);
+	int countByTsCreationAfter(final Instant limit);
 
-	int countByPurchased(boolean value);
+	int countByPurchased(final boolean value);
 
-	Optional<Serie> findByImdbId(String imdbId);
+	Optional<Series> findByImdbId(final String imdbId);
 
-	Iterable<Serie> searchByTituloContainingIgnoreCase(String query);
+	Iterable<Series> searchByTitleContainingIgnoreCase(final String query);
 
 	void flush();
 }

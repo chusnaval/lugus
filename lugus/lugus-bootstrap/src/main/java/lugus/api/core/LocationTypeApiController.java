@@ -2,7 +2,6 @@ package lugus.api.core;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,23 +31,23 @@ public class LocationTypeApiController {
 	@GetMapping
 	List<LocationTypeDTO> all() {
 		List<LocationType> locations = service.findAll();
-		return locations.stream().map(mapper::mapToDTO).collect(Collectors.toList());
+		return locations.stream().map(mapper::mapToDTO).toList();
 	}
 	
 	@GetMapping("/{id}")
-	LocationTypeDTO one(@PathVariable int id) throws LugusNotFoundException {
+	LocationTypeDTO one(@PathVariable final int id) throws LugusNotFoundException {
 		LocationType loc = service.findById(id).orElseThrow(() -> new LugusNotFoundException(id));
 		return mapper.mapToDTO(loc);
 	}
 	
 	@PostMapping
-	LocationTypeDTO newLocation(@RequestBody LocationTypeDTO dto) {
+	LocationTypeDTO newLocation(@RequestBody final LocationTypeDTO dto) {
 		LocationType location = service.save(mapper.mapToEntity(dto));
 		return mapper.mapToDTO(location);
 	}
 	
 	@PutMapping("/{id}")
-	LocationTypeDTO replace(@RequestBody LocationTypeDTO newSource, @PathVariable Integer id) {
+	LocationTypeDTO replace(@RequestBody final LocationTypeDTO newSource, @PathVariable final Integer id) {
 		Optional<LocationType> lt = service.findById(id);
 		if (lt.isPresent()) {
 			LocationType obj = lt.get();
@@ -62,7 +61,7 @@ public class LocationTypeApiController {
 	}
 	
 	@DeleteMapping("/{id}")
-	void delete(@PathVariable Integer id) {
+	void delete(@PathVariable final Integer id) {
 		service.deleteById(id);
 	}
 

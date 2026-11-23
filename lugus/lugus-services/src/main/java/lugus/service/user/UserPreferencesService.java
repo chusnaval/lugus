@@ -1,20 +1,18 @@
 package lugus.service.user;
 
 
-import java.util.ArrayList;
-
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.user.UserPreferencesDTO;
 import lugus.model.user.User;
-import lugus.repository.user.UsuarioRepository;
+import lugus.repository.user.UserRepository;
 
 @Service
 @RequiredArgsConstructor
 public class UserPreferencesService {
 
-	private final UsuarioRepository usuarioRepository;
+	private final UserRepository usuarioRepository;
 
 	private final GenreMapper genreMapper;
 	private static final int MAX_FAVORITOS = 4;

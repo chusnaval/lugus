@@ -10,6 +10,9 @@ import lugus.model.films.FilmImage;
 
 public class CoversSpecs {
 
+	private CoversSpecs(){// util class
+	}
+	
 	public static Specification<Film> withFilters(CoversFilter f) {
 		return Specification.where(titleContains(f.title())).and(missingCover(f.missing()))
 				.and(sourceEquals(f.source()));

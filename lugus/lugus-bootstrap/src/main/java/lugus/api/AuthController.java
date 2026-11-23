@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lugus.config.LoginRequest;
-import lugus.service.user.UsuarioService;
+import lugus.service.user.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -31,16 +31,16 @@ public class AuthController {
 	
     private final AuthenticationManager authenticationManager;
     
-    private final UsuarioService userService;
+    private final UserService userService;
     
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, UsuarioService userService) {
+    public AuthController(final AuthenticationManager authenticationManager, final UserService userService) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> login(@RequestBody final LoginRequest request, final HttpServletRequest httpRequest) {
 
         try {
             UsernamePasswordAuthenticationToken authReq =
@@ -52,7 +52,7 @@ public class AuthController {
             context.setAuthentication(auth);
             SecurityContextHolder.setContext(context);
 
-            // Crear sesión y cookie JSESSIONID
+            // create session and cookie JSESSIONID
             httpRequest.getSession(true) .setAttribute("SPRING_SECURITY_CONTEXT", context);
 
             return ResponseEntity.ok(Map.of("status", "ok"));
@@ -64,12 +64,12 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> me(Authentication auth) {
+    public ResponseEntity<?> me(final Authentication auth) {
         if (auth == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // Extraer roles del Authentication
+        // get roles of Authentication
         List<String> roles = auth.getAuthorities()
                 .stream()
                 .map(a -> a.getAuthority()) // ROLE_ADMIN, ROLE_USER, etc.
@@ -84,13 +84,13 @@ public class AuthController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDTO dto, Authentication auth) {
+    public ResponseEntity<?> changePassword(@RequestBody final ChangePasswordDTO dto, final Authentication auth) {
         userService.changePassword(auth.getName(), dto.currentPassword(), dto.newPassword());
         return ResponseEntity.ok().build();
     }
   
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> logout(final HttpServletRequest request, final HttpServletResponse response) {
         request.getSession().invalidate();
 
         // borrar cookie

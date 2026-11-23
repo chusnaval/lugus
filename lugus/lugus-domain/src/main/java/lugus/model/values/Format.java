@@ -34,7 +34,7 @@ public enum Format{
 			}
 		}
 
-		throw new IllegalArgumentException("No existe el formato");
+		throw new IllegalArgumentException("Not recognized format");
 	}
 	
 	/**
@@ -50,10 +50,10 @@ public enum Format{
 			}
 		}
 
-		throw new IllegalArgumentException("No existe el formato");
+		throw new IllegalArgumentException("Not recognized format");
 	}
 
-	public static List<Format> valoresOrdenados() {
+	public static List<Format> orderedValues() {
 		List<Format> lista = new ArrayList<>();
 		lista.add(DVD);
 		lista.add(BLURAY);
@@ -68,7 +68,7 @@ public enum Format{
 	 * 
 	 * @return
 	 */
-	public int getIdParaUbicaciones() {
+	public int getIdToLocations() {
 		if(this.id == 0) {
 			return 2;
 		}else if (this.id == 1) {

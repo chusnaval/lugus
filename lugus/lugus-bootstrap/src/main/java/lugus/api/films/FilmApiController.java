@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lugus.dto.core.CountryCode;
-import lugus.dto.core.FiltrosDto;
+import lugus.dto.core.FilterDto;
 import lugus.dto.films.FilmCategoryDto;
 import lugus.dto.films.FilmDto;
 import lugus.dto.films.FilmGenreDto;
@@ -51,11 +51,11 @@ import lugus.model.values.Genre;
 import lugus.model.values.TitleType;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
-import lugus.service.films.DwFotoService;
-import lugus.service.films.DwFotoServiceI;
+import lugus.service.films.DwImageService;
+import lugus.service.films.DwImageServiceI;
 import lugus.service.films.EdicionService;
-import lugus.service.films.PeliculaService;
-import lugus.service.films.PeliculasUsuarioService;
+import lugus.service.films.FilmService;
+import lugus.service.films.FilmUserService;
 import lugus.service.groups.GroupsService;
 import lugus.service.imdb.OmdbCacheService;
 import lugus.service.people.InsertPersonalDataService;
@@ -66,7 +66,7 @@ import lugus.service.titles.TitlesService;
 public class FilmApiController {
 
 	private static final String ATTACHMENT_FILENAME = "attachment; filename=";
-	private final PeliculaService service;
+	private final FilmService service;
 	private final EdicionService edicionService;
 	private final FilmMapper mapper;
 	private final GroupsService groupsService;
@@ -75,18 +75,18 @@ public class FilmApiController {
 	private final InsertPersonalDataService insertImdbService;
 	private final FilmExportService filmExportService;
 	private final TitlesService titlesService;
-	private final PeliculasUsuarioService usuarioPeliculaService;
+	private final FilmUserService usuarioPeliculaService;
 	private final String apiKey;
 	private final OmdbCacheService cacheService;
 	private final ObjectMapper jsonMapper;
 	private static final String FILE_NAME = "peliculas";
 
 	@Autowired
-	public FilmApiController(@Value("${omdb.api.key}") String apiKey, PeliculaService service,
+	public FilmApiController(@Value("${omdb.api.key}") String apiKey, FilmService service,
 			EdicionService edicionService, FilmMapper mapper, GroupsService groupsService, LocationService locService,
 			SourceService sourceService, InsertPersonalDataService insertImdbService,
 			FilmExportService filmExportService, TitlesService titlesService,
-			PeliculasUsuarioService usuarioPeliculaService, OmdbCacheService cacheService, ObjectMapper jsonMapper) {
+			FilmUserService usuarioPeliculaService, OmdbCacheService cacheService, ObjectMapper jsonMapper) {
 		super();
 		this.service = service;
 		this.edicionService = edicionService;
@@ -149,7 +149,7 @@ public class FilmApiController {
 			@RequestParam(required = false) Integer toYear, @RequestParam(required = false) String format,
 			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
 			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection) {
-		FiltrosDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+		FilterDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
 				sortDirection);
 		return service.findAllBy(filtro).map(mapper::mapToFilmDTO);
 	}
@@ -186,7 +186,7 @@ public class FilmApiController {
 
 		Film saved = service.save(film);
 		if (dto.getCoverSrc() != null && !dto.getCoverSrc().isEmpty()) {
-			final DwFotoServiceI dwFotoService = new DwFotoService();
+			final DwImageServiceI dwFotoService = new DwImageService();
 			final int sourceId = sourceService.calcularIdSource(dto.getCoverSrc());
 			Optional<Source> sourceObj = sourceService.findById(sourceId);
 			FilmImage pf = new FilmImage();
@@ -194,7 +194,7 @@ public class FilmApiController {
 			if (sourceObj.isPresent()) {
 				pf.setSource(sourceObj.get());
 			}
-			pf.setContent(dwFotoService.descargar(sourceId, dto.getCoverSrc()));
+			pf.setContent(dwFotoService.download(sourceId, dto.getCoverSrc()));
 			pf.setCover(true);
 
 			saved.addImage(pf);
@@ -208,7 +208,7 @@ public class FilmApiController {
 				title.setTitle(saved.getTitle());
 				title.setYear(saved.getYear());
 				title.setType(TitleType.MOVIE);
-				title.setPosterUrl(dto.getCoverSrc());
+				title.setUrlCover(dto.getCoverSrc());
 				title.setFilm(saved);
 				titlesService.save(title);
 			});
@@ -226,10 +226,9 @@ public class FilmApiController {
 			JsonNode node = jsonMapper.valueToTree(cached.getJson());
 			String country = node.get(OmdbConstants.COUNTRY_PLOT).asText();
 
-			// puede tener valor o no
-			// o tener uno o varios países separados por coma
+			// optional, if there's info, it's one or many sepparated by commas
 			List<String> values = getCountries(country);
-			// los guardamosen un campo separados por coma
+			// we save names sepparated by commas in only one field
 			saved.setCountry(String.join(",", values));
 			saved.setSynopsis(node.get(OmdbConstants.FIELD_PLOT).asText());
 
@@ -238,7 +237,7 @@ public class FilmApiController {
 			String posterUrl = node.get(OmdbConstants.POSTER).asText();
 			if (dto.getCoverSrc().isEmpty() || dto.getCoverSrc() == null) {
 				dto.setCoverSrc(posterUrl);
-				final DwFotoServiceI dwFotoService = new DwFotoService();
+				final DwImageServiceI dwFotoService = new DwImageService();
 				final int sourceId = sourceService.calcularIdSource(dto.getCoverSrc());
 				Optional<Source> sourceObj = sourceService.findById(sourceId);
 				FilmImage pf = new FilmImage();
@@ -246,7 +245,7 @@ public class FilmApiController {
 				if (sourceObj.isPresent()) {
 					pf.setSource(sourceObj.get());
 				}
-				pf.setContent(dwFotoService.descargar(sourceId, dto.getCoverSrc()));
+				pf.setContent(dwFotoService.download(sourceId, dto.getCoverSrc()));
 				pf.setCover(true);
 
 				saved.addImage(pf);
@@ -262,11 +261,11 @@ public class FilmApiController {
 
 	private void getDurationAndUpdate(Film saved, JsonNode node) {
 		try {
-			Integer duration = node.get(OmdbConstants.DURATION).asInt();
-			saved.setDuration(duration);
+			Integer length = node.get(OmdbConstants.RUNTIME).asInt();
+			saved.setDuration(length);
 			service.save(saved);
 		}catch(Exception e) {
-			// no pasa nada, no tiene duración
+			// we don't stop process if there's a problem with length
 		}
 	}
 
@@ -360,7 +359,7 @@ public class FilmApiController {
 	}
 
 	private int getNumberFromMap(Map<Object, Integer> generos, Genre genero) {
-		return generos.get(genero.getCodigo()) != null ? generos.get(genero.getCodigo()) : 0;
+		return generos.get(genero.getCode()) != null ? generos.get(genero.getCode()) : 0;
 	}
 
 	private int getNumberFromMap(Map<Object, Integer> categorias, Category categoria) {
@@ -380,10 +379,10 @@ public class FilmApiController {
 		stats.setDocumentalCategory(getNumberFromMap(categorias, Category.DOCUMENTAL));
 	}
 
-	private FiltrosDto crearFiltro(Integer page, Integer size, Boolean owned, String title, String casting,
+	private FilterDto crearFiltro(Integer page, Integer size, Boolean owned, String title, String casting,
 			Integer fromYear, Integer toYear, String format, String genre, Boolean pack, String sort,
 			String sortDirection) {
-		FiltrosDto filtro = new FiltrosDto();
+		FilterDto filtro = new FilterDto();
 		if (page != null) {
 			filtro.setPagina(Optional.of(page));
 		}
@@ -437,7 +436,7 @@ public class FilmApiController {
 			@RequestParam(required = false) Integer toYear, @RequestParam(required = false) String format,
 			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
 			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection) {
-		FiltrosDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+		FilterDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
 				sortDirection);
 		String file = filmExportService.toMarkdown(service.findAllBy(filtro).getContent());
 
@@ -453,7 +452,7 @@ public class FilmApiController {
 			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
 			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection)
 			throws IOException {
-		FiltrosDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+		FilterDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
 				sortDirection);
 		byte[] file = filmExportService.toPdf(service.findAllBy(filtro).getContent());
 
@@ -469,7 +468,7 @@ public class FilmApiController {
 			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
 			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection)
 			throws IOException {
-		FiltrosDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+		FilterDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
 				sortDirection);
 		byte[] file = filmExportService.toOds(service.findAllBy(filtro).getContent());
 

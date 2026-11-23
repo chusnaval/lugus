@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lugus.dto.core.CountryCode;
 import lugus.model.films.Film;
-import lugus.service.films.PeliculaService;
+import lugus.service.films.FilmService;
 import lugus.service.imdb.OmdbCacheService;
 
 @RestController
@@ -32,16 +32,17 @@ public class OmdbController {
 
 	private final OmdbCacheService cacheService;
 
-	private final PeliculaService peliculaService;
+	private final FilmService filmService;
 
 	private final ObjectMapper mapper;
 
-	public OmdbController(@Value("${omdb.api.key}") String apiKey, OmdbCacheService cacheService, ObjectMapper mapper,
-			PeliculaService peliculaService) {
+	public OmdbController(@Value("${omdb.api.key}") final String apiKey, final OmdbCacheService cacheService,
+			final ObjectMapper mapper,
+			FilmService filmService) {
 		this.apiKey = apiKey;
 		this.cacheService = cacheService;
 		this.mapper = mapper;
-		this.peliculaService = peliculaService;
+		this.filmService = filmService;
 	}
 
 	@GetMapping("/{imdbId}")
@@ -56,10 +57,10 @@ public class OmdbController {
 		}
 
 		Map<String, Object> json = recoverOmdbAndGetJson(imdbId);
-		
-		Optional<Film> peliculaOpt = peliculaService.findByImdbId(imdbId);
-		if(peliculaOpt.isPresent() && imdbId.equals(peliculaOpt.get().getImdbId())) {
-				updateWithOmdb(peliculaOpt.get());
+
+		Optional<Film> peliculaOpt = filmService.findByImdbId(imdbId);
+		if (peliculaOpt.isPresent() && imdbId.equals(peliculaOpt.get().getImdbId())) {
+			updateWithOmdb(peliculaOpt.get());
 		}
 
 		return ResponseEntity.ok(json);
@@ -78,10 +79,9 @@ public class OmdbController {
 		JsonNode node = mapper.valueToTree(cached.getJson());
 		boolean hasChanged = false;
 
-		if(p.getCountry()==null || p.getCountry().isBlank()){
+		if (p.getCountry() == null || p.getCountry().isBlank()) {
 			String country = node.get("Country").asText();
-			// puede tener valor o no
-			// o tener uno o varios países separados por coma
+			// optional, if there's info, it's one or many sepparated by commas
 			List<String> values = new ArrayList<>();
 			if (country != null) {
 				String[] countries = country.split(",");
@@ -89,30 +89,30 @@ public class OmdbController {
 					values.add(CountryCode.fromString(countries[i]).getCode());
 				}
 			}
-	
-			// los guardamosen un campo separados por coma
+
+			// we save name sepparated by commmas in only one field
 			p.setCountry(String.join(",", values));
 			hasChanged = true;
 		}
 
-		if(p.getSynopsis() == null || p.getSynopsis().isBlank()){
+		if (p.getSynopsis() == null || p.getSynopsis().isBlank()) {
 			p.setSynopsis(node.get("Plot").asText());
 			hasChanged = true;
 		}
 
-		if(p.getDuration()==0){
+		if (p.getDuration() == 0) {
 			// we have nn min. format, and we uso only int
 			String runtime = node.get("Runtime").asText();
-	
+
 			Matcher m = Pattern.compile("(\\d+)").matcher(runtime);
 			int minutes = m.find() ? Integer.parseInt(m.group(1)) : 0;
-	
+
 			p.setDuration(minutes);
 			hasChanged = true;
 		}
 
-		if(hasChanged){
-			peliculaService.save(p);
+		if (hasChanged) {
+			filmService.save(p);
 		}
 	}
 

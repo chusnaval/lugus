@@ -17,6 +17,6 @@ public interface ActorRepository {
 
 	void deleteById(final Integer id);
 
-	List<Actor> findByFilmIdOrderByOrderAsc(int id);
+	List<Actor> findByFilmIdOrderByOrderAsc(final int id);
 
 }

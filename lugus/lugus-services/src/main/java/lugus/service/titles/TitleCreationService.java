@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lugus.dto.groups.SearchTitleResultDto;
 import lugus.model.films.Film;
-import lugus.model.series.Serie;
+import lugus.model.series.Series;
 import lugus.model.titles.Title;
 import lugus.model.values.TitleType;
-import lugus.repository.films.PeliculaRepository;
+import lugus.repository.films.FilmRepository;
 import lugus.repository.imdb.ImdbTitleBasicsRepository;
 import lugus.repository.series.SerieRepository;
 import lugus.repository.titles.TitleRepository;
@@ -20,13 +20,13 @@ import lugus.repository.titles.TitleRepository;
 public class TitleCreationService {
 
     private final TitleRepository titleRepo;
-    private final PeliculaRepository peliculaRepo;
+    private final FilmRepository peliculaRepo;
     private final SerieRepository serieRepo;
     private final ImdbTitleBasicsRepository imdbRepo;
 
     public Title getOrCreateTitle(SearchTitleResultDto dto) {
 
-        // 1) Si ya existe en Titles
+        // 1) Already exists in titles
         if (dto.getTitleId() != null) {
             return titleRepo.findById(dto.getTitleId())
                     .orElseThrow(() -> new RuntimeException("Title not found"));
@@ -41,7 +41,7 @@ public class TitleCreationService {
             t.setFilm(p);
             t.setTitle(p.getTitle());
             t.setYear(p.getYear());
-            t.setPosterUrl(p.getCoverUrl());
+            t.setUrlCover(p.getCoverUrl());
             if(p.getImdbId() != null) {
             	t.setImdb(imdbRepo.findById(p.getImdbId()).orElse(null));
             }else if(dto.getImdbId() != null) {
@@ -52,21 +52,21 @@ public class TitleCreationService {
             return titleRepo.save(t);
         }
 
-        // 3) Si es serie de colección
+        // 3) its a series in the collection
         if (dto.getSource().equals("SERIES")) {
-            Serie s = serieRepo.findByImdbId(dto.getImdbId())
+            Series s = serieRepo.findByImdbId(dto.getImdbId())
                     .orElseThrow();
             Title t = new Title();
             t.setType(TitleType.SERIES);
-            t.setSerie(s);
-            t.setTitle(s.getTitulo());
-            t.setYear(s.getAnyoInicio());
-            t.setPosterUrl(s.getCoverUrl());
+            t.setSeries(s);
+            t.setTitle(s.getTitle());
+            t.setYear(s.getStartYear());
+            t.setUrlCover(s.getCoverUrl());
             t.setImdb(imdbRepo.findById(dto.getImdbId()).orElse(null));
             return titleRepo.save(t);
         }
 
-        // 4) Si es IMDB externo
+        // 4) External to collection IMDB code
         if (dto.getSource().equals("IMDB")) {
             var imdb = imdbRepo.findById(dto.getImdbId())
                     .orElseThrow();
@@ -76,7 +76,7 @@ public class TitleCreationService {
             t.setImdb(imdb);
             t.setTitle(imdb.getPrimarytitle());
             t.setYear(Integer.valueOf(imdb.getStartyear()));
-            t.setPosterUrl("./covers/placeholder.png"); 
+            t.setUrlCover("./covers/placeholder.png"); 
             return titleRepo.save(t);
         }
 

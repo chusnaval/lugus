@@ -18,7 +18,7 @@ public class FormatApiController {
 
 	@GetMapping
 	List<FormatDTO> all() {
-		List<Format> formats = Format.valoresOrdenados();
+		List<Format> formats = Format.orderedValues();
 		return formats.stream().map(d -> convert(d)).toList();
 	}
 

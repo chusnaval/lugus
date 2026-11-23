@@ -1,4 +1,5 @@
-package lugus.model.people;
+package lugus.model.series;
+
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -17,39 +18,37 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lugus.model.series.Serie;
+import lugus.model.core.Source;
 
 @Entity
-@Table(name = "series_personal")
+@Table(name = "series_fotos")
 @Data
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class SeriesPersonal {
+public class SeriesImage {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "serie_id", nullable = true) // FK → movie.id
-	private Serie serie;
-
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "persona_id", nullable = true) // FK → people.id
-	private People persona;
 	
-	@Column
-	private String notas;
-
-	@Column
-	private String personaje;
-
-	@Column
-	private Integer orden;
-
-	@Column
-	private String trabajo;
+	@Column(nullable = false)
+	private String url;
+	
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "serie_id", nullable = true) // FK → serie.id
+	private Series series;
+	
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "fuente_id", nullable = true) // FK → source.id
+	private Source source;
+	
+    @Column(name="foto")
+	private byte[] content;
+    
+    @Column(name="caratula")
+    private boolean cover;
+	
 }

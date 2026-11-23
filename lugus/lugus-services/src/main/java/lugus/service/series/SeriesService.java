@@ -18,39 +18,39 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import lugus.dto.core.FiltrosDto;
+import lugus.dto.core.FilterDto;
 import lugus.dto.films.SerieDto;
 import lugus.dto.series.SeasonDto;
-import lugus.infrastructure.repository.series.SerieSpecification;
+import lugus.infrastructure.repository.series.SeriesSpecification;
 import lugus.model.core.Location;
 import lugus.model.core.Source;
 import lugus.model.series.Season;
-import lugus.model.series.Serie;
-import lugus.model.series.SerieFoto;
+import lugus.model.series.Series;
+import lugus.model.series.SeriesImage;
 import lugus.model.values.Format;
 import lugus.model.values.Genre;
 import lugus.model.values.LangVersion;
 import lugus.repository.series.SerieRepository;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
-import lugus.service.films.DwFotoService;
-import lugus.service.films.DwFotoServiceI;
+import lugus.service.films.DwImageService;
+import lugus.service.films.DwImageServiceI;
 
 @Service
 @RequiredArgsConstructor
 public class SeriesService {
 
 	private static final int NUM_ELEMENTS_PER_HOME = 5;
-	private final SerieRepository serieRepo;
+	private final SerieRepository seriesRepo;
 	private final LocationService locService;
 	private final SourceService sourceService;
 
-	public List<Serie> findAll() {
-		return serieRepo.findAll();
+	public List<Series> findAll() {
+		return seriesRepo.findAll();
 	}
 
-	public Optional<Serie> findById(Integer id) {
-		return serieRepo.findById(id);
+	public Optional<Series> findById(Integer id) {
+		return seriesRepo.findById(id);
 	}
 
 	/**
@@ -59,8 +59,8 @@ public class SeriesService {
 	 * @param films
 	 * @return
 	 */
-	public Serie save(Serie film) {
-		return serieRepo.save(film);
+	public Series save(Series film) {
+		return seriesRepo.save(film);
 
 	}
 
@@ -73,22 +73,22 @@ public class SeriesService {
 	 * @param direction
 	 * @return
 	 */
-	public Page<Serie> findAllBy(FiltrosDto filter) {
+	public Page<Series> findAllBy(FilterDto filter) {
 		Sort sort = buildSort(filter.getOrden(), filter.getDireccion());
 
 		Pageable pageable = PageRequest.of(filter.getPagina().get(), filter.getPageSize(), sort);
 
-		Specification<Serie> spec = Specification.where(null);
+		Specification<Series> spec = Specification.where(null);
 
-		spec = spec.and(SerieSpecification.byPurchased(filter.getComprado()));
-		spec = spec.and(SerieSpecification.porFormato(filter.getFormato()));
-		spec = spec.and(SerieSpecification.porGenero(filter.getGenero()));
-		spec = spec.and(SerieSpecification.byLocation(filter.getLocation()));
-		spec = spec.and(SerieSpecification.porNotas(filter.getNotas()));
-		spec = spec.and(SerieSpecification.porTitulo(filter.getTitulo()));
-		spec = spec.and(SerieSpecification.porCompleta(filter.getCompleta()));
+		spec = spec.and(SeriesSpecification.byPurchased(filter.getComprado()));
+		spec = spec.and(SeriesSpecification.byFormat(filter.getFormato()));
+		spec = spec.and(SeriesSpecification.byGenre(filter.getGenero()));
+		spec = spec.and(SeriesSpecification.byLocation(filter.getLocation()));
+		spec = spec.and(SeriesSpecification.byNotes(filter.getNotas()));
+		spec = spec.and(SeriesSpecification.byTitle(filter.getTitulo()));
+		spec = spec.and(SeriesSpecification.byComplete(filter.getCompleta()));
 
-		return serieRepo.findAll(spec, pageable);
+		return seriesRepo.findAll(spec, pageable);
 	}
 
 	/**
@@ -100,17 +100,17 @@ public class SeriesService {
 	 * @param direction
 	 * @return
 	 */
-	public Page<Serie> wanted() {
-		Sort sort = Sort.by(Direction.fromString("ASC"), "tituloGest");
+	public Page<Series> wanted() {
+		Sort sort = Sort.by(Direction.fromString("ASC"), "mgmtTitle");
 
 		Pageable pageable = PageRequest.of(0, 1000, sort);
 
-		Specification<Serie> spec = Specification.where(null);
+		Specification<Series> spec = Specification.where(null);
 
-		spec = spec.or(SerieSpecification.byPurchased(false));
-		spec = spec.or(SerieSpecification.porCompleta(false));
+		spec = spec.or(SeriesSpecification.byPurchased(false));
+		spec = spec.or(SeriesSpecification.byComplete(false));
 
-		return serieRepo.findAll(spec, pageable);
+		return seriesRepo.findAll(spec, pageable);
 	}
 
 	private Sort buildSort(Optional<String> field, Optional<String> direction) {
@@ -118,53 +118,53 @@ public class SeriesService {
 		if (field.isPresent() && "compra".equals(field.get())) {
 			if (direction.isPresent() && "ASC".equalsIgnoreCase(direction.get())) {
 				sort = Sort.by(Sort.Order.desc("tsModif").with(Sort.DEFAULT_DIRECTION),
-						Sort.Order.desc("tsAlta"));
+						Sort.Order.desc("tsCreation"));
 			} else {
 
-				sort = Sort.by(Sort.Order.asc("tsModif").with(Sort.DEFAULT_DIRECTION), Sort.Order.asc("tsAlta"));
+				sort = Sort.by(Sort.Order.asc("tsModif").with(Sort.DEFAULT_DIRECTION), Sort.Order.asc("tsCreation"));
 			}
 		} else {
-			sort = Sort.by(Direction.fromString(direction.orElse("ASC")), field.orElse("tituloGest"));
+			sort = Sort.by(Direction.fromString(direction.orElse("ASC")), field.orElse("mgmtTitle"));
 		}
 		return sort;
 	}
 
 	@Transactional
-	public Serie update(Integer id, SerieDto dto) throws IOException, URISyntaxException {
+	public Series update(Integer id, SerieDto dto) throws IOException, URISyntaxException {
 
-		Serie p = serieRepo.findById(id).orElseThrow(() -> new RuntimeException("Pelicula no encontrada"));
+		Series p = seriesRepo.findById(id).orElseThrow(() -> new RuntimeException("Pelicula no encontrada"));
 		Optional<Location> loc = locService.findById(dto.getLocation());
 
-		p.setTitulo(dto.getTitle());
-		p.setTituloGest(dto.getTitleMgmt());
-		p.setAnyoInicio(dto.getStartYear());
-		p.setAnyoFin(dto.getFinishYear());
+		p.setTitle(dto.getTitle());
+		p.setMgmtTitle(dto.getTitleMgmt());
+		p.setStartYear(dto.getStartYear());
+		p.setEndYear(dto.getFinishYear());
 		p.setTsModif(Instant.now());
 		if (dto.getFormat() != null) {
-			p.setFormato(Format.getById(Short.valueOf(dto.getFormat())));
+			p.setFormat(Format.getById(Short.valueOf(dto.getFormat())));
 		}
-		p.setGenero(Genre.getById(dto.getGenreCode()));
+		p.setGenre(Genre.getById(dto.getGenreCode()));
 		if (loc.isPresent()) {
 			p.setLocation(loc.get());
 		}
-		p.setCodigo(dto.getMgmtCode());
+		p.setCode(dto.getMgmtCode());
 		p.setPurchased(dto.isOwned());
-		p.setNotas(dto.getNotes());
+		p.setNotes(dto.getNotes());
 		addCaratula(p, dto.getCoverSrc());
 		updateSeasons(p, dto.getSeasons());
-		serieRepo.save(p);
+		seriesRepo.save(p);
 
 		return p;
 	}
 	
-	private void updateSeasons(Serie serie, List<SeasonDto> seasonDtos) {
+	private void updateSeasons(Series serie, List<SeasonDto> seasonDtos) {
 
-	    // 1) Borrar temporadas actuales (gracias a orphanRemoval)
+	    // 1) clear actual seasons (orphanRemoval)
 	    serie.getSeasons().clear();
 	    
-	    serieRepo.flush();
+	    seriesRepo.flush();
 
-	    // 2) Añadir las nuevas
+	    // 2) add new seasons
 	    for (SeasonDto dto : seasonDtos) {
 	        Season s = new Season();
 	        s.setOrder(dto.getOrdinal());
@@ -173,72 +173,72 @@ public class SeriesService {
 	        s.setWanted(dto.isWanted());
 	        s.setPublishedVersion(LangVersion.VE);
 	        s.setPurchasedVersion(LangVersion.VE);
-	        s.setSerie(serie);
+	        s.setSeries(serie);
 
 	        serie.getSeasons().add(s);
 	    }
 	}
 
 
-	public void addCaratula(Serie serie, String url) throws IOException, URISyntaxException {
+	public void addCaratula(Series serie, String url) throws IOException, URISyntaxException {
 
-		final DwFotoServiceI dwFotoService = new DwFotoService();
+		final DwImageServiceI dwFotoService = new DwImageService();
 		Optional<Source> sourceObj = sourceService.findById(sourceService.calcularIdSource(url));
 		if (sourceObj.isPresent() && url!=null) {
-			SerieFoto pf = new SerieFoto();
+			SeriesImage pf = new SeriesImage();
 			pf.setUrl(url);
 			pf.setSource(sourceObj.get());
-			pf.setFoto(dwFotoService.descargar(sourceObj.get().getId(), url));
-			pf.setCaratula(true);
+			pf.setContent(dwFotoService.download(sourceObj.get().getId(), url));
+			pf.setCover(true);
 
-			serie.getSerieFotos().clear();
-			serie.addCaratula(pf);
+			serie.getImages().clear();
+			serie.addCover(pf);
 		}
 	}
 
-	public Page<Serie> findForHome() {
+	public Page<Series> findForHome() {
 		Sort sort = buildSort(Optional.of("compra"), Optional.of("ASC"));
 
 		Pageable pageable = PageRequest.of(0, NUM_ELEMENTS_PER_HOME, sort);
 
-		Specification<Serie> spec = Specification.where(null);
+		Specification<Series> spec = Specification.where(null);
 
-		spec = spec.and(SerieSpecification.byPurchased(true));
+		spec = spec.and(SeriesSpecification.byPurchased(true));
 
-		return serieRepo.findAll(spec, pageable);
+		return seriesRepo.findAll(spec, pageable);
 	}
 
-	public List<Serie> findByTitlesInYear(String title, Integer year) {
-		List<Serie> result = new ArrayList<>();
-		result.addAll(serieRepo.findByTituloAndAnyoInicio(title, year));
-		result.addAll(serieRepo.findByTituloGestAndAnyoInicio(title, year));
+	public List<Series> findByTitlesInYear(String title, Integer year) {
+		List<Series> result = new ArrayList<>();
+		result.addAll(seriesRepo.findByTitleAndStartYear(title, year));
+		result.addAll(seriesRepo.findByMgmtTitleAndStartYear(title, year));
 
 		return result;
 	}
 
-	public List<Serie> findAllOrdered() {
-		return serieRepo.findAllByOrderByTituloGestAscAnyoInicioAsc();
+	public List<Series> findAllOrdered() {
+		return seriesRepo.findAllByOrderByMgmtTitleAscStartYearAsc();
 	}
 
 	public long contarTodas() {
-		return serieRepo.count();
+		return seriesRepo.count();
 	}
 
 	public int addedInLastDays(int days) {
 		Instant limit = Instant.now().minus(days, ChronoUnit.DAYS);
-		return serieRepo.countByTsAltaAfter(limit);
+		return seriesRepo.countByTsCreationAfter(limit);
 	}
 
 	public int countByPurchased(boolean value) {
-		return serieRepo.countByPurchased(value);
+		return seriesRepo.countByPurchased(value);
 	}
 
 	public boolean isFilmRegistered(String tconst) {
 		return findByImdbId(tconst).isPresent();
 	}
 
-	public Optional<Serie> findByImdbId(String tconst) {
-		return serieRepo.findByImdbId(tconst);
+	public Optional<Series> findByImdbId(String tconst) {
+		return seriesRepo.findByImdbId(tconst);
 	}
 
 }

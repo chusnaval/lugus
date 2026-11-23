@@ -71,8 +71,8 @@ class SeriesWantedExportServiceTest {
 
 	private List<SerWanted> sample() {
 		return List.of(
-				SerWanted.builder().titulo("The Wire").anyoInicio(2002).seasonDesc("T1 - Piloto").build(),
-				SerWanted.builder().titulo("Lost").anyoInicio(2004).seasonDesc("T2").build());
+				SerWanted.builder().title("The Wire").startYear(2002).seasonDesc("T1 - Piloto").build(),
+				SerWanted.builder().title("Lost").startYear(2004).seasonDesc("T2").build());
 	}
 
 	private String extractZipEntry(byte[] zip, String entryName) throws IOException {

@@ -11,8 +11,8 @@ public interface LocationTypeRepository {
 
 	List<LocationType> findAll();
 
-	LocationType save(LocationType obj);
+	LocationType save(final LocationType obj);
 
-	void deleteById(int id);
+	void deleteById(final int id);
 
 }

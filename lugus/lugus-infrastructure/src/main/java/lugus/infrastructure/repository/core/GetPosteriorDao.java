@@ -11,12 +11,12 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import lugus.repository.core.GetPosteriorRepository;
+import lugus.repository.core.GetNextRepository;
 
 
 
 @Component
-public class GetPosteriorDao implements GetPosteriorRepository {
+public class GetPosteriorDao implements GetNextRepository {
 
 	private SimpleJdbcCall call;
 
@@ -30,7 +30,7 @@ public class GetPosteriorDao implements GetPosteriorRepository {
 	}
 
 	@Override
-	public String getPosterior(String codigo) {
+	public String getNext(String codigo) {
 
 		MapSqlParameterSource params = new MapSqlParameterSource()
 				.addValue("code", codigo, Types.VARCHAR);

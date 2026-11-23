@@ -16,7 +16,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FiltrosDto implements Serializable{
+public class FilterDto implements Serializable{
 
 	/**
 	 * Serial version UID
@@ -113,8 +113,8 @@ public class FiltrosDto implements Serializable{
 		return map;
 	}
 
-	public static FiltrosDto reset(String field) {
-		FiltrosDto filtro = new FiltrosDto();
+	public static FilterDto reset(String field) {
+		FilterDto filtro = new FilterDto();
 		filtro.setOrden(Optional.of(field));
 		filtro.setPack(false);
 		return filtro;

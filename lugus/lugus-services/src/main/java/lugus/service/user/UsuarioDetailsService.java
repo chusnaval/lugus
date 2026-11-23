@@ -5,8 +5,8 @@ import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
 
-import lugus.repository.user.RolRepository;
-import lugus.repository.user.UsuarioRepository;
+import lugus.repository.user.RoleRepository;
+import lugus.repository.user.UserRepository;
 
 import java.util.List;
 
@@ -14,10 +14,10 @@ import java.util.List;
 @Service
 public class UsuarioDetailsService implements UserDetailsService {
 
-    private final UsuarioRepository usuarioRepo;
-    private final RolRepository rolRepo;
+    private final UserRepository usuarioRepo;
+    private final RoleRepository rolRepo;
 
-    public UsuarioDetailsService(UsuarioRepository usuarioRepo, RolRepository rolRepo) {
+    public UsuarioDetailsService(UserRepository usuarioRepo, RoleRepository rolRepo) {
         this.usuarioRepo = usuarioRepo;
         this.rolRepo = rolRepo;
     }

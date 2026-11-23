@@ -29,7 +29,7 @@ public class TitlesService {
 	   }
 	   
 	   public Optional<Title> findBySerie_Id(Integer id) {
-		   return titleRepo.findBySerie_Id(id);
+		   return titleRepo.findBySeries_Id(id);
 	   }
 	   
 	   public Optional<Title> findByImdb_Id(String id) {

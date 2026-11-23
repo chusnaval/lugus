@@ -1,5 +1,4 @@
-package lugus.model.series;
-
+package lugus.model.people;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -18,37 +17,39 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lugus.model.core.Source;
+import lugus.model.series.Series;
 
 @Entity
-@Table(name = "series_fotos")
+@Table(name = "series_personal")
 @Data
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class SerieFoto {
+public class SeriesStaff {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
-	@Column(nullable = false)
-	private String url;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "serie_id", nullable = true) // FK → serie.id
-	private Serie serie;
-	
+	@JoinColumn(name = "serie_id", nullable = true) // FK → movie.id
+	private Series series;
+
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "fuente_id", nullable = true) // FK → source.id
-	private Source source;
+	@JoinColumn(name = "persona_id", nullable = true) // FK → people.id
+	private People people;
 	
-    @Column
-	private byte[] foto;
-    
-    @Column
-    private boolean caratula;
-	
+	@Column(name="notas")
+	private String notes;
+
+	@Column(name="personaje")
+	private String character;
+
+	@Column(name="orden")
+	private Integer order;
+
+	@Column(name="trabajo")
+	private String job;
 }

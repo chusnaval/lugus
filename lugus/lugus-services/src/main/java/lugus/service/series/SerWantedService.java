@@ -19,8 +19,8 @@ public class SerWantedService {
                 """;
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> SerWanted.builder()
-                .titulo(rs.getString("titulo"))
-                .anyoInicio(rs.getInt("anyo_inicio"))
+                .title(rs.getString("titulo"))
+                .startYear(rs.getInt("anyo_inicio"))
                 .seasonDesc(rs.getString("season_desc"))
                 .build());
     }

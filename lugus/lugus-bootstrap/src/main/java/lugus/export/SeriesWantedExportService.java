@@ -26,9 +26,9 @@ public class SeriesWantedExportService {
 
 		for (SerWanted item : list) {
 			md.append("| ")
-					.append(escapeMd(item.getTitulo()))
+					.append(escapeMd(item.getTitle()))
 					.append(" | ")
-					.append(item.getAnyoInicio())
+					.append(item.getStartYear())
 					.append(" | ")
 					.append(escapeMd(item.getSeasonDesc()))
 					.append(" |\n");
@@ -104,9 +104,9 @@ public class SeriesWantedExportService {
 					content.beginText();
 					content.setFont(PDType1Font.HELVETICA, 10);
 					content.newLineAtOffset(margin, y);
-					content.showText(trimForPdf(item.getTitulo(), 42));
+					content.showText(trimForPdf(item.getTitle(), 42));
 					content.newLineAtOffset(260, 0);
-					content.showText(String.valueOf(item.getAnyoInicio()));
+					content.showText(String.valueOf(item.getStartYear()));
 					content.newLineAtOffset(70, 0);
 					content.showText(trimForPdf(item.getSeasonDesc(), 34));
 					content.endText();
@@ -143,8 +143,8 @@ public class SeriesWantedExportService {
 		appendOdsRow(rows, "Título", "Año inicio", "Temporada");
 		for (SerWanted item : list) {
 			appendOdsRow(rows,
-					nullSafe(item.getTitulo()),
-					String.valueOf(item.getAnyoInicio()),
+					nullSafe(item.getTitle()),
+					String.valueOf(item.getStartYear()),
 					nullSafe(item.getSeasonDesc()));
 		}
 

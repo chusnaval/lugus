@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.dto.core.FiltrosDto;
+import lugus.dto.core.FilterDto;
 import lugus.model.groups.Group;
 import lugus.repository.groups.GroupRepository;
 
@@ -37,7 +37,7 @@ public class GroupsService {
 	}
 
 
-	public Page<Group> findAllBy(FiltrosDto filter) {
+	public Page<Group> findAllBy(FilterDto filter) {
 		Optional<String> direccion = filter.getDireccion();
 		if(direccion.isEmpty()) {
 			direccion = Optional.of("asc");
@@ -47,7 +47,7 @@ public class GroupsService {
 		Pageable pageable = PageRequest.of(filter.getPagina().get(), filter.getPageSize(), sort);
 
 		
-		Specification<Group> spec = Specification.where(null);
+		Specification<Group> spec = Specification.unrestricted();
 		spec = spec.and(porTitulo(filter.getTitulo()));
 		
 		return groupRepository.findAll(spec, pageable);

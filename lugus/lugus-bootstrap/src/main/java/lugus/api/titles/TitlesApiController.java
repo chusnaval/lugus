@@ -1,7 +1,6 @@
 package lugus.api.titles;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +35,7 @@ public class TitlesApiController {
 	@GetMapping
 	List<TitleDto> all() {
 		List<Title> sources = service.findByType(TitleType.EXTERNAL);
-		return sources.stream().map(mapper::mapToDTO).collect(Collectors.toList());
+		return sources.stream().map(mapper::mapToDTO).toList();
 	}
 
 	

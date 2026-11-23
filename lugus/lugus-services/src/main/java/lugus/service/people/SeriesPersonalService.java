@@ -3,7 +3,7 @@ package lugus.service.people;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.repository.people.SeriesPersonalRepository;
+import lugus.repository.people.SeriesStaffRepository;
 
 
 @Service
@@ -11,6 +11,6 @@ import lugus.repository.people.SeriesPersonalRepository;
 public class SeriesPersonalService {
 	
 	@SuppressWarnings("unused")
-	private final SeriesPersonalRepository seriesPersonalRepository;
+	private final SeriesStaffRepository seriesPersonalRepository;
 
 }

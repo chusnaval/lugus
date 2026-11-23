@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,110 +16,114 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import lugus.dto.core.FiltrosDto;
+import lugus.dto.core.FilterDto;
 import lugus.dto.groups.GroupDTO;
 import lugus.exception.LugusNotFoundException;
 import lugus.mapper.groups.GroupMapper;
 import lugus.model.groups.Group;
 import lugus.model.films.Film;
-import lugus.service.films.PeliculaService;
+import lugus.service.films.FilmService;
 import lugus.service.groups.GroupsService;
 import lugus.service.imdb.ImdbBasicsService;
 import lugus.model.imdb.ImdbBasics;
 import lugus.model.values.Format;
+
 @RestController
 @RequestMapping("/v1/api/groups")
 @RequiredArgsConstructor
 public class GroupApiController {
 
 	private final GroupsService service;
-	
+
 	private final GroupMapper mapper;
 
-	private final PeliculaService peliculaService;
+	private final FilmService filmService;
 
 	private final ImdbBasicsService imdbBasicsService;
-	
+
 	@GetMapping
 	List<GroupDTO> all() {
 		List<Group> sources = service.findAll();
 		return sources.stream().map(mapper::mapToDTO).toList();
 	}
-	
+
 	@GetMapping("/{id}")
-	GroupDTO one(@PathVariable Integer id) throws LugusNotFoundException {
+	GroupDTO one(@PathVariable final Integer id) throws LugusNotFoundException {
 		Group group = service.findById(id).orElseThrow(() -> new LugusNotFoundException(id));
 		return mapper.mapToDTO(group);
 	}
 
 	@GetMapping("/page")
-	public Page<GroupDTO> getSagas(@RequestParam Integer page, @RequestParam Integer size,
-			@RequestParam(required = false) Boolean owned, @RequestParam(required = false) String title,
-			@RequestParam(required = false) String casting, @RequestParam(required = false) Integer fromYear,
-			@RequestParam(required = false) Integer toYear, @RequestParam(required = false) String format,
-			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
-			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection) {
-		FiltrosDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+	public Page<GroupDTO> getSagas(@RequestParam final Integer page, @RequestParam final Integer size,
+			@RequestParam(required = false) final Boolean owned, @RequestParam(required = false) final String title,
+			@RequestParam(required = false) final String casting,
+			@RequestParam(required = false) final Integer fromYear,
+			@RequestParam(required = false) final Integer toYear, @RequestParam(required = false) final String format,
+			@RequestParam(required = false) final String genre, @RequestParam(required = false) final Boolean pack,
+			@RequestParam(required = false) final String sort,
+			@RequestParam(required = false) final String sortDirection) {
+		FilterDto filter = createFilter(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
 				sortDirection);
-	    return service.findAllBy(filtro).map(mapper::mapToDTO);
+		return service.findAllBy(filter).map(mapper::mapToDTO);
 	}
-	
-	private FiltrosDto crearFiltro(Integer page, Integer size, Boolean owned, String title, String casting,
-			Integer fromYear, Integer toYear, String format, String genre, Boolean pack, String sort,
-			String sortDirection) {
-		FiltrosDto filtro = new FiltrosDto();
+
+	private FilterDto createFilter(final Integer page, final Integer size, final Boolean owned,
+			final String title, final String casting,
+			final Integer fromYear, final Integer toYear, final String format, final String genre,
+			final Boolean pack, final String sort,
+			final String sortDirection) {
+		FilterDto filter = new FilterDto();
 		if (page != null) {
-			filtro.setPagina(Optional.of(page));
+			filter.setPagina(Optional.of(page));
 		}
 		if (title != null) {
-			filtro.setTitulo(title);
+			filter.setTitulo(title);
 		}
 		if (casting != null) {
-			filtro.setActor(casting);
-			filtro.setDirector(casting);
+			filter.setActor(casting);
+			filter.setDirector(casting);
 		}
 		if (fromYear != null) {
-			filtro.setFromAnyo(fromYear);
+			filter.setFromAnyo(fromYear);
 		}
 		if (toYear != null) {
-			filtro.setToAnyo(toYear);
+			filter.setToAnyo(toYear);
 		}
 		if (format != null) {
-			filtro.setFormato((int) Format.getByName(format).getId());
+			filter.setFormato((int) Format.getByName(format).getId());
 		}
 		if (genre != null) {
-			filtro.setGenero(genre);
+			filter.setGenero(genre);
 		}
 		if (pack != null) {
-			filtro.setPack(pack);
+			filter.setPack(pack);
 		}
 
 		if (sort != null) {
-			filtro.setOrden(Optional.of(sort));
+			filter.setOrden(Optional.of(sort));
 		}
 		if (sortDirection != null) {
-			filtro.setDireccion(Optional.of(sortDirection));
+			filter.setDireccion(Optional.of(sortDirection));
 		}
 		if (owned != null) {
-			filtro.setComprado(owned);
+			filter.setComprado(owned);
 		}
 		int sizeAux = size;
 		if (size == null || size <= 0) {
 			sizeAux = Integer.MAX_VALUE;
 		}
-		filtro.setPageSize(sizeAux);
-		return filtro;
+		filter.setPageSize(sizeAux);
+		return filter;
 	}
 
-	
 	@PostMapping
-	GroupDTO newGroup(@RequestBody GroupDTO dto) {
+	GroupDTO newGroup(@RequestBody final GroupDTO dto) {
 		Group group = service.saveGroup(mapper.mapToEntity(dto));
 		return mapper.mapToDTO(group);
 	}
-	
+
 	@PutMapping("/{id}")
-	GroupDTO replace(@RequestBody GroupDTO newSource, @PathVariable Integer id) {
+	GroupDTO replace(@RequestBody final GroupDTO newSource, @PathVariable final Integer id) {
 		Optional<Group> group = service.findById(id);
 		if (group.isPresent()) {
 			Group obj = group.get();
@@ -135,26 +138,30 @@ public class GroupApiController {
 	}
 
 	@DeleteMapping("/{id}")
-	void delete(@PathVariable Integer id) {
+	void delete(@PathVariable final Integer id) {
 		service.delete(id);
 	}
 
-	
 	/**
-	 * Search movies by title: returns registered movies first, then IMDB suggestions.
+	 * Search movies by title: returns registered movies first, then IMDB
+	 * suggestions.
 	 */
 	@GetMapping("/{id}/searchMovies")
-	public List<Object> searchMovies(@PathVariable Integer id, @RequestParam String title) {
+	public List<Object> searchMovies(@PathVariable final Integer id, @RequestParam final String title) {
 		List<Object> result = new ArrayList<>();
-		if (title == null || title.isBlank()) return result;
-		// search registered Pelicula (use repository's findByTitulo via service if available)
+		if (title == null || title.isBlank())
+			return result;
+		// search registered Pelicula (use repository's findByTitulo via service if
+		// available)
 		try {
-			// using service to search by title via repository method (will need a small wrapper)
-			List<Film> pelis = peliculaService.findByTitulo(title);
+			// using service to search by title via repository method (will need a small
+			// wrapper)
+			List<Film> pelis = filmService.findByTitle(title);
 			if (pelis != null) {
 				for (Film p : pelis) {
 					// return minimal object
-					result.add(new SimpleFilm(p.getId(), p.getImdbId()!=null? p.getImdbId():"", p.getTitle(), p.getYear()));
+					result.add(new SimpleFilm(p.getId(), p.getImdbId() != null ? p.getImdbId() : "", p.getTitle(),
+							p.getYear()));
 				}
 			}
 		} catch (Exception e) {
@@ -162,23 +169,24 @@ public class GroupApiController {
 		}
 
 		// IMDB suggestions
-		List<ImdbBasics> im = imdbBasicsService.findByTitleAndRegion(title.toLowerCase(),"ES");
+		List<ImdbBasics> im = imdbBasicsService.findByTitleAndRegion(title.toLowerCase(), "ES");
 		if (im != null) {
 			for (ImdbBasics d : im) {
-				// debemos evitar sugerencias ya registradas como Pelicula
-				// primero comprobamos si el título de IMDB ya existe en el result
-				// por si acas el título de IMDB no coincide exactamente con el título de Pelicula, comprobamos si el título de IMDB ya existe como Pelicula
+				// We must avoid suggestions already registered as "Movie"
+				// First, we check if the IMDb title already exists in the results
+				// In case the IMDb title doesn't exactly match the Movie title, we check if the
+				// IMDb title already exists as "Movie"
 				String imdbTitle = d.getTitleid();
-				if(imdbTitle == null || imdbTitle.isBlank() || !peliculaService.isFilmRegistered(imdbTitle)) {
+				if (imdbTitle == null || imdbTitle.isBlank() || !filmService.isFilmRegistered(imdbTitle)) {
 					continue; // skip this suggestion
 				}
-				if(result.stream().filter(r -> r instanceof SimpleFilm)
+				if (result.stream().filter(r -> r instanceof SimpleFilm)
 						.anyMatch(r -> ((SimpleFilm) r).tconst.equals(imdbTitle))) {
 					continue; // skip this suggestion
 				}
-					
+
 				result.add(new SimpleImdb(d.getTitleid(), d.getTitle(), d.getStartyear()));
-				
+
 			}
 		}
 
@@ -192,8 +200,12 @@ public class GroupApiController {
 		public String titulo;
 		public Integer anyo;
 		public String tipo = "local";
+
 		public SimpleFilm(Integer id, String tconst, String titulo, Integer anyo) {
-			this.id = id; this.tconst = tconst; this.titulo = titulo; this.anyo = anyo;
+			this.id = id;
+			this.tconst = tconst;
+			this.titulo = titulo;
+			this.anyo = anyo;
 		}
 	}
 
@@ -202,7 +214,12 @@ public class GroupApiController {
 		public String title;
 		public String anyo;
 		public String tipo = "imdb";
-		public SimpleImdb(String tconst, String title, String anyo) { this.tconst = tconst; this.title = title;  this.anyo = anyo;}
+
+		public SimpleImdb(String tconst, String title, String anyo) {
+			this.tconst = tconst;
+			this.title = title;
+			this.anyo = anyo;
+		}
 	}
 
 }

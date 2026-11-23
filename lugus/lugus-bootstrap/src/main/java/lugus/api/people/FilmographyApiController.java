@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lugus.model.films.Edition;
 import lugus.model.films.Film;
-import lugus.model.series.Serie;
+import lugus.model.series.Series;
 import lugus.model.values.Format;
 import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.imdb.ImdbTitlePrincipals;
 import lugus.model.people.Filmography;
 import lugus.model.people.People;
-import lugus.service.films.PeliculaService;
+import lugus.service.films.FilmService;
 
 import lugus.service.imdb.ImdbTitleAkasService;
 import lugus.service.imdb.ImdbTitleBasicsService;
@@ -41,19 +41,19 @@ public class FilmographyApiController {
 
 	private final ImdbTitleAkasService imdbTitleAkasService;
 
-	private final PeliculaService peliculaService;
+	private final FilmService peliculaService;
 
 	private final SeriesService seriesService;
 
 	@GetMapping("/{id}")
-	public List<Filmography> findFilmography(@PathVariable Integer id) {
+	public List<Filmography> findFilmography(@PathVariable final Integer id) {
 		People person = personaService.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("Persona no encontrada"));
+				.orElseThrow(() -> new IllegalArgumentException("People not found"));
 
 		return buildFilmsList(person);
 	}
 
-	private List<Filmography> buildFilmsList(People person) {
+	private List<Filmography> buildFilmsList(final People person) {
 
 		List<ImdbTitlePrincipals> aux = imdbTitlePrincipalsService.findAllByIdNconst(person.getNconst());
 
@@ -71,35 +71,37 @@ public class FilmographyApiController {
 			list.stream().skip(1).forEach(itp -> film.appendCategory(itp.getId().getCategory()));
 
 			return film;
-		}).filter(f -> f != null).collect(Collectors.toList());
+		}).filter(f -> f != null).toList();
 
 		Collections.sort(films, (o1, o2) -> o1.getStartyear().compareTo(o2.getStartyear()));
 		return films;
 	}
 
-	private Filmography buildNewFilmography(People person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb) {
+	private Filmography buildNewFilmography(final People person, final ImdbTitlePrincipals itp, 
+		final Optional<ImdbTitleBasics> itb) {
 
 		Optional<ImdbTitleAkas> ita = imdbTitleAkasService.findByTitleId(itp.getId().getTconst());
 
 		if (itb.isEmpty()) {
-			throw new IllegalArgumentException("No se puede construir Filmography: itb vacío");
+			throw new IllegalArgumentException("Cant build filmography: empty itb");
 		}
 		if (itb.isEmpty() || itb.get().getStartyear() == null) {
-			throw new IllegalArgumentException("No se puede construir Filmography: itb vacío o startyear nulo");
+			throw new IllegalArgumentException("Cant build filmography: empty itb or null startyear");
 		}
 		boolean isMovie = itb.get().isAMovie();
 		if (isMovie) {
-			return buildFilmographyForMovie(person, itp, itb, ita);
+			return buildFilmographyForFilm(person, itp, itb, ita);
 		} else if (itb.get().isASerie()) {
-			return buildFilmographyForSerie(person, itp, itb, ita);
+			return buildFilmographyForSeries(person, itp, itb, ita);
 		}
 
 		return null;
 
 	}
 
-	private Filmography buildFilmographyForSerie(People person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb,
-			Optional<ImdbTitleAkas> ita) {
+	private Filmography buildFilmographyForSeries(final People person,
+			final ImdbTitlePrincipals itp, final Optional<ImdbTitleBasics> itb,
+			final Optional<ImdbTitleAkas> ita) {
 		boolean isSerieRegister = seriesService.isFilmRegistered(itp.getId().getTconst());
 
 		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
@@ -107,12 +109,12 @@ public class FilmographyApiController {
 				.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
 
 		if (isSerieRegister) {
-			Optional<Serie> serie = seriesService.findByImdbId(itp.getId().getTconst());
+			Optional<Series> serie = seriesService.findByImdbId(itp.getId().getTconst());
 			if (!serie.isPresent()) {
 				film.setPeliculaId(serie.get().getId());
 
 				if (serie.get().isPurchased()) {
-					film.setFormatoId(obtainBestFormatoId(serie.get()));
+					film.setFormatoId(obtainBestFormatId(serie.get()));
 				}
 				film.setComprado(serie.get().isPurchased());
 				film.setBuscado(!serie.get().isPurchased());
@@ -125,7 +127,7 @@ public class FilmographyApiController {
 		return film;
 	}
 
-	private Short obtainBestFormatoId(Serie serie) {
+	private Short obtainBestFormatId(final Series series) {
 		Short bestFormatoId = null;
 		// best format would be the one with the highest priority, so we need to define
 		// a priority order for the formats
@@ -134,7 +136,7 @@ public class FilmographyApiController {
 		List<Format> orderedFormats = Format.prioritizedFormats();
 
 		for (Format formato : orderedFormats) {
-			if (serie.getFormato().getId() == formato.getId()) {
+			if (series.getFormat().getId() == formato.getId()) {
 				bestFormatoId = formato.getId();
 				break;
 			}
@@ -142,46 +144,48 @@ public class FilmographyApiController {
 		return bestFormatoId;
 	}
 
-	private Filmography buildFilmographyForMovie(People person, ImdbTitlePrincipals itp, Optional<ImdbTitleBasics> itb,
-			Optional<ImdbTitleAkas> ita) {
+	private Filmography buildFilmographyForFilm(final People person,
+			final ImdbTitlePrincipals itp, final Optional<ImdbTitleBasics> itb,
+			final Optional<ImdbTitleAkas> ita) {
 		boolean isFilmRegister = peliculaService.isFilmRegistered(itp.getId().getTconst());
 
-		Filmography film = Filmography.builder().id(person.getId()).nconst(person.getNconst())
+		Filmography filmography = Filmography.builder().id(person.getId()).nconst(person.getNconst())
 				.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type(itb.get().getTitletype())
 				.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
 		if (isFilmRegister) {
 			Optional<Film> filmOptional = peliculaService.findByImdbId(itp.getId().getTconst());
 			if (filmOptional.isPresent()) {
-				// necesitamos poner peliculaId en filmography para que se sepa que pelicula de
-				// una forma u otra
-				// la tenemos registrada, asi que si hay varias peliculas con ese tconst, se
-				// pone el id de la edicion con mayor fecha de modificacion, asi que se asume
-				// que es la edicion mas actualizada
-				// pero tsmodif puede ser nulo, asi que se asume que si es nulo, es la edicion
-				// mas antigua, y si no es nulo, se compara con las fechas de modificacion de
-				// las otras ediciones para determinar cual es la mas actualizada
-				Film pelicula = filmOptional.get();
-				film.setPeliculaId(pelicula.getId());
-				// queremos marcar como comprado o buscado el registro de filmografia, asi que
-				// si cualquiera de los registros de pelicula con ese tconst esta comprado, se
-				// marca como comprado, sino se marca como buscado
-				boolean comprado = pelicula.isComprado();
-				if (comprado) {
-					film.setFormatoId(obtainBestFormatoId(pelicula));
+				// We need to put movieId in filmography so we know which movie
+				// we have registered in one way or another
+				// so if there are several movies with that tconst, we
+				// use the ID of the edition with the latest modification date, so it's assumed
+				// to be the most up-to-date edition
+				// but tsmodif can be null, so if it's null, it's assumed to be the
+				// oldest edition, and if it's not null, we compare it with the modification
+				// dates of
+				// the other editions to determine which is the most up-to-date
+				Film film = filmOptional.get();
+				filmography.setPeliculaId(film.getId());
+				// We want to mark the filmography record as purchased or searched, so
+				// if any of the film records with that tconst are purchased, they are
+				// marked as purchased, otherwise they are marked as searched
+				boolean purchased = film.isPurchased();
+				if (purchased) {
+					filmography.setFormatoId(obtainBestFormatoId(film));
 				}
-				film.setComprado(comprado);
-				film.setBuscado(!comprado);
+				filmography.setComprado(purchased);
+				filmography.setBuscado(!purchased);
 			} else {
-				film.setBuscado(true);
-				film.setComprado(false);
+				filmography.setBuscado(true);
+				filmography.setComprado(false);
 			}
 
 		}
 
-		return film;
+		return filmography;
 	}
 
-	private Short obtainBestFormatoId(Film pelicula) {
+	private Short obtainBestFormatoId(final Film film) {
 		Short bestFormatoId = null;
 		// best format would be the one with the highest priority, so we need to define
 		// a priority order for the formats
@@ -191,7 +195,7 @@ public class FilmographyApiController {
 
 		for (Format formato : orderedFormats) {
 
-			for (Edition edition : pelicula.getEditions()) {
+			for (Edition edition : film.getEditions()) {
 				if (edition.getFormat().getId() == formato.getId()) {
 					bestFormatoId = formato.getId();
 					break;

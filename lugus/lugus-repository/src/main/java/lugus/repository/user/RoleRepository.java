@@ -7,7 +7,7 @@ import lugus.model.user.Role;
 
 
 
-public interface RolRepository {
+public interface RoleRepository {
 
 	Optional<Role> findById(final Long id);
 

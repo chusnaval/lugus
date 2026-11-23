@@ -7,8 +7,8 @@ import lugus.model.core.Status;
 
 public interface StatusRepository {
 
-	public Optional<Status> findById(final int statusCode);
+	Optional<Status> findById(final int statusCode);
 
-	public List<Status> findAll();
+	List<Status> findAll();
 
 }

@@ -19,13 +19,13 @@ public class GenreApiController {
 
 	@GetMapping
 	List<GenreDTO> all() {
-		List<Genre> genres = Genre.valoresOrdenados();
+		List<Genre> genres = Genre.orderedValues();
 		return genres.stream().map(d -> this.convert(d)).toList();
 	}
 
-	private GenreDTO convert(Genre d) {
+	private GenreDTO convert(final Genre d) {
 		GenreDTO dto = new GenreDTO();
-		dto.setCodigo(String.valueOf(d.getCodigo()));
+		dto.setCodigo(String.valueOf(d.getCode()));
 		dto.setDescripcion(d.name());
 		return dto;
 	}

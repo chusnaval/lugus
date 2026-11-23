@@ -46,15 +46,16 @@ public class SeasonOrder {
 	@Column(name = "imdb_id")
 	private String imdbId;
 	
-	@Column(nullable = false)
+	@Column(name="formato", nullable = false)
 	@Convert(converter = FormatConverter.class)
-	private Format formato;
+	private Format format;
 	
-	@Column(nullable = true)
-	private String notas;
+	@Column(name="notas", nullable = true)
+	private String notes;
 	
 	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
-	private Instant tsAlta;
+	private Instant tsCreation;
 	
-	private boolean recibido;
+	@Column (name="recibido")
+	private boolean received;
 }

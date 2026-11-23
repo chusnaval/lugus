@@ -14,36 +14,36 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.springframework.stereotype.Service;
 
 import lugus.model.series.Season;
-import lugus.model.series.Serie;
+import lugus.model.series.Series;
 @Service
 public class SeriesExportService {
 
-	public String toMarkdown(List<Serie> list) {
+	public String toMarkdown(List<Series> list) {
 		StringBuilder md = new StringBuilder();
 		md.append("# Series \n\n");
 		md.append("| Nº | Título | Año | Temporada |  Formato | Situación | Notas |\n");
 		md.append("|---|---|---:|---|---|---|---|---|\n");
 
-		for (Serie item : list) {
+		for (Series item : list) {
 			int index = 1;
 			// quiero cada temporada en una fila diferente, con el mismo título , pero con la temporada en la columna de temporada
 				for (Season temp : item.getSeasons()) {
-					temp.calcularSituacion();
+					temp.obtainSituation();
 					
 					md.append("| ")
 							.append(index++)
 							.append(" | ")
-							.append(escapeMd(item.getTitulo()))
+							.append(escapeMd(item.getTitle()))
 							.append(" | ")
 							.append(temp.getYear())
 							.append(" | ")
 							.append(escapeMd(String.valueOf(temp.getOrder())))
 							.append(" | ")
-							.append(escapeMd(item.getFormato().name()))
+							.append(escapeMd(item.getFormat().name()))
 							.append(" | ")
-							.append(escapeMd(temp.getSituacion()))
+							.append(escapeMd(temp.getSituation()))
 							.append(" | ")
-							.append(escapeMd(item.getNotas()))
+							.append(escapeMd(item.getNotes()))
 							.append(" |\n");
 				}
 		}
@@ -51,7 +51,7 @@ public class SeriesExportService {
 		return md.toString();
 	}
 
-	public byte[] toOds(List<Serie> list) throws IOException {
+	public byte[] toOds(List<Series> list) throws IOException {
 		String contentXml = buildOdsContentXml(list);
 		String manifestXml = """
 				<?xml version="1.0" encoding="UTF-8"?>
@@ -82,7 +82,7 @@ public class SeriesExportService {
 		}
 	}
 
-	public byte[] toPdf(List<Serie> list) throws IOException {
+	public byte[] toPdf(List<Series> list) throws IOException {
 		try (PDDocument doc = new PDDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			PDPage page = new PDPage();
 			doc.addPage(page);
@@ -118,9 +118,9 @@ public class SeriesExportService {
 				content.endText();
 
 				y -= leading;
-				for (Serie item : list) {
+				for (Series item : list) {
 					for (Season temp : item.getSeasons()) {
-						temp.calcularSituacion();
+						temp.obtainSituation();
 						if (y < 60) {
 							break;
 						}
@@ -130,17 +130,17 @@ public class SeriesExportService {
 						content.newLineAtOffset(margin, y);
 						content.showText(String.valueOf(index++));
 						content.newLineAtOffset(70, 0);
-						content.showText(trimForPdf(item.getTitulo(), 42));
+						content.showText(trimForPdf(item.getTitle(), 42));
 						content.newLineAtOffset(260, 0);
 						content.showText(String.valueOf(temp.getYear()));
 						content.newLineAtOffset(70, 0);
 						content.showText(trimForPdf(String.valueOf(temp.getOrder()), 34));
 						content.newLineAtOffset(70, 0);
-						content.showText(trimForPdf(item.getFormato().name(), 34));
+						content.showText(trimForPdf(item.getFormat().name(), 34));
 						content.newLineAtOffset(70, 0);
-						content.showText(trimForPdf(temp.getSituacion(), 42));
+						content.showText(trimForPdf(temp.getSituation(), 42));
 						content.newLineAtOffset(70, 0);
-						content.showText(trimForPdf(item.getNotas(), 70));
+						content.showText(trimForPdf(item.getNotes(), 70));
 						content.endText();
 	
 						y -= leading;
@@ -170,22 +170,22 @@ public class SeriesExportService {
 				.replace("'", "&apos;");
 	}
 
-	private String buildOdsContentXml(List<Serie> list) {
+	private String buildOdsContentXml(List<Series> list) {
 		StringBuilder rows = new StringBuilder();
 
 		appendOdsRow(rows, "Nº", "Título", "Año", "Temporada", "Formato", "Situación", "Notas");
-		for (Serie item : list) {
+		for (Series item : list) {
 			int index = 1;
 			for (Season temp : item.getSeasons()) {
-				temp.calcularSituacion();
+				temp.obtainSituation();
 			appendOdsRow(rows,
 					String.valueOf(index++),
-					nullSafe(item.getTitulo()),
+					nullSafe(item.getTitle()),
 					String.valueOf(temp.getYear()),
 					nullSafe(String.valueOf(temp.getOrder())),
-					nullSafe(item.getFormato().name()),
-					nullSafe(temp.getSituacion()),
-					nullSafe(item.getNotas())
+					nullSafe(item.getFormat().name()),
+					nullSafe(temp.getSituation()),
+					nullSafe(item.getNotes())
 					);
 			}
 		}

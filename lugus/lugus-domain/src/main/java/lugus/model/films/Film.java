@@ -37,7 +37,7 @@ import lugus.model.groups.GroupFilms;
 import lugus.model.orders.Order;
 import lugus.model.people.Actor;
 import lugus.model.people.Director;
-import lugus.model.people.Staff;
+import lugus.model.people.FilmStaff;
 import lugus.model.values.Genre;
 
 @Entity
@@ -58,7 +58,7 @@ public class Film {
 	private String title;
 
 	@Column(name = "titulo_gest", nullable = false)
-	private String mgmntTitle;
+	private String mgmtTitle;
 
 	@Column(name = "anyo", nullable = false)
 	private int year;
@@ -70,7 +70,7 @@ public class Film {
 	@JsonIgnore
 	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private final Set<Staff> staff = new HashSet<>();
+	private final Set<FilmStaff> staff = new HashSet<>();
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -265,14 +265,14 @@ public class Film {
 
 		if (purchased) {
 			this.situation = "Comprado";
-		} else if (tieneOrdenPendiente()) {
+		} else if (hasAnIncompleteOrder()) {
 			this.situation = "En pedido";
 		} else {
 			this.situation = "No comprado";
 		}
 	}
 
-	private boolean tieneOrdenPendiente() {
+	private boolean hasAnIncompleteOrder() {
 		boolean tieneOrdenPendiente = orders.stream().anyMatch(order -> !order.isReceived());
 		if (tieneOrdenPendiente) {
 			return true;
@@ -280,7 +280,7 @@ public class Film {
 		return false;
 	}
 
-	public boolean isComprado() {
+	public boolean isPurchased() {
 		return this.editions.stream().anyMatch(e -> e.isPurchased());
 	}
 
@@ -311,39 +311,39 @@ public class Film {
 	public String obtainCode() {
 
 		// Eliminar artículos del título
-		String procesado = mgmntTitle.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
+		String processed = mgmtTitle.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
 
 		// reemplazar caracteres acentuados por sus equivalentes sin acento
-		procesado = procesado.replaceAll("[áàäâ]", "a");
-		procesado = procesado.replaceAll("[éèëê]", "e");
-		procesado = procesado.replaceAll("[íìïî]", "i");
-		procesado = procesado.replaceAll("[óòöô]", "o");
-		procesado = procesado.replaceAll("[úùüû]", "u");
+		processed = processed.replaceAll("[áàäâ]", "a");
+		processed = processed.replaceAll("[éèëê]", "e");
+		processed = processed.replaceAll("[íìïî]", "i");
+		processed = processed.replaceAll("[óòöô]", "o");
+		processed = processed.replaceAll("[úùüû]", "u");
 		// y en mayúsculas
-		procesado = procesado.replaceAll("[ÁÀÄÂ]", "A");
-		procesado = procesado.replaceAll("[ÉÈËÊ]", "E");
-		procesado = procesado.replaceAll("[ÍÌÏÎ]", "I");
-		procesado = procesado.replaceAll("[ÓÒÖÔ]", "O");
-		procesado = procesado.replaceAll("[ÚÙÜÛ]", "U");
+		processed = processed.replaceAll("[ÁÀÄÂ]", "A");
+		processed = processed.replaceAll("[ÉÈËÊ]", "E");
+		processed = processed.replaceAll("[ÍÌÏÎ]", "I");
+		processed = processed.replaceAll("[ÓÒÖÔ]", "O");
+		processed = processed.replaceAll("[ÚÙÜÛ]", "U");
 
 		// reemplazar la ñ por n
-		procesado = procesado.replaceAll("[ñ]", "n");
-		procesado = procesado.replaceAll("[Ñ]", "N");
+		processed = processed.replace("ñ", "n");
+		processed = processed.replace("Ñ", "N");
 
 		// eliminar caracteres especiales y espacios
-		procesado = procesado.replaceAll("[^a-zA-Z0-9]", "");
+		processed = processed.replaceAll("[^a-zA-Z0-9]", "");
 
 		// Obtener los primeros tres caracteres del título procesado
-		String prefijo = procesado.length() >= 3 ? procesado.substring(0, 3).toUpperCase() : procesado.toUpperCase();
+		String prefix = processed.length() >= 3 ? processed.substring(0, 3).toUpperCase() : processed.toUpperCase();
 
-		String codGenero = genre.getCodigo();
+		String genreCode = genre.getCode();
 
-		return codGenero + "-" + prefijo + "-" + year;
+		return genreCode + "-" + prefix + "-" + year;
 
 	}
 
 	public boolean isDiffInCode(String mgmtTitle, int year, String genreCode) {
-		return (!this.getMgmntTitle().equals(mgmtTitle) || this.getYear() != year
-				|| !this.getGenre().getCodigo().equals(genreCode));
+		return (!this.getMgmtTitle().equals(mgmtTitle) || this.getYear() != year
+				|| !this.getGenre().getCode().equals(genreCode));
 	}
 }

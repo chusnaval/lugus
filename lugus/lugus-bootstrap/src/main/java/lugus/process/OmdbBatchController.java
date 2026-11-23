@@ -22,39 +22,39 @@ public class OmdbBatchController {
     @PostMapping("/update-cache")
     public ResponseEntity<String> fillCache() throws JsonProcessingException {
     	omdbBatchExecutor.fillCache();
-        return ResponseEntity.ok("Batch iniciado");
+        return ResponseEntity.ok("Batch initiated");
     }
     
     /**
-     * Endpoit para actualizar los datos de pais de las peliculas
-     * a partir de la informacion de OMDB. Esto se hace porque en IMDB
-     * no se tiene la informacion de pais, y se necesita para el proceso de recomendacion.
+     * Endpoit to update country in films collection
+     * Reads from OMDB. In IMDB export info we haven't the neccesary country info.
+     * We want this info for recommendation utils
      */
     @PostMapping("/update-country")
-    public ResponseEntity<String> updateCountry() throws JsonProcessingException {
+    public ResponseEntity<String> updateCountry() {
 		omdbBatchExecutor.updateCountry();
-		return ResponseEntity.ok("Batch de actualizacion de pais iniciado");
+		return ResponseEntity.ok("Update country batch initiated");
 	}
     
     /**
-     * Endpoit para actualizar los datos de duracion de las peliculas
-     * a partir de la informacion de OMDB. Esto se hace porque en IMDB
-     * no se tiene la informacion de pais, y se necesita para el proceso de recomendacion.
+     * Endpoit to update length in films collection
+     * Reads from OMDB. In IMDB export info we haven't the neccesary length info.
+     * We want this info for recommendation utils
      */
     @PostMapping("/update-runtime")
-    public ResponseEntity<String> updateRuntime() throws JsonProcessingException {
+    public ResponseEntity<String> updateRuntime() {
 		omdbBatchExecutor.updateRuntime();
-		return ResponseEntity.ok("Batch de actualizacion de duración iniciado");
+		return ResponseEntity.ok("Update length batch initiated");
 	}
     
-    /**
-     * Endpoit para actualizar los datos de duracion de las peliculas
-     * a partir de la informacion de OMDB. Esto se hace porque en IMDB
-     * no se tiene la informacion de pais, y se necesita para el proceso de recomendacion.
+   /**
+     * Endpoit to update cover in films collection
+     * Reads from OMDB. In IMDB export info we haven't the neccesary cover info.
+     * We want this info for recommendation utils
      */
     @PostMapping("/update-covers")
-    public ResponseEntity<String> updateCovers() throws JsonProcessingException {
+    public ResponseEntity<String> updateCovers() {
 		omdbBatchExecutor.updateCovers();
-		return ResponseEntity.ok("Batch de actualizacion de covers de titles iniciado");
+		return ResponseEntity.ok("Update covers batch initiated");
 	}
 }

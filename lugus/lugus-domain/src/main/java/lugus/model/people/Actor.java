@@ -15,7 +15,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lugus.model.films.Film;
-import lugus.model.series.Serie;
+import lugus.model.series.Series;
 import lugus.model.values.TitleType;
 
 @Entity
@@ -40,7 +40,7 @@ public class Actor {
 	
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "serie_id", nullable = true)
-    private Serie serie;
+    private Series series;
     
 	@Column(name="persona_id")
 	private int people;

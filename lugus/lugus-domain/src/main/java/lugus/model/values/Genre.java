@@ -21,20 +21,20 @@ public enum Genre {
 
 	// Codigo usado identificarlo
 	@Getter
-	private String codigo;
+	private String code;
 
 	// Indica la categoria a la que pertenece
 	@Getter
-	private Category categoria;
+	private Category category;
 
 	// orden dentro de la categoria
 	@Getter
-	private int orden;
+	private int order;
 
-	private Genre(String codigo, Category categoria, int orden) {
-		this.codigo = codigo;
-		this.categoria = categoria;
-		this.orden = orden;
+	private Genre(String code, Category category, int order) {
+		this.code = code;
+		this.category = category;
+		this.order = order;
 	}
 
 	/**
@@ -45,12 +45,12 @@ public enum Genre {
 	 */
 	public static Genre getById(String code) {
 		for (Genre aux : values()) {
-			if (aux.getCodigo().equals(code)) {
+			if (aux.getCode().equals(code)) {
 				return aux;
 			}
 		}
 
-		throw new IllegalArgumentException("No existe el genero: " + code);
+		throw new IllegalArgumentException("Not recognized genre: " + code);
 	}
 
 	public String getDisplayName() {
@@ -58,9 +58,8 @@ public enum Genre {
 				.map(s -> Character.toUpperCase(s.charAt(0)) + s.substring(1)).collect(Collectors.joining(" "));
 	}
 
-	public static List<Genre> valoresOrdenados() {
-		return Arrays.stream(Genre.values()).sorted(Comparator.comparing(Genre::getDisplayName))
-				.collect(Collectors.toList());
+	public static List<Genre> orderedValues() {
+		return Arrays.stream(Genre.values()).sorted(Comparator.comparing(Genre::getDisplayName)).toList();
 
 	}
 

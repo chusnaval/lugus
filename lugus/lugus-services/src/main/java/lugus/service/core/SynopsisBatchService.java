@@ -6,15 +6,15 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lugus.model.films.Film;
-import lugus.repository.films.PeliculaRepository;
+import lugus.repository.films.FilmRepository;
 
 @Service
 public class SynopsisBatchService {
 
-    private final PeliculaRepository repo;
+    private final FilmRepository repo;
     private final TranslationService translator;
 
-    public SynopsisBatchService(PeliculaRepository repo, TranslationService translator) {
+    public SynopsisBatchService(FilmRepository repo, TranslationService translator) {
         this.repo = repo;
         this.translator = translator;
     }

@@ -12,7 +12,7 @@ public class GenreConverter implements AttributeConverter<Genre, String> {
 
 	@Override
 	public String convertToDatabaseColumn(final Genre attribute) {
-		return attribute == null ? null : attribute.getCodigo(); 
+		return attribute == null ? null : attribute.getCode(); 
 	}
 
 	@Override

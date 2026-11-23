@@ -3,6 +3,7 @@ package lugus.service.films;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,7 @@ public class EdicionService {
 		return edicionRepository.countByPurchased(false);
 	}
 
-	public Edition findById(final int id) {
+	public Optional<Edition> findById(final int id) {
 		return edicionRepository.findById(id);
 	}
 

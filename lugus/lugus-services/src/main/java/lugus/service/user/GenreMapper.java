@@ -10,7 +10,7 @@ public class GenreMapper {
 
 	public GenreDTO toDTO(Genre genre) {
 		GenreDTO dto = new GenreDTO();
-		dto.setCodigo(genre.getCodigo());
+		dto.setCodigo(genre.getCode());
 		dto.setDescripcion(genre.name());
 		return dto;
 	}

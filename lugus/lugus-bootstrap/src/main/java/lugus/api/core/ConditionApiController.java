@@ -1,11 +1,9 @@
 package lugus.api.core;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +12,6 @@ import lugus.model.core.Status;
 import lugus.service.core.EstadoService;
 
 @RestController
-@ResponseBody
 @RequestMapping("/v1/api/conditions")
 @RequiredArgsConstructor
 public class ConditionApiController {
@@ -23,7 +20,7 @@ public class ConditionApiController {
 	@GetMapping
 	List<ConditionDto> all() {
 		List<Status> formats = service.findAll();
-		return formats.stream().map(d -> convert(d)).collect(Collectors.toList());
+		return formats.stream().map(d -> convert(d)).toList();
 	}
 
 	private ConditionDto convert(Status d) {

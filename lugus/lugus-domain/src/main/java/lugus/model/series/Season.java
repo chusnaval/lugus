@@ -44,7 +44,7 @@ public class Season {
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "serie_id", nullable = true) // FK → serie.id
-	private Serie serie;
+	private Series series;
 	
 	@Column(name = "\"desc\"")
 	private String desc;
@@ -74,7 +74,7 @@ public class Season {
 	@ToString.Exclude
 	private final Set<SeasonOrder> orders = new HashSet<>();
 	
-	private transient String situacion;
+	private transient String situation;
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -94,23 +94,19 @@ public class Season {
 	}
 	
 
-	public void calcularSituacion() {
+	public void obtainSituation() {
 
 		if (purchased) {
-			this.situacion = "Comprado";
-		} else if (tieneOrdenPendiente()) {
-			this.situacion = "En pedido";
+			this.situation = "Comprado";
+		} else if (hasIncompleteOrders()) {
+			this.situation = "En pedido";
 		} else {
-			this.situacion = "No comprado";
+			this.situation = "No comprado";
 		}
 	}
 
-	private boolean tieneOrdenPendiente() {
-		boolean tieneOrdenPendiente = orders.stream().anyMatch(order -> !order.isRecibido());
-		if (tieneOrdenPendiente) {
-			return true;
-		}
-		return false;
+	private boolean hasIncompleteOrders() {
+		return orders.stream().anyMatch(o -> !o.isReceived());
 	}
 
 }

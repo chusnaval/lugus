@@ -36,19 +36,19 @@ public class SourceApiController {
 	}
 
 	@PostMapping
-	SourceDTO newSource(@RequestBody SourceDTO dto) {
+	SourceDTO newSource(@RequestBody final SourceDTO dto) {
 		Source source = service.save(mapper.mapToEntity(dto));
 		return mapper.mapToDTO(source);
 	}
 
 	@GetMapping("/{id}")
-	SourceDTO one(@PathVariable Integer id) throws LugusNotFoundException {
+	SourceDTO one(@PathVariable final Integer id) throws LugusNotFoundException {
 		Source source = service.findById(id).orElseThrow(() -> new LugusNotFoundException(id));
 		return mapper.mapToDTO(source);
 	}
 
 	@PutMapping("/{id}")
-	SourceDTO replaceEmployee(@RequestBody SourceDTO newSource, @PathVariable Integer id) {
+	SourceDTO replaceEmployee(@RequestBody final SourceDTO newSource, @PathVariable final Integer id) {
 		Optional<Source> source = service.findById(id);
 		if (source.isPresent()) {
 			Source obj = source.get();
@@ -63,7 +63,7 @@ public class SourceApiController {
 	}
 
 	@DeleteMapping("/{id}")
-	void deleteEmployee(@PathVariable Integer id) {
+	void deleteEmployee(@PathVariable final Integer id) {
 		service.deleteById(id);
 	}
 

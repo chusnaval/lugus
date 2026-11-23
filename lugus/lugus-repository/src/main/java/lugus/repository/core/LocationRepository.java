@@ -23,7 +23,7 @@ public interface LocationRepository {
 
 	void deleteById(final String id);
 
-	List<Location> findAllByLocationType(final LocationType tipoObj, final Sort sort);
+	List<Location> findAllByLocationType(final LocationType type, final Sort sort);
 
 	Page<Location> findAll(final Specification<Location> spec, final Pageable pageable);
 

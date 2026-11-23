@@ -13,8 +13,8 @@ public interface PeopleRepository {
 
 	Optional<People> findById(final Integer id);
 
-	People save(People persona);
+	People save(final People people);
 
-	void deleteById(Integer id);
+	void deleteById(final Integer id);
 
 }
