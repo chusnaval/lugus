@@ -5,6 +5,9 @@ import lugus.model.titles.Title;
 
 public class TitleMapper {
 
+	private TitleMapper() {// util class
+	}
+
 	public static TitleDto toDto(Title t) {
 		TitleDto dto = new TitleDto();
 		dto.setId(t.getId());
@@ -15,12 +18,8 @@ public class TitleMapper {
 		dto.setPeliculaId(t.getFilm() != null ? t.getFilm().getId() : null);
 		dto.setSerieId(t.getSeries() != null ? t.getSeries().getId() : null);
 		dto.setImdbId(t.getImdb() != null ? t.getImdb().getTconst() : null);
-		if ((t.getFilm() != null && t.getFilm().isPurchased())
-				|| (t.getSeries() != null && t.getSeries().isComplete())) {
-			dto.setOwned(true);
-		} else {
-			dto.setOwned(false);
-		}
+		dto.setOwned((t.getFilm() != null && t.getFilm().isPurchased())
+				|| (t.getSeries() != null && t.getSeries().isComplete()));
 
 		return dto;
 	}

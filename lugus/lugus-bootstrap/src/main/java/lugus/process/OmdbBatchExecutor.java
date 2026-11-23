@@ -6,12 +6,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,6 +31,7 @@ import lugus.service.titles.TitlesService;
 
 @Service
 public class OmdbBatchExecutor {
+	private static final Logger LOGGER = LoggerFactory.getLogger(OmdbBatchExecutor.class);
 
 	private final FilmService filmService;
 	private final SeriesService seriesService;
@@ -50,13 +54,13 @@ public class OmdbBatchExecutor {
 	}
 
 	@Transactional
-	public void fillCache() throws JsonProcessingException {
+	public void fillCache() {
 		updatePeliculas();
-		System.out.println("✔ Batch películas completado");
+		LOGGER.info("✔ Batch películas completado");
 		updateSeries();
-		System.out.println("✔ Batch series completado");
+		LOGGER.info("✔ Batch series completado");
 		updateTitles();
-		System.out.println("✔ Batch todos completado");
+		LOGGER.info("✔ Batch todos completado");
 	}
 
 	private void updateTitles() {
@@ -67,24 +71,21 @@ public class OmdbBatchExecutor {
 
 		for (Title s : title) {
 			if (s.getImdb() == null) {
-				System.out.println("Saltando title sin IMDb: " + s.getTitle());
-				continue;
-			}
-			String imdbId = s.getImdb().getTconst();
+				LOGGER.info("Saltando title sin IMDb: {} ", s.getTitle());
+			} else {
+				String imdbId = s.getImdb().getTconst();
 
-			if (imdbId == null || imdbId.isBlank()) {
-				System.out.println("Saltando title sin IMDb ID: " + s.getTitle());
-				continue;
+				if (imdbId == null || imdbId.isBlank()) {
+					LOGGER.info("Saltando title sin IMDb ID: {} ", s.getTitle());
+				} else {
+					OmdbCache cached = cacheService.getFromCache(imdbId);
+					if (cached != null) {
+						LOGGER.info("{}/{} — Ya cacheada: {} ", index, total, imdbId);
+					} else {
+						extract(total, index, imdbId);
+					}
+				}
 			}
-
-			OmdbCache cached = cacheService.getFromCache(imdbId);
-			if (cached != null) {
-				System.out.println(index + "/" + total + " — Ya cacheada: " + imdbId);
-				index++;
-				continue;
-			}
-
-			extraer(total, index, imdbId);
 
 			index++;
 		}
@@ -101,60 +102,57 @@ public class OmdbBatchExecutor {
 			String imdbId = s.getImdbId();
 
 			if (imdbId == null || imdbId.isBlank()) {
-				System.out.println("Saltando serie sin IMDb ID: " + s.getTitle());
-				continue;
+				LOGGER.info("Saltando serie sin IMDb ID: {} ", s.getTitle());
+			} else {
+				OmdbCache cached = cacheService.getFromCache(imdbId);
+				if (cached != null) {
+					LOGGER.info("{}/{} — Ya cacheada: {} ", index, total, imdbId);
+				} else {
+					extract(total, index, imdbId);
+				}
 			}
-
-			OmdbCache cached = cacheService.getFromCache(imdbId);
-			if (cached != null) {
-				System.out.println(index + "/" + total + " — Ya cacheada: " + imdbId);
-				index++;
-				continue;
-			}
-
-			extraer(total, index, imdbId);
 
 			index++;
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void extraer(int total, int index, String imdbId) {
+	private void extract(int total, int index, String imdbId) {
 		try {
-			System.out.println(index + "/" + total + " — Cacheando: " + imdbId);
+			LOGGER.info("{}/{} — Cacheando: {} ", index, total, imdbId);
 			String url = "https://www.omdbapi.com/?i=" + imdbId + "&apikey=" + apiKey + "&plot=full";
 			Map<String, Object> json = rest.getForObject(url, Map.class);
 
 			cacheService.saveToCache(imdbId, json);
 
-			Thread.sleep(500); // evitar rate limit
-		} catch (Exception e) {
-			System.err.println("Error cacheando " + imdbId + ": " + e.getMessage());
+			Thread.sleep(500); // due to rate limits
+		} catch (RestClientException e) {
+			LOGGER.error("Error consultando OMDb para {}: {}", imdbId, e.getMessage(), e);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			LOGGER.warn("Interrumpida la espera al cachear {}: {}", imdbId, e.getMessage(), e);
 		}
 	}
 
 	private void updatePeliculas() {
-		List<Film> peliculas = filmService.findAll();
+		List<Film> films = filmService.findAll();
 
-		int total = peliculas.size();
+		int total = films.size();
 		int index = 1;
 
-		for (Film p : peliculas) {
+		for (Film p : films) {
 			String imdbId = p.getImdbId();
 
 			if (imdbId == null || imdbId.isBlank()) {
-				System.out.println("Saltando película sin IMDb ID: " + p.getTitle());
-				continue;
+				LOGGER.info("Saltando película sin IMDb ID: {} ", p.getTitle());
+			} else {
+				OmdbCache cached = cacheService.getFromCache(imdbId);
+				if (cached != null) {
+					LOGGER.info("{}/{} — Ya cacheada: {} ", index, total, imdbId);
+				} else {
+					extract(total, index, imdbId);
+				}
 			}
-
-			OmdbCache cached = cacheService.getFromCache(imdbId);
-			if (cached != null) {
-				System.out.println(index + "/" + total + " — Ya cacheada: " + imdbId);
-				index++;
-				continue;
-			}
-
-			extraer(total, index, imdbId);
 
 			index++;
 		}
@@ -165,43 +163,44 @@ public class OmdbBatchExecutor {
 		int index = 1;
 		for (Film p : filmService.findAll()) {
 			if (p.getImdbId() == null || p.getImdbId().isBlank()) {
-				System.out.println("Saltando película sin IMDb ID: " + p.getTitle());
-				continue;
-			}
-			if (p.getCountry() != null && !p.getCountry().isBlank()) {
-				System.out.println("Saltando película con país ya seteado: " + p.getTitle());
-				continue;
-			}
-			OmdbCache cached = cacheService.getFromCache(p.getImdbId());
-			if(cached == null) {
-				extraer(count, index, p.getImdbId());
-				cached = cacheService.getFromCache(p.getImdbId());
-			}
-			if (cached != null) {
-				JsonNode node = mapper.valueToTree(cached.getJson());
-				String country = node.get("Country").asText();
-
-				// Optional info, if there's info, its one or many
-				List<String> values = new ArrayList<>();
-				if (country != null) {
-					String[] countries = country.split(",");
-					for (int i = 0; i < countries.length; i++) {
-						values.add(CountryCode.fromString(countries[i]).getCode());
-					}
-				}
-
-				// we save joined but separated by commas
-				p.setCountry(String.join(",", values));
-
-				filmService.save(p);
-				System.out.println("Actualizada película: " + p.getTitle() + " con país: " + country + " en posición "
-						+ index + "/" + count);
+				LOGGER.info("Saltando película sin IMDb ID: {} ", p.getTitle());
+			} else if (p.getCountry() != null && !p.getCountry().isBlank()) {
+				LOGGER.info("Saltando película con país ya seteado: {} ", p.getTitle());
 			} else {
-				System.out.println("No se encontró en cache, saltando: " + p.getTitle());
+				OmdbCache cached = obtainCachedFilm(count, index, p);
+				if (cached != null) {
+					String country = updateCountryFromOmdb(p, cached);
+					LOGGER.info("Actualizada película: {} con país: {} en posición {}/{} ", p.getTitle(), country,
+							index,
+							count);
+				} else {
+					LOGGER.info("No se encontró en cache, saltando: {} ", p.getTitle());
+				}
+			}
+			index++;
+		}
+		LOGGER.info(
+				"Terminado batch de actualización de país para películas: {} películas procesadas.", count);
+	}
+
+	private String updateCountryFromOmdb(Film p, OmdbCache cached) {
+		JsonNode node = mapper.valueToTree(cached.getJson());
+		String country = node.get("Country").asText();
+
+		// Optional info, if there's info, its one or many
+		List<String> values = new ArrayList<>();
+		if (country != null) {
+			String[] countries = country.split(",");
+			for (int i = 0; i < countries.length; i++) {
+				values.add(CountryCode.fromString(countries[i]).getCode());
 			}
 		}
-		System.out.println(
-				"Terminado batch de actualización de país para películas: " + count + " películas procesadas.");
+
+		// we save joined but separated by commas
+		p.setCountry(String.join(",", values));
+
+		filmService.save(p);
+		return country;
 	}
 
 	public void updateRuntime() {
@@ -209,77 +208,91 @@ public class OmdbBatchExecutor {
 		int index = 1;
 		for (Film p : filmService.findAll()) {
 			if (p.getImdbId() == null || p.getImdbId().isBlank()) {
-				System.out.println("Saltando película sin IMDb ID: " + p.getTitle());
-				continue;
-			}
-			if (p.getDuration() != 0 ) {
-				System.out.println("Saltando película con duracion ya seteado: " + p.getTitle());
-				continue;
-			}
-			OmdbCache cached = cacheService.getFromCache(p.getImdbId());
-			if(cached == null) {
-				extraer(count, index, p.getImdbId());
-				cached = cacheService.getFromCache(p.getImdbId());
-			}
-			if (cached != null) {
-				JsonNode node = mapper.valueToTree(cached.getJson());
-				String runtime = node.get("Runtime").asText();
-
-				Matcher m = Pattern.compile("(\\d+)").matcher(runtime);
-				int minutes = m.find() ? Integer.parseInt(m.group(1)) : 0;
-				
-				p.setDuration(minutes);
-
-				filmService.save(p);
-				System.out.println("Actualizada película: " + p.getTitle() + " con runtime: " + minutes + " en posición "
-						+ index++ + "/" + count);
+				LOGGER.info("Saltando película sin IMDb ID: {} ", p.getTitle());
+			} else if (p.getDuration() != 0) {
+				LOGGER.info("Saltando película con duracion ya seteado: {} ", p.getTitle());
 			} else {
-				System.out.println("No se encontró en cache, saltando: " + p.getTitle());
+				OmdbCache cached = obtainCachedFilm(count, index, p);
+				if (cached != null) {
+					JsonNode node = mapper.valueToTree(cached.getJson());
+					String runtime = node.get("Runtime").asText();
+
+					Matcher m = Pattern.compile("(\\d+)").matcher(runtime);
+					int minutes = m.find() ? Integer.parseInt(m.group(1)) : 0;
+
+					p.setDuration(minutes);
+
+					filmService.save(p);
+					LOGGER.info("Actualizada película: {} con runtime: {} en posición {}/{} ", p.getTitle(), minutes,
+							index,
+							count);
+				} else {
+					LOGGER.info("No se encontró en cache, saltando: {} ", p.getTitle());
+				}
 			}
 		}
-		System.out.println(
-				"Terminado batch de actualización de duracion para películas: " + count + " películas procesadas.");
+		LOGGER.info(
+				"Terminado batch de actualización de duracion para películas: {} películas procesadas.", count);
 
+	}
+
+	private OmdbCache obtainCachedFilm(int count, int index, Film p) {
+		OmdbCache cached = cacheService.getFromCache(p.getImdbId());
+		if (cached == null) {
+			extract(count, index, p.getImdbId());
+			cached = cacheService.getFromCache(p.getImdbId());
+		}
+		return cached;
 	}
 
 	public void updateCovers() {
 		int count = titlesService.findAll().size();
 		int index = 1;
 		for (Title p : titlesService.findAll()) {
-			if (p.getImdb() == null) {
-				System.out.println("Saltando title sin IMDb ID: " + p.getTitle());
-				continue;
-			}
-			if (p.getUrlCover() != null && !p.getUrlCover().isBlank() && !"./covers/placeholder.png".equals(p.getUrlCover())) {
-				System.out.println("Saltando title con poster ya seteado: " + p.getTitle());
-				continue;
-			}
-			OmdbCache cached = cacheService.getFromCache(p.getImdb().getTconst());
-			if(cached == null) {
-				extraer(count, index, p.getImdb().getTconst());
-				cached = cacheService.getFromCache(p.getImdb().getTconst());
-			}
-			
-			if (cached != null) {
-				JsonNode node = mapper.valueToTree(cached.getJson());
-				if(node.get("Poster")==null) {
-					System.out.println("Saltando title sin Poster: " + p.getTitle());
-					continue;
+			if (p.getImdb() == null || (!StringUtils.hasText(p.getUrlCover())
+					&& !"./covers/placeholder.png".equals(p.getUrlCover()))) {
+				if (p.getImdb() == null) {
+					LOGGER.info("Saltando title sin IMDb ID: {} ", p.getTitle());
+				} else {
+					LOGGER.info("Saltando title con poster ya seteado: {} ", p.getTitle());
 				}
-				String poster = node.get("Poster").asText();
-				
-				p.setUrlCover(poster);
+				continue;
+			}
+			OmdbCache cached = obtainCachedTitle(count, index, p);
 
-				titlesService.save(p);
-				System.out.println("Actualizada title: " + p.getTitle() + " con poster: " + poster + " en posición "
-						+ index++ + "/" + count);
+			if (cached != null) {
+				obtainCoverFromOmdb(count, index, p, cached);
 			} else {
-				System.out.println("No se encontró en cache, saltando: " + p.getTitle());
+				LOGGER.info("No se encontró cache, saltando: {} ", p.getTitle());
 			}
 		}
-		System.out.println(
-				"Terminado batch de actualización de posters para titles: " + count + " titles procesadas.");
+		LOGGER.info(
+				"Terminado batch de actualización de posters para titles: {} titles procesadas.", count);
 
-		
+	}
+
+	private void obtainCoverFromOmdb(int count, int index, Title p, OmdbCache cached) {
+		JsonNode node = mapper.valueToTree(cached.getJson());
+		if (node.get("Poster") == null) {
+			LOGGER.info("Saltando title sin Poster: {} ", p.getTitle());
+		} else {
+			String poster = node.get("Poster").asText();
+
+			p.setUrlCover(poster);
+
+			titlesService.save(p);
+			LOGGER.info("Actualizada película: {} con poster: {} en posición {}/{} ", p.getTitle(), poster,
+					index,
+					count);
+		}
+	}
+
+	private OmdbCache obtainCachedTitle(int count, int index, Title p) {
+		OmdbCache cached = cacheService.getFromCache(p.getImdb().getTconst());
+		if (cached == null) {
+			extract(count, index, p.getImdb().getTconst());
+			cached = cacheService.getFromCache(p.getImdb().getTconst());
+		}
+		return cached;
 	}
 }

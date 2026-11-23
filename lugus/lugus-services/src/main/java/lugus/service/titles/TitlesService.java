@@ -24,15 +24,15 @@ public class TitlesService {
 		return titleRepo.findById(titleId);
 	   }
 
-	   public Optional<Title> findByFilm_Id(Integer id) {
+	   public Optional<Title> findByFilmId(Integer id) {
 		   return titleRepo.findByFilm_Id(id);
 	   }
 	   
-	   public Optional<Title> findBySerie_Id(Integer id) {
+	   public Optional<Title> findBySerieId(Integer id) {
 		   return titleRepo.findBySeries_Id(id);
 	   }
 	   
-	   public Optional<Title> findByImdb_Id(String id) {
+	   public Optional<Title> findByImdbId(String id) {
 		   return titleRepo.findByImdb_Tconst(id);
 	   }
 

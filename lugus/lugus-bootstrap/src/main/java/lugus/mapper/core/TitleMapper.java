@@ -26,9 +26,6 @@ public class TitleMapper {
 		} else if (title.getSeries() != null) {
 			dto.setOwned(title.getSeries().isComplete());
 			dto.setType("SERIES");
-		} else if (title.getImdb() != null) {
-			dto.setOwned(false);
-			dto.setType("EXTERNAL");
 		} else {
 			dto.setOwned(false);
 			dto.setType("EXTERNAL");

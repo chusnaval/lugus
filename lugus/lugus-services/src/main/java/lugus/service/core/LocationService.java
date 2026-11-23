@@ -54,7 +54,7 @@ public class LocationService {
 	public Page<Location> findAllBy(FilterDto filter) {
 		Sort sort = Sort.by(Direction.ASC, DESCRIPCION);
 
-		Pageable pageable = PageRequest.of(filter.getPagina().get(), 50, sort);
+		Pageable pageable = PageRequest.of(filter.getPage().get(), 50, sort);
 
 		Specification<Location> spec = Specification.unrestricted();
 

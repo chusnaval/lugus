@@ -51,10 +51,13 @@ public class User {
         name = "usuario_favoritos",
         joinColumns = @JoinColumn(name = "login")
     )
+
+    @Builder.Default
     @Column(name = "genero")
 	@Convert(converter = GenreConverter.class)
     private List<Genre> favorites = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FilmUser> films = new HashSet<>();
 

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -46,27 +46,27 @@ public class OmdbController {
 	}
 
 	@GetMapping("/{imdbId}")
-	public ResponseEntity<Map<String, Object>> getFullOmdbJson(@PathVariable String imdbId)
-			throws JsonProcessingException {
+	public ResponseEntity<Map<String, Object>> getFullOmdbJson(@PathVariable String imdbId) {
 
 		var cached = cacheService.getFromCache(imdbId);
 
 		if (cached != null) {
-			Map<String, Object> json = mapper.convertValue(cached.getJson(), Map.class);
+			Map<String, Object> json = mapper.convertValue(cached.getJson(), new TypeReference<Map<String, Object>>() {});
 			return ResponseEntity.ok(json);
 		}
 
 		Map<String, Object> json = recoverOmdbAndGetJson(imdbId);
 
-		Optional<Film> peliculaOpt = filmService.findByImdbId(imdbId);
-		if (peliculaOpt.isPresent() && imdbId.equals(peliculaOpt.get().getImdbId())) {
-			updateWithOmdb(peliculaOpt.get());
+		Optional<Film> optFilm = filmService.findByImdbId(imdbId);
+		if (optFilm.isPresent() && imdbId.equals(optFilm.get().getImdbId())) {
+			updateWithOmdb(optFilm.get());
 		}
 
 		return ResponseEntity.ok(json);
 	}
 
-	private Map<String, Object> recoverOmdbAndGetJson(String imdbId) throws JsonProcessingException {
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> recoverOmdbAndGetJson(String imdbId) {
 		String url = "https://www.omdbapi.com/?i=" + imdbId + "&apikey=" + apiKey + "&plot=full";
 		final RestTemplate rest = new RestTemplate();
 		Map<String, Object> json = rest.getForObject(url, Map.class);

@@ -19,6 +19,6 @@ public class TranslateBatchController {
     @PostMapping("/translate-synopsis")
     public String translateAll() {
         int count = batchService.translateAllPending();
-        return "Sinopsis traducidas: " + count;
+        return "Translated synopsis: " + count;
     }
 }

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +53,7 @@ import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
 import lugus.service.films.DwImageService;
 import lugus.service.films.DwImageServiceI;
-import lugus.service.films.EdicionService;
+import lugus.service.films.EditionService;
 import lugus.service.films.FilmService;
 import lugus.service.films.FilmUserService;
 import lugus.service.groups.GroupsService;
@@ -67,7 +67,7 @@ public class FilmApiController {
 
 	private static final String ATTACHMENT_FILENAME = "attachment; filename=";
 	private final FilmService service;
-	private final EdicionService edicionService;
+	private final EditionService edicionService;
 	private final FilmMapper mapper;
 	private final GroupsService groupsService;
 	private final LocationService locService;
@@ -75,7 +75,7 @@ public class FilmApiController {
 	private final InsertPersonalDataService insertImdbService;
 	private final FilmExportService filmExportService;
 	private final TitlesService titlesService;
-	private final FilmUserService usuarioPeliculaService;
+	private final FilmUserService filmUserService;
 	private final String apiKey;
 	private final OmdbCacheService cacheService;
 	private final ObjectMapper jsonMapper;
@@ -83,10 +83,10 @@ public class FilmApiController {
 
 	@Autowired
 	public FilmApiController(@Value("${omdb.api.key}") String apiKey, FilmService service,
-			EdicionService edicionService, FilmMapper mapper, GroupsService groupsService, LocationService locService,
+			EditionService edicionService, FilmMapper mapper, GroupsService groupsService, LocationService locService,
 			SourceService sourceService, InsertPersonalDataService insertImdbService,
 			FilmExportService filmExportService, TitlesService titlesService,
-			FilmUserService usuarioPeliculaService, OmdbCacheService cacheService, ObjectMapper jsonMapper) {
+			FilmUserService filmUserService, OmdbCacheService cacheService, ObjectMapper jsonMapper) {
 		super();
 		this.service = service;
 		this.edicionService = edicionService;
@@ -97,7 +97,7 @@ public class FilmApiController {
 		this.insertImdbService = insertImdbService;
 		this.filmExportService = filmExportService;
 		this.titlesService = titlesService;
-		this.usuarioPeliculaService = usuarioPeliculaService;
+		this.filmUserService = filmUserService;
 		this.apiKey = apiKey;
 		this.cacheService = cacheService;
 		this.jsonMapper = jsonMapper;
@@ -116,6 +116,7 @@ public class FilmApiController {
 		return mapper.mapToFilmDTO(service.updateTrailer(id, req.trailerUrl()), null);
 	}
 
+	@SuppressWarnings("unchecked")
 	@PutMapping("/{id}")
 	public FilmDto update(@PathVariable Integer id, @RequestBody FilmDto dto) throws IOException, URISyntaxException {
 		var cached = cacheService.getFromCache(dto.getImdbId());
@@ -132,13 +133,13 @@ public class FilmApiController {
 
 	@PostMapping("/{id}/toggle")
 	public ResponseEntity<Object> toggleOwned(@PathVariable Integer id, Authentication auth) {
-		usuarioPeliculaService.toggleOwned(auth.getName(), id);
+		filmUserService.toggleOwned(auth.getName(), id);
 		return ResponseEntity.ok().build();
 	}
 
 	@PostMapping("/{id}/fav")
 	public ResponseEntity<Object> toggleFav(@PathVariable Integer id, Authentication auth) {
-		usuarioPeliculaService.toggleFav(auth.getName(), id);
+		filmUserService.toggleFav(auth.getName(), id);
 		return ResponseEntity.ok().build();
 	}
 
@@ -149,7 +150,8 @@ public class FilmApiController {
 			@RequestParam(required = false) Integer toYear, @RequestParam(required = false) String format,
 			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
 			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection) {
-		FilterDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+		FilterDto filtro = FilterDto.buildFilter(page, size, owned, title, casting, fromYear,
+				toYear, format, genre, pack, null, sort,
 				sortDirection);
 		return service.findAllBy(filtro).map(mapper::mapToFilmDTO);
 	}
@@ -160,51 +162,21 @@ public class FilmApiController {
 		Film film = mapper.mapToFilm(dto);
 
 		for (Edition edto : film.getEditions()) {
-
-			if (edto.getLocation() != null && edto.getLocation().getCode() != null
-					&& !edto.getLocation().getCode().isEmpty()) {
-				Location loc = locService.findById(edto.getLocation().getCode())
-						.orElseThrow(() -> new LugusNotFoundException(edto.getLocation().getCode()));
-				edto.setLocation(loc);
-			} else {
-				edto.setLocation(null);
-			}
-
-			// TIMESTAMPS
-			edto.setTsCreation(Instant.now());
-			edto.setTsModif(Instant.now());
-			edto.setUsrCreation(auth.getName());
-			edto.setUsrModif(auth.getName());
-
-			if (edto.isPurchased()) {
-				edto.setTsPurchase(Instant.now());
-			}
-
-			edto.setCode(edicionService.calculateCompleteCode(edto.getId(), film));
-
+			manageEditionsForNewFilm(auth, film, edto);
 		}
 
-		Film saved = service.save(film);
-		if (dto.getCoverSrc() != null && !dto.getCoverSrc().isEmpty()) {
-			final DwImageServiceI dwFotoService = new DwImageService();
-			final int sourceId = sourceService.calcularIdSource(dto.getCoverSrc());
-			Optional<Source> sourceObj = sourceService.findById(sourceId);
-			FilmImage pf = new FilmImage();
-			pf.setUrl(dto.getCoverSrc());
-			if (sourceObj.isPresent()) {
-				pf.setSource(sourceObj.get());
-			}
-			pf.setContent(dwFotoService.download(sourceId, dto.getCoverSrc()));
-			pf.setCover(true);
+		Film saved = manageCoverForNewFilm(dto, film);
+		manageImdbForNewFilm(dto, saved);
 
-			saved.addImage(pf);
-			service.save(saved);
-		}
+		return ResponseEntity.ok().build();
+	}
 
+	@SuppressWarnings("unchecked")
+	private void manageImdbForNewFilm(FilmDto dto, Film saved) throws IOException, URISyntaxException {
 		if (dto.getImdbId() != null && !dto.getImdbId().isBlank()) {
 			insertImdbService.insert(saved.getId(), dto.getImdbId());
 
-			titlesService.findByImdb_Id(dto.getImdbId()).ifPresent(title -> {
+			titlesService.findByImdbId(dto.getImdbId()).ifPresent(title -> {
 				title.setTitle(saved.getTitle());
 				title.setYear(saved.getYear());
 				title.setType(TitleType.MOVIE);
@@ -251,12 +223,57 @@ public class FilmApiController {
 				saved.addImage(pf);
 				service.save(saved);
 			}
-			
+
 			getDurationAndUpdate(saved, node);
-			
+
+		}
+	}
+
+	private Film manageCoverForNewFilm(FilmDto dto, Film film) throws IOException, URISyntaxException {
+		Film saved = service.save(film);
+		if (dto.getCoverSrc() != null && !dto.getCoverSrc().isEmpty()) {
+			final DwImageServiceI dwFotoService = new DwImageService();
+			final int sourceId = sourceService.calcularIdSource(dto.getCoverSrc());
+			Optional<Source> sourceObj = sourceService.findById(sourceId);
+			FilmImage pf = new FilmImage();
+			pf.setUrl(dto.getCoverSrc());
+			if (sourceObj.isPresent()) {
+				pf.setSource(sourceObj.get());
+			}
+			pf.setContent(dwFotoService.download(sourceId, dto.getCoverSrc()));
+			pf.setCover(true);
+
+			saved.addImage(pf);
+			service.save(saved);
+		}
+		return saved;
+	}
+
+	private void manageEditionsForNewFilm(Authentication auth, Film film, Edition edto) {
+		if (locationHasChanged(edto)) {
+			Location loc = locService.findById(edto.getLocation().getCode())
+					.orElseThrow(() -> new LugusNotFoundException(edto.getLocation().getCode()));
+			edto.setLocation(loc);
+		} else {
+			edto.setLocation(null);
 		}
 
-		return ResponseEntity.ok().build();
+		// TIMESTAMPS
+		edto.setTsCreation(Instant.now());
+		edto.setTsModif(Instant.now());
+		edto.setUsrCreation(auth.getName());
+		edto.setUsrModif(auth.getName());
+
+		if (edto.isPurchased()) {
+			edto.setTsPurchase(Instant.now());
+		}
+
+		edto.setCode(edicionService.calculateCompleteCode(edto.getId(), film));
+	}
+
+	private boolean locationHasChanged(Edition edto) {
+		return edto.getLocation() != null && edto.getLocation().getCode() != null
+				&& !edto.getLocation().getCode().isEmpty();
 	}
 
 	private void getDurationAndUpdate(Film saved, JsonNode node) {
@@ -264,7 +281,7 @@ public class FilmApiController {
 			Integer length = node.get(OmdbConstants.RUNTIME).asInt();
 			saved.setDuration(length);
 			service.save(saved);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			// we don't stop process if there's a problem with length
 		}
 	}
@@ -291,10 +308,10 @@ public class FilmApiController {
 	}
 
 	@GetMapping("/random/wanted")
+	@SuppressWarnings("java:S2245") // This random choice is not security-sensitive.
 	FilmDto randomw() throws LugusNotFoundException {
 		Page<Film> page = service.wanted();
-		Random random = new Random(Instant.now().toEpochMilli());
-		int number = (random.nextInt() * page.getNumberOfElements()) + 1;
+		int number = ThreadLocalRandom.current().nextInt(page.getNumberOfElements());
 		return mapper.mapToFilmDTO(page.getContent().get(number));
 	}
 
@@ -379,56 +396,6 @@ public class FilmApiController {
 		stats.setDocumentalCategory(getNumberFromMap(categorias, Category.DOCUMENTAL));
 	}
 
-	private FilterDto crearFiltro(Integer page, Integer size, Boolean owned, String title, String casting,
-			Integer fromYear, Integer toYear, String format, String genre, Boolean pack, String sort,
-			String sortDirection) {
-		FilterDto filtro = new FilterDto();
-		if (page != null) {
-			filtro.setPagina(Optional.of(page));
-		}
-		if (title != null) {
-			filtro.setTitulo(title);
-		}
-		if (casting != null) {
-			filtro.setActor(casting);
-			filtro.setDirector(casting);
-		}
-		if (fromYear != null) {
-			filtro.setFromAnyo(fromYear);
-		}
-		if (toYear != null) {
-			filtro.setToAnyo(toYear);
-		}
-		if (format != null) {
-			if(Format.getById(Short.valueOf(format)) == null) {
-				throw new IllegalArgumentException("Formato no válido: " + format);
-			}
-			filtro.setFormato((int) Format.getById(Short.valueOf(format)).getId());
-		}
-		if (genre != null) {
-			filtro.setGenero(genre);
-		}
-		if (pack != null) {
-			filtro.setPack(pack);
-		}
-
-		if (sort != null) {
-			filtro.setOrden(Optional.of(sort));
-		}
-		if (sortDirection != null) {
-			filtro.setDireccion(Optional.of(sortDirection));
-		}
-		if (owned != null) {
-			filtro.setComprado(owned);
-		}
-		int sizeAux = size;
-		if (size == null || size <= 0) {
-			sizeAux = Integer.MAX_VALUE;
-		}
-		filtro.setPageSize(sizeAux);
-		return filtro;
-	}
-
 	@GetMapping("/export/md")
 	public ResponseEntity<String> exportMarkdown(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) Boolean owned, @RequestParam(required = false) String title,
@@ -436,7 +403,8 @@ public class FilmApiController {
 			@RequestParam(required = false) Integer toYear, @RequestParam(required = false) String format,
 			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
 			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection) {
-		FilterDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+		FilterDto filtro = FilterDto.buildFilter(page, size, owned, title, casting, fromYear,
+				toYear, format, genre, pack, null, sort,
 				sortDirection);
 		String file = filmExportService.toMarkdown(service.findAllBy(filtro).getContent());
 
@@ -452,7 +420,8 @@ public class FilmApiController {
 			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
 			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection)
 			throws IOException {
-		FilterDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+		FilterDto filtro = FilterDto.buildFilter(page, size, owned, title, casting, fromYear, toYear, format, genre,
+				pack, null, sort,
 				sortDirection);
 		byte[] file = filmExportService.toPdf(service.findAllBy(filtro).getContent());
 
@@ -468,7 +437,8 @@ public class FilmApiController {
 			@RequestParam(required = false) String genre, @RequestParam(required = false) Boolean pack,
 			@RequestParam(required = false) String sort, @RequestParam(required = false) String sortDirection)
 			throws IOException {
-		FilterDto filtro = crearFiltro(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+		FilterDto filtro = FilterDto.buildFilter(page, size, owned, title, casting, fromYear, toYear, format, genre,
+				pack, null, sort,
 				sortDirection);
 		byte[] file = filmExportService.toOds(service.findAllBy(filtro).getContent());
 

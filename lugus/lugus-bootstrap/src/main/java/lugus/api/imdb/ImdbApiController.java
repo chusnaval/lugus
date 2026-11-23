@@ -17,7 +17,7 @@ import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.values.Format;
 import lugus.model.values.Genre;
-import lugus.service.films.EdicionService;
+import lugus.service.films.EditionService;
 import lugus.service.imdb.ImdbTitleAkasService;
 import lugus.service.imdb.ImdbTitleBasicsService;
 
@@ -31,7 +31,7 @@ public class ImdbApiController {
 
 	private final ImdbTitleAkasService itaService;
 	
-	private final EdicionService edicionService;
+	private final EditionService edicionService;
 
 	@GetMapping("/{id}")
 	FilmDto one(@PathVariable String id) throws LugusNotFoundException {

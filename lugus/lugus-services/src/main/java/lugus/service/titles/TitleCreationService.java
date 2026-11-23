@@ -2,6 +2,8 @@ package lugus.service.titles;
 
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -18,13 +20,18 @@ import lugus.repository.titles.TitleRepository;
 @Service
 @RequiredArgsConstructor
 public class TitleCreationService {
+    
+    private static final Logger logger = LogManager.getLogger();
 
     private final TitleRepository titleRepo;
-    private final FilmRepository peliculaRepo;
+    private final FilmRepository filmRepo;
     private final SerieRepository serieRepo;
     private final ImdbTitleBasicsRepository imdbRepo;
 
     public Title getOrCreateTitle(SearchTitleResultDto dto) {
+
+       
+
 
         // 1) Already exists in titles
         if (dto.getTitleId() != null) {
@@ -34,7 +41,7 @@ public class TitleCreationService {
 
         // 2) if is a MOVIE there is a film in DB
         if (dto.getSource().equals("MOVIE")) {
-            Optional<Film> optFilm = peliculaRepo.findByImdbId(dto.getImdbId());
+            Optional<Film> optFilm = filmRepo.findByImdbId(dto.getImdbId());
             Film p = optFilm.get();
             Title t = new Title();
             t.setType(TitleType.MOVIE);
@@ -47,7 +54,7 @@ public class TitleCreationService {
             }else if(dto.getImdbId() != null) {
 				t.setImdb(imdbRepo.findById(dto.getImdbId()).orElse(null));
 			}else {
-				System.out.println("No IMDB ID for " + p.getTitle());
+				logger.info("No IMDB ID for {}", p.getTitle());
 			}
             return titleRepo.save(t);
         }

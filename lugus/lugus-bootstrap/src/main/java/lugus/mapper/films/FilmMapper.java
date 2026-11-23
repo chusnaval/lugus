@@ -106,31 +106,31 @@ public class FilmMapper {
 	}
 
 	public Film mapToFilm(FilmDto dto) {
-		Film pelicula = new Film();
-		pelicula.setTitle(dto.getTitle());
-		pelicula.setMgmtTitle(dto.getTitleMgmt());
-		pelicula.setYear(dto.getYear());
+		Film film = new Film();
+		film.setTitle(dto.getTitle());
+		film.setMgmtTitle(dto.getTitleMgmt());
+		film.setYear(dto.getYear());
 
 		for (EditionDto dtoEd : dto.getEditions()) {
-			Edition edicion = new Edition();
-			edicion.setLocation(new Location());
-			edicion.getLocation().setCode(dtoEd.getLocation());
-			edicion.setCode(dtoEd.getMgmtCode());
-			edicion.setFormat(Format.getById(Short.valueOf(dtoEd.getFormat().getCodigo())));
-			edicion.setSteelbook(dtoEd.isSteelbook());
-			edicion.setSlipCover(dtoEd.isSlipcover());
-			edicion.setPurchased(dtoEd.isOwned());
-			edicion.setNotes(dtoEd.getNotes());
+			Edition edition = new Edition();
+			edition.setLocation(new Location());
+			edition.getLocation().setCode(dtoEd.getLocation());
+			edition.setCode(dtoEd.getMgmtCode());
+			edition.setFormat(Format.getById(Short.valueOf(dtoEd.getFormatCode())));
+			edition.setSteelbook(dtoEd.isSteelbook());
+			edition.setSlipCover(dtoEd.isSlipcover());
+			edition.setPurchased(dtoEd.isOwned());
+			edition.setNotes(dtoEd.getNotes());
 
-			pelicula.addEdition(edicion);
+			film.addEdition(edition);
 		}
 
-		pelicula.setGenre(Genre.getById(dto.getGenreCode()));
-		pelicula.setImdbId(dto.getImdbId());
-		pelicula.setRating(dto.getRating());
-		pelicula.setVotes(dto.getVotes());
-		pelicula.setDuration(dto.getDuration());
+		film.setGenre(Genre.getById(dto.getGenreCode()));
+		film.setImdbId(dto.getImdbId());
+		film.setRating(dto.getRating());
+		film.setVotes(dto.getVotes());
+		film.setDuration(dto.getDuration());
 
-		return pelicula;
+		return film;
 	}
 }

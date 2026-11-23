@@ -1,5 +1,6 @@
 package lugus.api.people;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +42,7 @@ public class FilmographyApiController {
 
 	private final ImdbTitleAkasService imdbTitleAkasService;
 
-	private final FilmService peliculaService;
+	private final FilmService filmService;
 
 	private final SeriesService seriesService;
 
@@ -73,6 +74,7 @@ public class FilmographyApiController {
 			return film;
 		}).filter(f -> f != null).toList();
 
+		films = new ArrayList<>(films);
 		Collections.sort(films, (o1, o2) -> o1.getStartyear().compareTo(o2.getStartyear()));
 		return films;
 	}
@@ -147,13 +149,13 @@ public class FilmographyApiController {
 	private Filmography buildFilmographyForFilm(final People person,
 			final ImdbTitlePrincipals itp, final Optional<ImdbTitleBasics> itb,
 			final Optional<ImdbTitleAkas> ita) {
-		boolean isFilmRegister = peliculaService.isFilmRegistered(itp.getId().getTconst());
+		boolean isFilmRegister = filmService.isFilmRegistered(itp.getId().getTconst());
 
 		Filmography filmography = Filmography.builder().id(person.getId()).nconst(person.getNconst())
 				.category(itp.getId().getCategory()).tconst(itp.getId().getTconst()).type(itb.get().getTitletype())
 				.startyear(Integer.parseInt(itb.get().getStartyear())).title(getTitle(ita, itb)).build();
 		if (isFilmRegister) {
-			Optional<Film> filmOptional = peliculaService.findByImdbId(itp.getId().getTconst());
+			Optional<Film> filmOptional = filmService.findByImdbId(itp.getId().getTconst());
 			if (filmOptional.isPresent()) {
 				// We need to put movieId in filmography so we know which movie
 				// we have registered in one way or another

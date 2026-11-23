@@ -74,19 +74,19 @@ public class SeriesService {
 	 * @return
 	 */
 	public Page<Series> findAllBy(FilterDto filter) {
-		Sort sort = buildSort(filter.getOrden(), filter.getDireccion());
+		Sort sort = buildSort(filter.getOrder(), filter.getDireccion());
 
-		Pageable pageable = PageRequest.of(filter.getPagina().get(), filter.getPageSize(), sort);
+		Pageable pageable = PageRequest.of(filter.getPage().get(), filter.getPageSize(), sort);
 
-		Specification<Series> spec = Specification.where(null);
+		Specification<Series> spec = Specification.unrestricted();
 
-		spec = spec.and(SeriesSpecification.byPurchased(filter.getComprado()));
-		spec = spec.and(SeriesSpecification.byFormat(filter.getFormato()));
-		spec = spec.and(SeriesSpecification.byGenre(filter.getGenero()));
+		spec = spec.and(SeriesSpecification.byPurchased(filter.getPurchased()));
+		spec = spec.and(SeriesSpecification.byFormat(filter.getFormat()));
+		spec = spec.and(SeriesSpecification.byGenre(filter.getGenre()));
 		spec = spec.and(SeriesSpecification.byLocation(filter.getLocation()));
-		spec = spec.and(SeriesSpecification.byNotes(filter.getNotas()));
-		spec = spec.and(SeriesSpecification.byTitle(filter.getTitulo()));
-		spec = spec.and(SeriesSpecification.byComplete(filter.getCompleta()));
+		spec = spec.and(SeriesSpecification.byNotes(filter.getNotes()));
+		spec = spec.and(SeriesSpecification.byTitle(filter.getTitle()));
+		spec = spec.and(SeriesSpecification.byComplete(filter.getComplete()));
 
 		return seriesRepo.findAll(spec, pageable);
 	}
@@ -105,7 +105,7 @@ public class SeriesService {
 
 		Pageable pageable = PageRequest.of(0, 1000, sort);
 
-		Specification<Series> spec = Specification.where(null);
+		Specification<Series> spec = Specification.unrestricted();
 
 		spec = spec.or(SeriesSpecification.byPurchased(false));
 		spec = spec.or(SeriesSpecification.byComplete(false));
@@ -201,7 +201,7 @@ public class SeriesService {
 
 		Pageable pageable = PageRequest.of(0, NUM_ELEMENTS_PER_HOME, sort);
 
-		Specification<Series> spec = Specification.where(null);
+		Specification<Series> spec = Specification.unrestricted();
 
 		spec = spec.and(SeriesSpecification.byPurchased(true));
 

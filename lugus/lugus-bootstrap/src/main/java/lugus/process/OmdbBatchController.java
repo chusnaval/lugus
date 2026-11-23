@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 @RestController
 @RequestMapping("/api/omdb/batch")
@@ -20,7 +19,7 @@ public class OmdbBatchController {
     }
 
     @PostMapping("/update-cache")
-    public ResponseEntity<String> fillCache() throws JsonProcessingException {
+    public ResponseEntity<String> fillCache() {
     	omdbBatchExecutor.fillCache();
         return ResponseEntity.ok("Batch initiated");
     }

@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +50,10 @@ import lugus.service.titles.TitlesService;
 @RequiredArgsConstructor
 public class FilmService {
 
+	private static final String MGMT_TITLE = "mgmtTitle";
+
+	private static final Logger logger = LogManager.getLogger();
+
 	private static final int NUM_ELEMENTS_PER_HOME = 5;
 	private final FilmRepository filmRepo;
 	private final LocationService locService;
@@ -56,7 +62,7 @@ public class FilmService {
 	private final ImdbTitleBasicsService imdbTitleBasicsService;
 	private final OmdbCacheService cacheService;
 	private final ObjectMapper jsonMapper;
-	private final EdicionService edicionService;
+	private final EditionService edicionService;
 
 	public List<Film> findAll() {
 		return filmRepo.findAll();
@@ -82,15 +88,14 @@ public class FilmService {
 		return filmRepo.save(p);
 	}
 
-	@Transactional
-	public Film update(final Integer id, final FilmDto dto, final String apiKey) throws IOException, URISyntaxException {
+	@Transactional(rollbackFor = {java.io.IOException.class, java.net.URISyntaxException.class})
+	public Film update(final Integer id, final FilmDto dto, final String apiKey)
+			throws IOException, URISyntaxException {
 
 		Film p = filmRepo.findById(id).orElseThrow(() -> new RuntimeException("Pelicula no encontrada"));
-		
-		// Check if there are differences in the code based on title, year, or genre
-		// TODO dont expose the fields that are used to calculate the code, and use a method in Pelicula to check if the code is different
+
 		boolean isDiffInCode = p.isDiffInCode(dto.getTitleMgmt(), dto.getYear(), dto.getGenreCode());
-		
+
 		p.setTitle(dto.getTitle());
 		p.setMgmtTitle(dto.getTitleMgmt());
 		p.setYear(dto.getYear());
@@ -104,7 +109,7 @@ public class FilmService {
 		Film saved = filmRepo.save(p);
 
 		// Sincronizar Title si existe
-		titlesService.findByFilm_Id(id).ifPresent(title -> {
+		titlesService.findByFilmId(id).ifPresent(title -> {
 			title.setTitle(p.getTitle());
 			title.setYear(p.getYear());
 			title.setUrlCover(dto.getCoverSrc());
@@ -147,11 +152,11 @@ public class FilmService {
 	private void updateEditions(final FilmDto dto, Film p, boolean updateCode) {
 		for (EditionDto edto : dto.getEditions()) {
 			Optional<Edition> optEditional = edicionService.findById(edto.getId());
-			if(optEditional.isPresent()){
+			if (optEditional.isPresent()) {
 				Edition edition = optEditional.get();
 				Optional<Location> loc = locService.findById(edto.getLocation());
 				edition.setTsModif(Instant.now());
-				edition.setFormat(Format.getById(Short.valueOf(edto.getFormat().getCodigo())));
+				edition.setFormat(Format.getById(Short.valueOf(edto.getFormatCode())));
 				if (loc.isPresent()) {
 					edition.setLocation(loc.get());
 				}
@@ -160,13 +165,12 @@ public class FilmService {
 				edition.setSlipCover(edto.isSlipcover());
 				edition.setSteelbook(edto.isSteelbook());
 				edition.setNotes(edto.getNotes());
-	
+
 				p.addEdition(edition);
 			}
 		}
-		
-		if(updateCode)
-		{
+
+		if (updateCode) {
 			for (Edition edicion : p.getEditions()) {
 				String expected = edicionService.calculateCompleteCode(edicion.getId(), p);
 				edicion.setCode(expected);
@@ -186,11 +190,11 @@ public class FilmService {
 			}
 			pf.setContent(dwFotoService.download(sourceObj.get().getId(), url));
 			pf.setCover(true);
-			
+
 			pelicula.getImages().clear();
 			pelicula.addImage(pf);
-		}catch (Exception e) {
-			System.err.println("Error al descargar la carátula: " + e.getMessage());
+		} catch (Exception e) {
+			logger.error("Error al descargar la carátula: {}", e.getMessage());
 		}
 	}
 
@@ -232,29 +236,29 @@ public class FilmService {
 	 * @return
 	 */
 	public Page<Film> findAllBy(FilterDto filter) {
-		Sort sort = buildSort(filter.getOrden(), filter.getDireccion());
-		int pageNum = filter.getPagina().orElse(0);
+		Sort sort = buildSort(filter.getOrder(), filter.getDireccion());
+		int pageNum = filter.getPage().orElse(0);
 		Pageable pageable = PageRequest.of(pageNum, filter.getPageSize(), sort);
 
 		Specification<Film> spec = Specification.unrestricted();
 
 		spec = spec.and(FilmSpecification.byPack(filter.getPack()));
-		spec = spec.and(FilmSpecification.byPurchased(filter.getComprado()));
-		spec = spec.and(FilmSpecification.byFromYear(filter.getFromAnyo()));
-		spec = spec.and(FilmSpecification.byToYear(filter.getToAnyo()));
+		spec = spec.and(FilmSpecification.byPurchased(filter.getPurchased()));
+		spec = spec.and(FilmSpecification.byFromYear(filter.getFromYear()));
+		spec = spec.and(FilmSpecification.byToYear(filter.getToYear()));
 		spec = spec.and(FilmSpecification.bySteelbook(filter.getSteelbook()));
-		spec = spec.and(FilmSpecification.bySlipCover(filter.getFunda()));
-		spec = spec.and(FilmSpecification.byFormat(filter.getFormato()));
+		spec = spec.and(FilmSpecification.bySlipCover(filter.getSlipCover()));
+		spec = spec.and(FilmSpecification.byFormat(filter.getFormat()));
 
-		spec = spec.and(FilmSpecification.byGenre(filter.getGenero()));
+		spec = spec.and(FilmSpecification.byGenre(filter.getGenre()));
 		spec = spec.and(FilmSpecification.byLocation(filter.getLocation()));
-		spec = spec.and(FilmSpecification.byNotes(filter.getNotas()));
+		spec = spec.and(FilmSpecification.byNotes(filter.getNotes()));
 		spec = spec.and(FilmSpecification.vigentes());
-		spec = spec.and(FilmSpecification.byTitle(filter.getTitulo()));
+		spec = spec.and(FilmSpecification.byTitle(filter.getTitle()));
 
 		// test if has fotos associated as caratula
-		if (filter.getTieneCaratula() != null) {
-			spec = spec.and(FilmSpecification.hasCover(filter.getTieneCaratula()));
+		if (filter.getHasCover() != null) {
+			spec = spec.and(FilmSpecification.hasCover(filter.getHasCover()));
 		}
 
 		Specification<Film> textoGroup = null;
@@ -262,7 +266,7 @@ public class FilmService {
 			Specification<Film> actorSpec = FilmSpecification.byActor(filter.getActor());
 			Specification<Film> directorSpec = FilmSpecification.byDirector(filter.getDirector());
 
-			textoGroup = Specification.where(actorSpec).or(directorSpec);
+			textoGroup = actorSpec.or(directorSpec);
 		}
 
 		if (textoGroup != null) {
@@ -273,7 +277,7 @@ public class FilmService {
 	}
 
 	public Page<Film> wanted() {
-		Sort sort = Sort.by(Sort.Order.desc("mgmtTitle"));
+		Sort sort = Sort.by(Sort.Order.desc(MGMT_TITLE));
 
 		Pageable pageable = PageRequest.of(0, 1000, sort);
 
@@ -286,24 +290,20 @@ public class FilmService {
 
 	public Page<Film> findForHome() {
 
-	    Pageable pageable = PageRequest.of(0, NUM_ELEMENTS_PER_HOME,
-	        Sort.by(Sort.Order.desc("lastPurchased"))
-	    );
+		Pageable pageable = PageRequest.of(0, NUM_ELEMENTS_PER_HOME,
+				Sort.by(Sort.Order.desc("lastPurchased")));
 
-	    Specification<Film> spec = Specification.unrestricted();
+		Specification<Film> spec = Specification.unrestricted();
 
-	    spec = spec.and(FilmSpecification.byPurchased(true));
+		spec = spec.and(FilmSpecification.byPurchased(true));
 
-	    return filmRepo.findAll(spec, pageable);
+		return filmRepo.findAll(spec, pageable);
 	}
-
-
 
 	public Page<Film> lastForGenre(String generoCodigo) {
 
-	    Pageable pageable = PageRequest.of(0, NUM_ELEMENTS_PER_HOME-1,
-		        Sort.by(Sort.Order.desc("lastPurchased"))
-		    );
+		Pageable pageable = PageRequest.of(0, NUM_ELEMENTS_PER_HOME - 1,
+				Sort.by(Sort.Order.desc("lastPurchased")));
 		Specification<Film> spec = Specification.unrestricted();
 
 		spec = spec.and(FilmSpecification.byPurchased(true));
@@ -321,25 +321,7 @@ public class FilmService {
 	 * @return
 	 */
 	protected static Sort buildSort(final Optional<String> field, final Optional<String> direction) {
-		Sort sort;
-		// when order by "compra", we want to order by tsModif and tsCreation,
-		// when ts modif is null, we want to order by tsCreation, and in desc
-		// because we want to see first the last modified, and when is null, the last
-		// created
-
-//		if (field.isPresent() && "compra".equals(field.get())) {
-//
-//			Direction dir = Direction.DESC;
-//			Sort.Order orderCompra = new Sort.Order(dir, "editions.tsCompra").with(Sort.NullHandling.NULLS_LAST);
-//			Sort.Order orderModif = new Sort.Order(dir, "editions.tsModif").with(Sort.NullHandling.NULLS_LAST);
-//			Sort.Order orderAlta = new Sort.Order(dir, "editions.tsCreation").with(Sort.NullHandling.NULLS_LAST);
-//
-//			sort = Sort.by(orderCompra, orderModif, orderAlta);
-//
-//		} else {
-		sort = Sort.by(Direction.fromString(direction.orElse("ASC")), field.isPresent() ? field.get() : "tituloGest");
-		// }
-		return sort;
+		return Sort.by(Direction.fromString(direction.orElse("ASC")), field.isPresent() ? field.get() : MGMT_TITLE);
 	}
 
 	public List<Film> findByTitlesInYear(String title, int year) {
@@ -351,11 +333,12 @@ public class FilmService {
 	}
 
 	public boolean isFilmRegistered(String tconst) {
-		System.out.println("Comprobando si la película está registrada para imdbId = [" + tconst + "]");
+		logger.info("Comprobando si la película está registrada para imdbId = [{}]", tconst);
 		return !filmRepo.findByImdbId(tconst).isEmpty();
 	}
+
 	public Optional<Film> findByImdbId(String tconst) {
-		System.out.println("Buscando imdbId = [" + tconst + "]");
+		logger.info("Buscando imdbId = [{}]", tconst);
 		return filmRepo.findByImdbId(tconst);
 	}
 
@@ -369,15 +352,14 @@ public class FilmService {
 			org.springframework.data.domain.Pageable pg = org.springframework.data.domain.PageRequest.of(0, 20);
 			Specification<Film> tituloSpec = FilmSpecification.byTitle(title);
 
-			Specification<Film> textoGroup = Specification.where(tituloSpec);
-			return filmRepo.findAll(textoGroup, pg).getContent();
+			return filmRepo.findAll(tituloSpec, pg).getContent();
 		} catch (Exception e) {
 			return java.util.Collections.emptyList();
 		}
 	}
 
 	public Page<Film> findAll(Pageable pageable) {
-		Sort sort = Sort.by(Direction.ASC, "mgmtTitle");
+		Sort sort = Sort.by(Direction.ASC, MGMT_TITLE);
 
 		Pageable pageable2 = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
@@ -404,7 +386,7 @@ public class FilmService {
 	}
 
 	public Map<Object, Integer> countByGenre() {
-		
+
 		return filmRepo.countByGenre().stream()
 				.collect(Collectors.toMap(row -> ((Genre) row[0]).getCode(), row -> ((Long) row[1]).intValue()));
 	}

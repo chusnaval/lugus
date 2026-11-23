@@ -17,28 +17,28 @@ import lugus.repository.films.EditionRepository;
 
 @Service
 @RequiredArgsConstructor
-public class EdicionService {
+public class EditionService {
 
-	private final EditionRepository edicionRepository;
+	private final EditionRepository editionRepository;
 		
 	public int addedInLastDays(final int days) {
 		Instant limit = Instant.now().minus(days, ChronoUnit.DAYS);
-		return edicionRepository.countByTsCreationAfter(limit);
+		return editionRepository.countByTsCreationAfter(limit);
 	}
 
 	public long countAllPurchased() {
-		return edicionRepository.countByPurchased(true);
+		return editionRepository.countByPurchased(true);
 	}
 	public int countByFormat(Format format) {
-		return edicionRepository.countByFormatAndPurchased(format, true);
+		return editionRepository.countByFormatAndPurchased(format, true);
 	}
 
 	public int countNotPurchased() {
-		return edicionRepository.countByPurchased(false);
+		return editionRepository.countByPurchased(false);
 	}
 
 	public Optional<Edition> findById(final int id) {
-		return edicionRepository.findById(id);
+		return editionRepository.findById(id);
 	}
 
 
@@ -59,7 +59,7 @@ public class EdicionService {
 		String completeCode = filmCode  + "-" + suffixText;
 		
 		while (codeExists) {
-			if (edicionRepository.existsByCodeAndIdNot(completeCode, idEdition)) {
+			if (editionRepository.existsByCodeAndIdNot(completeCode, idEdition)) {
 				suffix++;
 				suffixText =  df.format(suffix);
 				completeCode = filmCode  + "-" + suffixText;
@@ -72,7 +72,7 @@ public class EdicionService {
 	}
 
 	public void update(final Edition edition) {
-		edicionRepository.save(edition);
+		editionRepository.save(edition);
 		
 	}
 

@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Importa el fichero title.akas.tsv.gz del dataset de IMDb a la tabla
  * lugus.imdb_title_akas de PostgreSQL.
@@ -19,6 +22,7 @@ import java.util.zip.GZIPInputStream;
  * "/path/to/title.akas.tsv.gz"); importer.importData();
  */
 public class ImdbTitleAkasImporter {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ImdbTitleAkasImporter.class);
 
 	private static final String COPY_SQL = "COPY lugus.imdb_title_basics ("
 			+ "tconst, titletype, primarytitle, originaltitle, isadult, startyear, endyear, runtimeminutes, genres) FROM STDIN WITH (FORMAT csv, DELIMITER E'\\t', NULL '\\N')";
@@ -52,22 +56,22 @@ public class ImdbTitleAkasImporter {
 	 * @throws IOException  si hay problemas leyendo el archivo
 	 */
 	public void importData() throws SQLException, IOException {
-		System.out.println("Conectando a la base de datos...");
+		LOGGER.info("Conectando a la base de datos...");
 		try (Connection conn = DriverManager.getConnection(jdbcUrl, dbUser, dbPassword)) {
 			// Necesitamos el API de CopyManager del driver PostgreSQL
 			org.postgresql.PGConnection pgConn = conn.unwrap(org.postgresql.PGConnection.class);
 			org.postgresql.copy.CopyManager copyManager = pgConn.getCopyAPI();
 
-			System.out.println("Abriendo archivo GZIP: " + tsvGzFile.getAbsolutePath());
+			LOGGER.info("Abriendo archivo GZIP: {} ", tsvGzFile.getAbsolutePath());
 			try (InputStream fileIn = new FileInputStream(tsvGzFile);
 					InputStream gzipIn = new GZIPInputStream(fileIn);
 					BufferedReader reader = new BufferedReader(new InputStreamReader(gzipIn, StandardCharsets.UTF_8))) {
-				String header = reader.readLine(); // <-- la descartamos
+				String header = reader.readLine(); // <-- header skip
 				if (header == null) {
-					throw new IOException("El archivo está vacío.");
+					throw new IOException("The file is empty.");
 				}
-				System.out.println("Cabecera detectada y omitida: " + header);
-				// Creamos un pipe para alimentar a COPY sin cargar todo en memoria
+				LOGGER.info("Cabecera detectada y omitida: {}", header);
+				// create a pipe to feed a COPY without load all in memory
 				PipedOutputStream pipeOut = new PipedOutputStream();
 				PipedInputStream pipeIn = new PipedInputStream(pipeOut);
 
@@ -87,7 +91,7 @@ public class ImdbTitleAkasImporter {
 							count++;
 
 							if (count % 1_000_000 == 0) {
-								System.out.printf("%,d filas procesadas...%n", count);
+								LOGGER.info("{} filas procesadas...", count);
 							}
 						}
 						writer.flush();
@@ -99,9 +103,9 @@ public class ImdbTitleAkasImporter {
 				producer.start();
 
 				// Consumidor: COPY lee directamente del pipe
-				System.out.println("Iniciando COPY...");
+				LOGGER.info("Iniciando COPY...");
 				long copiedRows = copyManager.copyIn(COPY_SQL, pipeIn);
-				System.out.printf("COPY finalizado: %d filas insertadas.%n", copiedRows);
+				LOGGER.info("COPY finalizado:{} filas insertadas.", copiedRows);
 
 				// Esperamos que el hilo productor termine (debe haberlo hecho antes de que COPY
 				// cierre el pipe)
@@ -147,8 +151,7 @@ public class ImdbTitleAkasImporter {
 
 		// Convertir tipos y atributos a la sintaxis de array de PostgreSQL
 		cols[8] = toPgArray(cols[8]);
-		// cols[2] = toPgArray(cols[2]);
-
+	
 		// El campo isOriginalTitle ya está como 0/1; COPY lo interpreta como BIT(1)
 		// Si fuera "\N" lo dejamos sin cambios (NULL).
 

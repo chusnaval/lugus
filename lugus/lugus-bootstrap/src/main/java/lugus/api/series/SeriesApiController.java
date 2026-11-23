@@ -31,7 +31,6 @@ import lugus.model.core.Location;
 import lugus.model.core.Source;
 import lugus.model.series.Series;
 import lugus.model.series.SeriesImage;
-import lugus.model.values.Format;
 import lugus.model.values.TitleType;
 import lugus.service.core.LocationService;
 import lugus.service.core.SourceService;
@@ -47,93 +46,57 @@ import lugus.service.titles.TitlesService;
 public class SeriesApiController {
 
 	private final SeriesMapper mapper;
-	
+
 	private final SeriesService service;
-	
+
 	private final SourceService sourceService;
-	
+
 	private final LocationService locService;
-	
+
 	private final SeriesExportService seriesExportService;
-	
+
 	private final InsertPersonalSeriesDataService insertImdbService;
-	
+
 	private final TitlesService titlesService;
-	
+
 	@GetMapping("/{id}")
 	SerieDto one(@PathVariable int id) {
 		Series serie = service.findById(id).orElse(null);
-		if(serie!=null) {
+		if (serie != null) {
 			return mapper.mapToSerieDTO(serie);
 		}
 		return null;
 	}
-	
+
 	@GetMapping("/page")
 	public Page<SerieDto> getAllFilms(
-	        @RequestParam Integer page,
-	        @RequestParam Integer size,
-	        @RequestParam(required = false) Boolean owned,
-	        @RequestParam(required = false) String title,
-	        @RequestParam(required = false) String casting,
-	        @RequestParam(required = false) Integer fromYear,
-	        @RequestParam(required = false) Integer toYear,
-	        @RequestParam(required = false) String format,
-	        @RequestParam(required = false) String genre,
-	        @RequestParam(required = false) Boolean complete,
-	        @RequestParam(required = false) String sort,
-	        @RequestParam(required = false) String sortDirection
-	) {
-		FilterDto filtro = new FilterDto();
-		if(page!=null) {
-			filtro.setPagina(Optional.of(page));
-		}
-		if(title!=null) {
-			filtro.setTitulo(title);
-		}
-		if(casting!=null) {
-			filtro.setActor(casting);
-			filtro.setDirector(casting);
-		}
-		if(fromYear!=null) {
-			filtro.setFromAnyo(fromYear);
-		}
-		if(toYear!=null) {
-			filtro.setToAnyo(toYear);
-		}
-		if(format!=null) {
-			filtro.setFormato((int) Format.getByName(format).getId());
-		}
-		if(genre!=null) {
-			filtro.setGenero(genre);
-		}
-		if(complete!=null) {
-			filtro.setCompleta(complete);
-		}
-
-		if(sort!=null) {
-			filtro.setOrden(Optional.of(sort));
-		}
-		if(sortDirection!=null) {
-			filtro.setDireccion(Optional.of(sortDirection));
-		}
-		if(owned!=null) {
-			filtro.setComprado(owned);
-		}
-		filtro.setPageSize(size);
-	    return service.findAllBy(filtro).map(mapper::mapToSerieDTO);
+			@RequestParam Integer page,
+			@RequestParam Integer size,
+			@RequestParam(required = false) Boolean owned,
+			@RequestParam(required = false) String title,
+			@RequestParam(required = false) String casting,
+			@RequestParam(required = false) Integer fromYear,
+			@RequestParam(required = false) Integer toYear,
+			@RequestParam(required = false) String format,
+			@RequestParam(required = false) String genre,
+			@RequestParam(required = false) Boolean complete,
+			@RequestParam(required = false) String sort,
+			@RequestParam(required = false) String sortDirection) {
+		FilterDto filtro = FilterDto.buildFilter(page, size, owned, title, casting, fromYear,
+				toYear, format, genre, null, complete, sort, sortDirection);
+		return service.findAllBy(filtro).map(mapper::mapToSerieDTO);
 	}
-	
+
 	@PutMapping("/{id}")
 	public SerieDto update(
-	        @PathVariable Integer id,
-	        @RequestBody SerieDto dto
-	) throws IOException, URISyntaxException {
-	    return mapper.mapToSerieDTO(service.update(id, dto));
+			@PathVariable Integer id,
+			@RequestBody SerieDto dto) throws IOException, URISyntaxException {
+		return mapper.mapToSerieDTO(service.update(id, dto));
 	}
-	
+
 	@PostMapping("new")
-	ResponseEntity<Object> save(@RequestBody SerieDto dto, Authentication auth) throws LugusNotFoundException, IOException, URISyntaxException {
+	ResponseEntity<Object> save(@RequestBody SerieDto dto, Authentication auth)
+			throws LugusNotFoundException, IOException, URISyntaxException {
 		Series serie = mapper.mapToSerie(dto);
 		Location loc = findLocation(dto);
 		serie.setLocation(loc);
@@ -141,7 +104,7 @@ public class SeriesApiController {
 		serie.setTsCreation(Instant.now());
 		serie.setUsrCreation(auth.getName());
 		Series saved = service.save(serie);
-		
+
 		if (dto.getCoverSrc() != null && !dto.getCoverSrc().isEmpty()) {
 			final DwImageServiceI dwFotoService = new DwImageService();
 			final int sourceId = sourceService.calcularIdSource(dto.getCoverSrc());
@@ -161,7 +124,7 @@ public class SeriesApiController {
 		if (dto.getImdbId() != null && !dto.getImdbId().isBlank()) {
 			insertImdbService.insert(saved.getId(), dto.getImdbId());
 
-			titlesService.findByImdb_Id(dto.getImdbId()).ifPresent(title -> {
+			titlesService.findByImdbId(dto.getImdbId()).ifPresent(title -> {
 				title.setTitle(saved.getTitle());
 				title.setYear(saved.getStartYear());
 				title.setType(TitleType.SERIES);
@@ -170,11 +133,10 @@ public class SeriesApiController {
 				titlesService.save(title);
 			});
 		}
-		
+
 		return ResponseEntity.ok().build();
 	}
-	
-	
+
 	private Location findLocation(SerieDto dto) {
 		Location loc = null;
 		if (dto.getLocation() != null && !dto.getLocation().isBlank()) {
@@ -183,16 +145,16 @@ public class SeriesApiController {
 		}
 		return loc;
 	}
-	
-	@GetMapping(value="/ultimas", produces = "application/json;charset=UTF-8")
+
+	@GetMapping(value = "/ultimas", produces = "application/json;charset=UTF-8")
 	public List<SerieDto> ultimas() throws LugusNotFoundException {
 
 		return service.findForHome().getContent().stream()
-                .map(mapper::mapToSerieDTO)
-                .toList();
+				.map(mapper::mapToSerieDTO)
+				.toList();
 	}
-	
-	@GetMapping(value="/stats", produces = "application/json;charset=UTF-8")
+
+	@GetMapping(value = "/stats", produces = "application/json;charset=UTF-8")
 	public SeriesStatsDto getStats() {
 		SeriesStatsDto stats = new SeriesStatsDto();
 		stats.setTotal(service.contarTodas());
@@ -201,122 +163,76 @@ public class SeriesApiController {
 		stats.setCompleteGroups(service.countByPurchased(true));
 		return stats;
 	}
-	
+
 	@GetMapping("/export/ods")
-	public ResponseEntity<byte[]> exportOds(  @RequestParam Integer page,
-	        @RequestParam Integer size,
-	        @RequestParam(required = false) Boolean owned,
-	        @RequestParam(required = false) String title,
-	        @RequestParam(required = false) String casting,
-	        @RequestParam(required = false) Integer fromYear,
-	        @RequestParam(required = false) Integer toYear,
-	        @RequestParam(required = false) String format,
-	        @RequestParam(required = false) String genre,
-	        @RequestParam(required = false) Boolean complete,
-	        @RequestParam(required = false) String sort,
-	        @RequestParam(required = false) String sortDirection) throws IOException {
-		FilterDto filtro = createFilter(page, size, owned, title, casting, fromYear, toYear, format, genre, false, sort,
+	public ResponseEntity<byte[]> exportOds(@RequestParam Integer page,
+			@RequestParam Integer size,
+			@RequestParam(required = false) Boolean owned,
+			@RequestParam(required = false) String title,
+			@RequestParam(required = false) String casting,
+			@RequestParam(required = false) Integer fromYear,
+			@RequestParam(required = false) Integer toYear,
+			@RequestParam(required = false) String format,
+			@RequestParam(required = false) String genre,
+			@RequestParam(required = false) Boolean complete,
+			@RequestParam(required = false) String sort,
+			@RequestParam(required = false) String sortDirection) throws IOException {
+		FilterDto filtro = FilterDto.buildFilter(page, size, owned, title, casting, fromYear,
+				toYear, format, genre, null, complete, sort,
 				sortDirection);
-	    byte[] file = seriesExportService.toOds(service.findAllBy(filtro).getContent());
+		byte[] file = seriesExportService.toOds(service.findAllBy(filtro).getContent());
 
-	    return ResponseEntity.ok()
-	            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas.ods")
-	            .contentType(MediaType.parseMediaType("application/vnd.oasis.opendocument.spreadsheet"))
-	            .body(file);
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=films.ods")
+				.contentType(MediaType.parseMediaType("application/vnd.oasis.opendocument.spreadsheet"))
+				.body(file);
 	}
 
-	private FilterDto createFilter(Integer page, Integer size, Boolean owned, String title, String casting,
-			Integer fromYear, Integer toYear, String format, String genre, Boolean pack, String sort,
-			String sortDirection) {
-		FilterDto filtro = new FilterDto();
-		if(page!=null) {
-			filtro.setPagina(Optional.of(page));
-		}
-		if(title!=null) {
-			filtro.setTitulo(title);
-		}
-		if(casting!=null) {
-			filtro.setActor(casting);
-			filtro.setDirector(casting);
-		}
-		if(fromYear!=null) {
-			filtro.setFromAnyo(fromYear);
-		}
-		if(toYear!=null) {
-			filtro.setToAnyo(toYear);
-		}
-		if(format!=null) {
-			filtro.setFormato((int) Format.getByName(format).getId());
-		}
-		if(genre!=null) {
-			filtro.setGenero(genre);
-		}
-		if(pack!=null) {
-			filtro.setPack(pack);
-		}
-
-		if(sort!=null) {
-			filtro.setOrden(Optional.of(sort));
-		}
-		if(sortDirection!=null) {
-			filtro.setDireccion(Optional.of(sortDirection));
-		}
-		if(owned!=null) {
-			filtro.setComprado(owned);
-		}
-		int sizeAux = size;
-		if(size==null || size <=0) {
-			sizeAux = Integer.MAX_VALUE;
-		}
-		filtro.setPageSize(sizeAux);
-		return filtro;
-	}
-
-	
 	@GetMapping("/export/md")
-	public ResponseEntity<String> exportMarkdown(	  @RequestParam Integer page,
-	        @RequestParam Integer size,
-	        @RequestParam(required = false) Boolean owned,
-	        @RequestParam(required = false) String title,
-	        @RequestParam(required = false) String casting,
-	        @RequestParam(required = false) Integer fromYear,
-	        @RequestParam(required = false) Integer toYear,
-	        @RequestParam(required = false) String format,
-	        @RequestParam(required = false) String genre,
-	        @RequestParam(required = false) Boolean complete,
-	        @RequestParam(required = false) String sort,
-	        @RequestParam(required = false) String sortDirection) {
-		FilterDto filtro = createFilter(page, size, owned, title, casting, fromYear, toYear, format, genre, false, sort,
+	public ResponseEntity<String> exportMarkdown(@RequestParam Integer page,
+			@RequestParam Integer size,
+			@RequestParam(required = false) Boolean owned,
+			@RequestParam(required = false) String title,
+			@RequestParam(required = false) String casting,
+			@RequestParam(required = false) Integer fromYear,
+			@RequestParam(required = false) Integer toYear,
+			@RequestParam(required = false) String format,
+			@RequestParam(required = false) String genre,
+			@RequestParam(required = false) Boolean complete,
+			@RequestParam(required = false) String sort,
+			@RequestParam(required = false) String sortDirection) {
+		FilterDto filtro = FilterDto.buildFilter(page, size, owned, title, casting, fromYear,
+				toYear, format, genre, null, complete, sort,
 				sortDirection);
-	    String file = seriesExportService.toMarkdown(service.findAllBy(filtro).getContent());
-	    
+		String file = seriesExportService.toMarkdown(service.findAllBy(filtro).getContent());
 
-	    return ResponseEntity.ok()
-	            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas.md")
-	            .contentType(MediaType.TEXT_MARKDOWN)
-	            .body(file);
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=films.md")
+				.contentType(MediaType.TEXT_MARKDOWN)
+				.body(file);
 	}
-	
+
 	@GetMapping("/export/pdf")
-	public ResponseEntity<byte[]> exportPdf(  @RequestParam Integer page,
-	        @RequestParam Integer size,
-	        @RequestParam(required = false) Boolean owned,
-	        @RequestParam(required = false) String title,
-	        @RequestParam(required = false) String casting,
-	        @RequestParam(required = false) Integer fromYear,
-	        @RequestParam(required = false) Integer toYear,
-	        @RequestParam(required = false) String format,
-	        @RequestParam(required = false) String genre,
-	        @RequestParam(required = false) Boolean complete,
-	        @RequestParam(required = false) String sort,
-	        @RequestParam(required = false) String sortDirection) throws IOException {
-		FilterDto filtro = createFilter(page, size, owned, title, casting, fromYear, toYear, format, genre, false, sort,
+	public ResponseEntity<byte[]> exportPdf(@RequestParam Integer page,
+			@RequestParam Integer size,
+			@RequestParam(required = false) Boolean owned,
+			@RequestParam(required = false) String title,
+			@RequestParam(required = false) String casting,
+			@RequestParam(required = false) Integer fromYear,
+			@RequestParam(required = false) Integer toYear,
+			@RequestParam(required = false) String format,
+			@RequestParam(required = false) String genre,
+			@RequestParam(required = false) Boolean complete,
+			@RequestParam(required = false) String sort,
+			@RequestParam(required = false) String sortDirection) throws IOException {
+		FilterDto filtro = FilterDto.buildFilter(page, size, owned, title, casting, fromYear, toYear, format, genre,
+				null, complete, sort,
 				sortDirection);
 		byte[] file = seriesExportService.toPdf(service.findAllBy(filtro).getContent());
 
-	    return ResponseEntity.ok()
-	            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=peliculas.pdf")
-	            .contentType(MediaType.APPLICATION_PDF)
-	            .body(file);
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=films.pdf")
+				.contentType(MediaType.APPLICATION_PDF)
+				.body(file);
 	}
 }

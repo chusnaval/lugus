@@ -42,13 +42,13 @@ public class GroupsService {
 		if(direccion.isEmpty()) {
 			direccion = Optional.of("asc");
 		}
-		Sort sort = Sort.by(Direction.fromString(direccion.get()), filter.getOrden().orElse("name"));
+		Sort sort = Sort.by(Direction.fromString(direccion.get()), filter.getOrder().orElse("name"));
 
-		Pageable pageable = PageRequest.of(filter.getPagina().get(), filter.getPageSize(), sort);
+		Pageable pageable = PageRequest.of(filter.getPage().get(), filter.getPageSize(), sort);
 
 		
 		Specification<Group> spec = Specification.unrestricted();
-		spec = spec.and(porTitulo(filter.getTitulo()));
+		spec = spec.and(porTitulo(filter.getTitle()));
 		
 		return groupRepository.findAll(spec, pageable);
 	}
@@ -71,7 +71,7 @@ public class GroupsService {
 		
 		Pageable pageable2 = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
-		Specification<Group> spec = Specification.where(null);
+		Specification<Group> spec = Specification.unrestricted();
 
 		return groupRepository.findAll(spec, pageable2);
 	}

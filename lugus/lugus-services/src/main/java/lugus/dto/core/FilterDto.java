@@ -1,122 +1,121 @@
 package lugus.dto.core;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-
-import org.springframework.util.StringUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lugus.model.values.Format;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FilterDto implements Serializable{
+public class FilterDto implements Serializable {
 
 	/**
 	 * Serial version UID
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private String texto;
+	private String text;
 
-	private String titulo;
+	private String title;
 
-	private Integer fromAnyo;
+	private Integer fromYear;
 
-	private Integer toAnyo;
+	private Integer toYear;
 
 	private Boolean pack;
 
-	private Integer formato;
+	private Integer format;
 
 	private Boolean steelbook;
 
-	private Boolean funda;
+	private Boolean slipCover;
 
-	private Boolean comprado;
-	
-	private Boolean completa;
+	private Boolean purchased;
 
-	private Boolean tieneCaratula;
+	private Boolean complete;
 
-	private String genero;
+	private Boolean hasCover;
+
+	private String genre;
 
 	private String location;
 
-	private String notas;
+	private String notes;
 
 	private String director;
 
 	private String actor;
-	
+
 	private int pageSize = 30;
 
-	private Optional<Integer> pagina = Optional.of(0);
+	private transient Optional<Integer> page = Optional.of(0);
 
-	private Optional<String> orden = Optional.empty();
+	private transient Optional<String> order = Optional.empty();
 
-	private Optional<String> direccion = Optional.empty();
-
-	public Map<String, Object> toMap() {
-		Map<String, Object> map = new HashMap<>();
-
-		if (StringUtils.hasLength(texto))
-			map.put("texto", texto);
-
-		if (StringUtils.hasLength(titulo))
-			map.put("titulo", titulo);
-		if (StringUtils.hasLength(genero))
-			map.put("genero", genero);
-		if (StringUtils.hasLength(location))
-			map.put("location", location);
-		if (StringUtils.hasLength(notas))
-			map.put("notas", notas);
-		if (orden.isPresent() && StringUtils.hasLength(orden.get()))
-			map.put("orden", orden);
-		if (direccion.isPresent() && StringUtils.hasLength(direccion.get()))
-			map.put("direccion", direccion);
-
-		if (StringUtils.hasLength(director))
-			map.put("director", director);
-
-		if (StringUtils.hasLength(actor))
-			map.put("actor", actor);
-
-		if (fromAnyo != null)
-			map.put("fromAnyo", fromAnyo);
-		if (toAnyo != null)
-			map.put("toAnyo", toAnyo);
-		if (formato != null)
-			map.put("formato", formato);
-		if (pack != null)
-			map.put("pack", pack);
-		if (steelbook != null)
-			map.put("steelbook", steelbook);
-		if (funda != null)
-			map.put("funda", funda);
-		if (comprado != null)
-			map.put("comprado", comprado);
-		if (completa != null)
-			map.put("completa", completa);
-		if (tieneCaratula != null)
-			map.put("tieneCaratula", tieneCaratula);
-
-		if (pagina.get() >= 0)
-			map.put("pagina", pagina);
-
-		return map;
-	}
+	private transient Optional<String> direccion = Optional.empty();
 
 	public static FilterDto reset(String field) {
 		FilterDto filtro = new FilterDto();
-		filtro.setOrden(Optional.of(field));
+		filtro.setOrder(Optional.of(field));
 		filtro.setPack(false);
+		return filtro;
+	}
+
+	public static FilterDto buildFilter(Integer page, Integer size, Boolean owned, String title, String casting,
+			Integer fromYear, Integer toYear, String format, String genre, Boolean pack, Boolean complete, String sort,
+			String sortDirection) {
+		FilterDto filtro = new FilterDto();
+		if (page != null) {
+			filtro.setPage(Optional.of(page));
+		}
+		if (title != null) {
+			filtro.setTitle(title);
+		}
+		if (casting != null) {
+			filtro.setActor(casting);
+			filtro.setDirector(casting);
+		}
+		if (fromYear != null) {
+			filtro.setFromYear(fromYear);
+		}
+		if (toYear != null) {
+			filtro.setToYear(toYear);
+		}
+		if (format != null) {
+			if (Format.getById(Short.valueOf(format)) == null) {
+				throw new IllegalArgumentException("Formato no válido: " + format);
+			}
+			filtro.setFormat((int) Format.getById(Short.valueOf(format)).getId());
+		}
+		if (genre != null) {
+			filtro.setGenre(genre);
+		}
+		if (pack != null) {
+			filtro.setPack(pack);
+		}
+		if (complete != null) {
+			filtro.setComplete(complete);
+		}
+		if (sort != null) {
+			filtro.setOrder(Optional.of(sort));
+		}
+		if (sortDirection != null) {
+			filtro.setDireccion(Optional.of(sortDirection));
+		}
+		if (owned != null) {
+			filtro.setPurchased(owned);
+		}
+		int sizeAux = size;
+		if (size == null || size <= 0) {
+			sizeAux = Integer.MAX_VALUE;
+		}
+		filtro.setPageSize(sizeAux);
 		return filtro;
 	}
 

@@ -14,7 +14,8 @@ public class CoversSpecs {
 	}
 	
 	public static Specification<Film> withFilters(CoversFilter f) {
-		return Specification.where(titleContains(f.title())).and(missingCover(f.missing()))
+		Specification<Film> spec = Specification.unrestricted();
+		return spec.and(titleContains(f.title())).and(missingCover(f.missing()))
 				.and(sourceEquals(f.source()));
 	}
 
@@ -43,7 +44,7 @@ public class CoversSpecs {
 			if (source == null || source.isBlank())
 				return null;
 
-			Join<Film, FilmImage> fotos = root.join("peliculaFotos", JoinType.LEFT);
+			Join<Film, FilmImage> fotos = root.join("images", JoinType.LEFT);
 			Join<FilmImage, Source> sourceJoin = fotos.join("source", JoinType.LEFT);
 			return cb.equal(sourceJoin.get("id"), Integer.valueOf(source));
 		};

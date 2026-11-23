@@ -5,7 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,13 +15,17 @@ import lugus.repository.imdb.OmdbCacheRepository;
 @Service
 public class OmdbCacheService {
 
-	@Autowired
-	private OmdbCacheRepository repo;
+	private final OmdbCacheRepository repo;
 
+	private final ObjectMapper mapper;
+	
 	@Autowired
-	private ObjectMapper mapper;
+	public OmdbCacheService(final OmdbCacheRepository repo, final ObjectMapper mapper){
+		this.repo = repo;
+		this.mapper = mapper;
+	}
 
-	public void saveToCache(String imdbId, Map<String, Object> json) throws JsonProcessingException {
+	public void saveToCache(String imdbId, Map<String, Object> json) {
 
 		JsonNode node = mapper.valueToTree(json);
 

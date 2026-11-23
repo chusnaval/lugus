@@ -1,5 +1,6 @@
 package lugus.model.films;
 
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import org.hibernate.annotations.Formula;
 
@@ -48,7 +50,7 @@ import lugus.model.values.Genre;
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Film {
+public class Film implements Serializable{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -261,7 +263,7 @@ public class Film {
 
 	public void obtainSituation() {
 
-		boolean purchased = this.editions.stream().anyMatch(e -> e.isPurchased());
+		boolean purchased = this.editions.stream().anyMatch(Edition::isPurchased);
 
 		if (purchased) {
 			this.situation = "Comprado";
@@ -273,15 +275,11 @@ public class Film {
 	}
 
 	private boolean hasAnIncompleteOrder() {
-		boolean tieneOrdenPendiente = orders.stream().anyMatch(order -> !order.isReceived());
-		if (tieneOrdenPendiente) {
-			return true;
-		}
-		return false;
+		return orders.stream().anyMatch(order -> !order.isReceived());
 	}
 
 	public boolean isPurchased() {
-		return this.editions.stream().anyMatch(e -> e.isPurchased());
+		return this.editions.stream().anyMatch(Edition::isPurchased);
 	}
 
 	public String getCoverUrl() {
@@ -299,13 +297,19 @@ public class Film {
 	}
 
 	public String getFormatosConjunto() {
-		// TODO Auto-generated method stub
-		return null;
+		StringJoiner joiner = new StringJoiner("|");
+		for (Edition edition : this.editions) {
+			joiner.add(edition.getFormat().name());
+		}
+		return joiner.toString();
 	}
 
 	public String getNotasConjuntas() {
-		// TODO Auto-generated method stub
-		return null;
+		StringJoiner joiner = new StringJoiner("|");
+		for (Edition edition : this.editions) {
+			joiner.add(edition.getNotes());
+		}
+		return joiner.toString();
 	}
 
 	public String obtainCode() {

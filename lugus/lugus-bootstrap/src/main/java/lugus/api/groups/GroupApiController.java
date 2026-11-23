@@ -26,7 +26,6 @@ import lugus.service.films.FilmService;
 import lugus.service.groups.GroupsService;
 import lugus.service.imdb.ImdbBasicsService;
 import lugus.model.imdb.ImdbBasics;
-import lugus.model.values.Format;
 
 @RestController
 @RequestMapping("/v1/api/groups")
@@ -62,59 +61,13 @@ public class GroupApiController {
 			@RequestParam(required = false) final String genre, @RequestParam(required = false) final Boolean pack,
 			@RequestParam(required = false) final String sort,
 			@RequestParam(required = false) final String sortDirection) {
-		FilterDto filter = createFilter(page, size, owned, title, casting, fromYear, toYear, format, genre, pack, sort,
+		FilterDto filter = FilterDto.buildFilter(page, size, owned, title, casting, fromYear,
+			 toYear, format, genre, pack, null, sort,
 				sortDirection);
 		return service.findAllBy(filter).map(mapper::mapToDTO);
 	}
 
-	private FilterDto createFilter(final Integer page, final Integer size, final Boolean owned,
-			final String title, final String casting,
-			final Integer fromYear, final Integer toYear, final String format, final String genre,
-			final Boolean pack, final String sort,
-			final String sortDirection) {
-		FilterDto filter = new FilterDto();
-		if (page != null) {
-			filter.setPagina(Optional.of(page));
-		}
-		if (title != null) {
-			filter.setTitulo(title);
-		}
-		if (casting != null) {
-			filter.setActor(casting);
-			filter.setDirector(casting);
-		}
-		if (fromYear != null) {
-			filter.setFromAnyo(fromYear);
-		}
-		if (toYear != null) {
-			filter.setToAnyo(toYear);
-		}
-		if (format != null) {
-			filter.setFormato((int) Format.getByName(format).getId());
-		}
-		if (genre != null) {
-			filter.setGenero(genre);
-		}
-		if (pack != null) {
-			filter.setPack(pack);
-		}
-
-		if (sort != null) {
-			filter.setOrden(Optional.of(sort));
-		}
-		if (sortDirection != null) {
-			filter.setDireccion(Optional.of(sortDirection));
-		}
-		if (owned != null) {
-			filter.setComprado(owned);
-		}
-		int sizeAux = size;
-		if (size == null || size <= 0) {
-			sizeAux = Integer.MAX_VALUE;
-		}
-		filter.setPageSize(sizeAux);
-		return filter;
-	}
+	
 
 	@PostMapping
 	GroupDTO newGroup(@RequestBody final GroupDTO dto) {
@@ -151,7 +104,7 @@ public class GroupApiController {
 		List<Object> result = new ArrayList<>();
 		if (title == null || title.isBlank())
 			return result;
-		// search registered Pelicula (use repository's findByTitulo via service if
+		// search registered Film (use repository's findByTitle via service if
 		// available)
 		try {
 			// using service to search by title via repository method (will need a small
@@ -177,16 +130,15 @@ public class GroupApiController {
 				// In case the IMDb title doesn't exactly match the Movie title, we check if the
 				// IMDb title already exists as "Movie"
 				String imdbTitle = d.getTitleid();
-				if (imdbTitle == null || imdbTitle.isBlank() || !filmService.isFilmRegistered(imdbTitle)) {
-					continue; // skip this suggestion
-				}
-				if (result.stream().filter(r -> r instanceof SimpleFilm)
-						.anyMatch(r -> ((SimpleFilm) r).tconst.equals(imdbTitle))) {
-					continue; // skip this suggestion
-				}
+				boolean alreadyRegistered = imdbTitle != null && !imdbTitle.isBlank()
+						&& !filmService.isFilmRegistered(imdbTitle);
+				boolean alreadyInResults = imdbTitle != null
+						&& result.stream().filter(SimpleFilm.class::isInstance)
+								.anyMatch(r -> ((SimpleFilm) r).tconst.equals(imdbTitle));
 
-				result.add(new SimpleImdb(d.getTitleid(), d.getTitle(), d.getStartyear()));
-
+				if (!alreadyRegistered && !alreadyInResults) {
+					result.add(new SimpleImdb(d.getTitleid(), d.getTitle(), d.getStartyear()));
+				}
 			}
 		}
 
