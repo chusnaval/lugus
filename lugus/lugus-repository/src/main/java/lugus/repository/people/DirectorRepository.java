@@ -10,12 +10,12 @@ public interface DirectorRepository {
 
 	List<Director> findAll();
 
-	Optional<Director> findById(Integer id);
+	Optional<Director> findById(final Integer id);
 
-	Director save(Director director);
+	Director save(final Director director);
 
-	void deleteById(Integer id);
+	void deleteById(final Integer id);
 
-	List<Director> findByPeliculaId(int id);
+	List<Director> findByFilmId(final int id);
 
 }

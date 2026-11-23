@@ -46,11 +46,11 @@ public class TitleSearchService {
         });
 
         // 2) Películas de colección
-        peliculaRepo.findByTituloContainingIgnoreCase(query).forEach(p -> {
+        peliculaRepo.findByTitleContainingIgnoreCase(query).forEach(p -> {
             SearchTitleResultDto dto = new SearchTitleResultDto();
             dto.setSource(MOVIE);
-            dto.setTitle(p.getTitulo());
-            dto.setYear(p.getAnyo());
+            dto.setTitle(p.getTitle());
+            dto.setYear(p.getYear());
             dto.setType(MOVIE);
             dto.setPosterUrl(p.getCoverUrl());
             dto.setImdbId(p.getImdbId());

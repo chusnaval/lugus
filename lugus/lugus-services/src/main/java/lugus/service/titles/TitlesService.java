@@ -24,8 +24,8 @@ public class TitlesService {
 		return titleRepo.findById(titleId);
 	   }
 
-	   public Optional<Title> findByPelicula_Id(Integer id) {
-		   return titleRepo.findByPelicula_Id(id);
+	   public Optional<Title> findByFilm_Id(Integer id) {
+		   return titleRepo.findByFilm_Id(id);
 	   }
 	   
 	   public Optional<Title> findBySerie_Id(Integer id) {

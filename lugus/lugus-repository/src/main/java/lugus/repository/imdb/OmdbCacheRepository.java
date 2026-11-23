@@ -10,13 +10,13 @@ import lugus.model.imdb.OmdbCache;
 
 public interface OmdbCacheRepository {
 
-	OmdbCache save(OmdbCache entry);
+	OmdbCache save(final OmdbCache entry);
 
-	Optional<OmdbCache> findById(String imdbId);
+	Optional<OmdbCache> findById(final String imdbId);
 
 	@Modifying
 	@Query(value = "UPDATE lugus.omdb_cache SET json = CAST(:json AS jsonb) WHERE imdb_id = :imdbId", nativeQuery = true)
-	void updateJson(@Param("imdbId") String imdbId, @Param("json") String json);
+	void updateJson(@Param("imdbId") final String imdbId, @Param("json") final String json);
 
 
 }

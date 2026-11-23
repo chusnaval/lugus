@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lugus.model.core.Status;
-import lugus.repository.core.EstadoRepository;
+import lugus.repository.core.StatusRepository;
 
 @Service
 @RequiredArgsConstructor
 public class EstadoService {
 
-	private final EstadoRepository estadoRepo;
+	private final StatusRepository estadoRepo;
 
 	public Optional<Status> findEstadoById(Integer estadoCodigo) {
 		

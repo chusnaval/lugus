@@ -6,10 +6,10 @@ import java.sql.SQLException;
 
 import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
-import lugus.repository.people.InsertPersonalSeriesDataRepository;
+import lugus.repository.people.InsertStaffSeriesDataRepository;
 
 @Component
-public class InsertPersonalSeriesDataDao implements InsertPersonalSeriesDataRepository {
+public class InsertPersonalSeriesDataDao implements InsertStaffSeriesDataRepository {
 	private final DataSource dataSource;
 
 	public InsertPersonalSeriesDataDao(DataSource dataSource) {

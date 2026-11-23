@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lugus.dto.groups.SearchTitleResultDto;
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 import lugus.model.series.Serie;
 import lugus.model.titles.Title;
 import lugus.model.values.TitleType;
@@ -34,20 +34,20 @@ public class TitleCreationService {
 
         // 2) if is a MOVIE there is a film in DB
         if (dto.getSource().equals("MOVIE")) {
-            Optional<Pelicula> optFilm = peliculaRepo.findByImdbId(dto.getImdbId());
-            Pelicula p = optFilm.get();
+            Optional<Film> optFilm = peliculaRepo.findByImdbId(dto.getImdbId());
+            Film p = optFilm.get();
             Title t = new Title();
             t.setType(TitleType.MOVIE);
-            t.setPelicula(p);
-            t.setTitle(p.getTitulo());
-            t.setYear(p.getAnyo());
+            t.setFilm(p);
+            t.setTitle(p.getTitle());
+            t.setYear(p.getYear());
             t.setPosterUrl(p.getCoverUrl());
             if(p.getImdbId() != null) {
             	t.setImdb(imdbRepo.findById(p.getImdbId()).orElse(null));
             }else if(dto.getImdbId() != null) {
 				t.setImdb(imdbRepo.findById(dto.getImdbId()).orElse(null));
 			}else {
-				System.out.println("No IMDB ID for " + p.getTitulo());
+				System.out.println("No IMDB ID for " + p.getTitle());
 			}
             return titleRepo.save(t);
         }

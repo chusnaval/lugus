@@ -17,7 +17,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lugus.model.films.PeliculaFoto;
+import lugus.model.films.FilmImage;
 
 @Entity
 @Table(name = "fuentes")
@@ -33,13 +33,13 @@ public class Source {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-    @Column
-	private String descripcion;
+    @Column(name="descripcion")
+	private String description;
 
 	@Column(name="suggest")
 	private String suggest;
 	
 	@OneToMany(mappedBy = "source")
 	@ToString.Exclude
-	private final Set<PeliculaFoto> peliculaFotos = new HashSet<>();
+	private final Set<FilmImage> filmImages = new HashSet<>();
 }

@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import lugus.model.films.Edition;
 
-public interface JpaEdicionRepository extends EdicionRepository, JpaRepository<Edition, Integer>, JpaSpecificationExecutor<Edition> {
+public interface JpaEditionRepository extends EditionRepository, JpaRepository<Edition, Integer>, JpaSpecificationExecutor<Edition> {
 
 }

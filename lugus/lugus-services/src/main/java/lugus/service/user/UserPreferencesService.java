@@ -17,12 +17,12 @@ public class UserPreferencesService {
 	private final UsuarioRepository usuarioRepository;
 
 	private final GenreMapper genreMapper;
-	private final int MAX_FAVORITOS = 4;
+	private static final int MAX_FAVORITOS = 4;
 	
 	
     public UserPreferencesDTO getPreferences(String username) {
     	User user =findCurrentUser(username);
-        return new UserPreferencesDTO(user.getFavoritos().stream().map(genreMapper::toDTO).toList());
+        return new UserPreferencesDTO(user.getFavorites().stream().map(genreMapper::toDTO).toList());
     }
 
 	public UserPreferencesDTO savePreferences(String username, UserPreferencesDTO dto) {
@@ -30,8 +30,8 @@ public class UserPreferencesService {
 			throw new IllegalArgumentException("Solo puedes elegir 4 géneros favoritos");
 		}
 
-		User user = findCurrentUser(username);
-		user.setFavoritos( new ArrayList<>(dto.favoritos().stream().map(genreMapper::toEntity).toList()));
+		lugus.model.user.User user = findCurrentUser(username);
+		user.setFavorites( dto.favoritos().stream().map(genreMapper::toEntity).toList());
 		usuarioRepository.save(user);
 
 		return dto;

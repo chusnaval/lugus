@@ -3,17 +3,17 @@ package lugus.repository.people;
 import java.util.List;
 import java.util.Optional;
 
-import lugus.model.people.PeliculasPersonal;
+import lugus.model.people.Staff;
 
 
 
 public interface PeliculasPersonalRepository {
 
-	List<PeliculasPersonal> findAll();
+	List<Staff> findAll();
 
-	Optional<PeliculasPersonal> findById(Integer id);
+	Optional<Staff> findById(Integer id);
 
-	PeliculasPersonal save(PeliculasPersonal peliculasPersonal);
+	Staff save(Staff peliculasPersonal);
 
 	void deleteById(Integer id);
 

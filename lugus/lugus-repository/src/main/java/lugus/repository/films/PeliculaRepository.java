@@ -8,39 +8,39 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Query;
 
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 
 public interface PeliculaRepository {
 
 	long count();
 	
-	List<Pelicula> findAll();
+	List<Film> findAll();
 
-	Optional<Pelicula> findById(Integer id);
+	Optional<Film> findById(Integer id);
 
-	Pelicula save(Pelicula pelicula);
+	Film save(Film pelicula);
 
 	void deleteById(Integer id);
 
 	boolean existsById(Integer id);
 
-	List<Pelicula> findAllById(Iterable<Integer> ids);
+	List<Film> findAllById(Iterable<Integer> ids);
 
-	Page<Pelicula> findAll(Specification<Pelicula> spec, Pageable pageable);
+	Page<Film> findAll(Specification<Film> spec, Pageable pageable);
 
-	List<Pelicula> findByTitulo(String titulo, Pageable pageable);
+	List<Film> findByTitle(final String title, Pageable pageable);
 
-	List<Pelicula> findByTituloAndAnyo(final String titulo, final int anyo);
+	List<Film> findByTitleAndYear(final String title, final int year);
 
-	List<Pelicula> findByTituloGestAndAnyo(final String titulo, final int anyo);
+	List<Film> findByMgmntTitleAndYear(final String mgmntTitle, final int year);
 
-	Optional<Pelicula> findByImdbId(String tconst);
+	Optional<Film> findByImdbId(String tconst);
 
-	List<Pelicula> findAllByOrderByTituloGestAscAnyoAsc();
+	List<Film> findAllByOrderByMgmntTitleAscYearAsc();
 
-	List<Pelicula> findByTituloContainingIgnoreCase(String query);
+	List<Film> findByTitleContainingIgnoreCase(String query);
 
-	@Query("SELECT p.genero, COUNT(p) FROM Pelicula p GROUP BY p.genero")
-	List<Object[]> countByGenero();
+	@Query("SELECT p.genre, COUNT(p) FROM Film p GROUP BY p.genre")
+	List<Object[]> countByGenre();
 
 }

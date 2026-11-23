@@ -9,13 +9,13 @@ import lugus.model.user.Role;
 
 public interface RolRepository {
 
-	Optional<Role> findById(Long id);
+	Optional<Role> findById(final Long id);
 
-	Role save(Role rol);
+	Role save(final Role role);
 
-	void deleteById(Long id);
+	void deleteById(final Long id);
 
-	Optional<Role> findByLogin(String login);
+	Optional<Role> findByLogin(final String login);
 
 
 }

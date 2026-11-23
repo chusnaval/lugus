@@ -23,31 +23,31 @@ import lombok.ToString;
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Persona {
+public class People {
 
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column
-	private String nombre;
+	@Column(name="nombre")
+	private String name;
 	
 	@OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private Set<PeliculasPersonal> peliculasPersonal = new HashSet<>();
+	private Set<Staff> filmStaff = new HashSet<>();
 	
 	@OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private Set<SeriesPersonal> seriesPersonal = new HashSet<>();
+	private Set<SeriesPersonal> seriesStaff = new HashSet<>();
 	
 	@Column
 	private String nconst;
 	
-	@Column
-	private Integer nacimiento;
+	@Column(name="nacimiento")
+	private Integer birth;
 	
-	@Column
-	private Integer fallecimiento;
+	@Column(name="fallecimiento")
+	private Integer dead;
 	
 }

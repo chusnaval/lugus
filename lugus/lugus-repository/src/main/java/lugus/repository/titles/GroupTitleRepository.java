@@ -9,14 +9,14 @@ import lugus.model.groups.GroupTitle;
 @Repository
 public interface GroupTitleRepository {
 
-	List<GroupTitle> findByGroupIdOrderByOrdenAsc(int groupId);
+	List<GroupTitle> findByGroupIdOrderByOrdenAsc(final int groupId);
 
 	GroupTitle save(GroupTitle gt);
 
-	Optional<GroupTitle> findByIdAndGroupId(Long groupTitleId, int groupId);
+	Optional<GroupTitle> findByIdAndGroupId(final Long groupTitleId, final int groupId);
 
-	void delete(GroupTitle gt);
+	void delete(final GroupTitle gt);
 
 
-	List<GroupTitle> findByTitle_Id(Long titleId);
+	List<GroupTitle> findByTitle_Id(final Long titleId);
 }

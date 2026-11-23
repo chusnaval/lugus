@@ -16,6 +16,6 @@ public class DirectorService {
 	private final  DirectorRepository directorRepository;
 
 	public List<Director> findByPeliculaId(int id) {
-		return directorRepository.findByPeliculaId(id);
+		return directorRepository.findByFilmId(id);
 	}
 }

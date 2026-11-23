@@ -32,13 +32,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lugus.converter.GeneroConverter;
+import lugus.converter.GenreConverter;
 import lugus.model.groups.GroupFilms;
 import lugus.model.orders.Order;
 import lugus.model.people.Actor;
 import lugus.model.people.Director;
-import lugus.model.people.PeliculasPersonal;
-import lugus.model.values.Genere;
+import lugus.model.people.Staff;
+import lugus.model.values.Genre;
 
 @Entity
 @Table(name = "peliculas")
@@ -48,70 +48,70 @@ import lugus.model.values.Genere;
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Pelicula {
+public class Film {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@Column(nullable = false)
-	private String titulo;
+	@Column(name = "titulo", nullable = false)
+	private String title;
 
-	@Column(nullable = false, name = "titulo_gest")
-	private String tituloGest;
+	@Column(name = "titulo_gest", nullable = false)
+	private String mgmntTitle;
 
-	@Column(nullable = false)
-	private int anyo;
+	@Column(name = "anyo", nullable = false)
+	private int year;
 
-	@Column(nullable = false)
-	@Convert(converter = GeneroConverter.class)
-	private Genere genero;
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
-	@ToString.Exclude
-	private final Set<PeliculasPersonal> peliculasPersonal = new HashSet<>();
+	@Column(name = "genero", nullable = false)
+	@Convert(converter = GenreConverter.class)
+	private Genre genre;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private final Set<PeliculaFoto> peliculaFotos = new HashSet<>();
+	private final Set<Staff> staff = new HashSet<>();
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private final Set<PeliculasEnlaces> peliculasEnlaces = new HashSet<>();
+	private final Set<FilmImage> images = new HashSet<>();
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL, orphanRemoval = true)
 	@ToString.Exclude
-	private final Set<Director> directores = new HashSet<>();
+	private final Set<FilmLink> links = new HashSet<>();
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL)
+	@ToString.Exclude
+	private final Set<Director> directors = new HashSet<>();
 
 	@JsonIgnore
 	@OrderBy("orden ASC")
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL)
 	@ToString.Exclude
-	private final Set<Actor> actores = new HashSet<>();
+	private final Set<Actor> actors = new HashSet<>();
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL)
 	@ToString.Exclude
-	private final Set<PeliculasUsuario> peliculasUsuario = new HashSet<>();
+	private final Set<FilmUser> userFilms = new HashSet<>();
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL)
 	@ToString.Exclude
 	private final Set<GroupFilms> groups = new HashSet<>();
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL)
 	@ToString.Exclude
 	private final Set<Order> orders = new HashSet<>();
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL)
 	@ToString.Exclude
-	private List<Edition> editions = new ArrayList<>();
+	private final List<Edition> editions = new ArrayList<>();
 
 	@Column(name = "imdb_id")
 	private String imdbId;
@@ -138,42 +138,41 @@ public class Pelicula {
 	private boolean synopsisTranslated;
 
 	@Formula("(select max(e.ts_compra) from peliculas_edicion e where e.pelicula_id = id)")
-	private Instant ultimaCompra;
+	private Instant lastPurchased;
 
-	
 	// exports
-	private transient String situacion;
+	private transient String situation;
 
 	/**
 	 * Constructor para facilitar la creación de instancias con solo el ID, útil
 	 * para asociaciones sin necesidad de cargar toda la entidad.
 	 * 
-	 * @param peliculaId
+	 * @param filmId
 	 */
-	public Pelicula(Integer peliculaId) {
-		this.id = peliculaId;
+	public Film(Integer filmId) {
+		this.id = filmId;
 	}
 
 	public boolean isFavorite(String login) {
-		return peliculasUsuario.stream().filter(up -> up.getUsuario().getLogin().equals(login))
-				.map(PeliculasUsuario::isFavorita).findFirst().orElse(false);
+		return userFilms.stream().filter(up -> up.getUser().getLogin().equals(login))
+				.map(FilmUser::isFavorite).findFirst().orElse(false);
 	}
 
 	public boolean isMine(String login) {
-		return peliculasUsuario.stream().filter(up -> up.getUsuario().getLogin().equals(login)).findFirst().isPresent();
+		return userFilms.stream().anyMatch(up -> up.getUser().getLogin().equals(login));
 	}
 
-	public LocalDateTime getFechaVista(String login) {
-		Optional<PeliculasUsuario> aux = peliculasUsuario.stream()
-				.filter(up -> up.getUsuario().getLogin().equals(login)).findFirst();
+	public LocalDateTime getLastSeenDate(String login) {
+		Optional<FilmUser> aux = userFilms.stream()
+				.filter(up -> up.getUser().getLogin().equals(login)).findFirst();
 		if (aux.isPresent()) {
-			return aux.get().getFechaVista();
+			return aux.get().getSeenDate();
 		}
 		return null;
 	}
 
-	public boolean tieneCaratula() {
-		return !peliculaFotos.isEmpty();
+	public boolean hasImages() {
+		return !images.isEmpty();
 	}
 
 	public String getRatingFormatted() {
@@ -186,95 +185,95 @@ public class Pelicula {
 		}
 	}
 
-	public void addCaratula(PeliculaFoto pf) {
-		this.peliculaFotos.add(pf);
-		pf.setPelicula(this);
+	public void addImage(FilmImage pf) {
+		this.images.add(pf);
+		pf.setFilm(this);
 
 	}
-	
-	public void addEdicion(Edition ed) {
+
+	public void addEdition(Edition ed) {
 		this.editions.add(ed);
-		ed.setPelicula(this);
+		ed.setFilm(this);
 	}
 
 	public void addDirector(Director d) {
-		this.directores.add(d);
-		d.setPelicula(this);
+		this.directors.add(d);
+		d.setFilm(this);
 
 	}
 
 	public void addActor(Actor a) {
-		this.actores.add(a);
-		a.setPelicula(this);
+		this.actors.add(a);
+		a.setFilm(this);
 
 	}
 
-	public void addPeliculasUsuario(PeliculasUsuario pu) {
-		this.peliculasUsuario.add(pu);
-		pu.setPelicula(this);
+	public void addUserFilm(FilmUser pu) {
+		this.userFilms.add(pu);
+		pu.setFilm(this);
 
 	}
 
 	public void addGroup(GroupFilms gf) {
 		this.groups.add(gf);
-		gf.setPelicula(this);
+		gf.setFilm(this);
 
 	}
 
 	public void removeGroup(GroupFilms gf) {
 		this.groups.remove(gf);
-		gf.setPelicula(null);
+		gf.setFilm(null);
 
 	}
 
-	public void removePeliculasUsuario(PeliculasUsuario pu) {
-		this.peliculasUsuario.remove(pu);
-		pu.setPelicula(null);
+	public void removeUserFilm(FilmUser pu) {
+		this.userFilms.remove(pu);
+		pu.setFilm(null);
 
 	}
 
 	public void removeActor(Actor a) {
-		this.actores.remove(a);
-		a.setPelicula(null);
+		this.actors.remove(a);
+		a.setFilm(null);
 
 	}
 
 	public void removeDirector(Director d) {
-		this.directores.remove(d);
-		d.setPelicula(null);
+		this.directors.remove(d);
+		d.setFilm(null);
 
 	}
 
-	public void removeCaratula(PeliculaFoto pf) {
-		this.peliculaFotos.remove(pf);
-		pf.setPelicula(null);
+	public void removeImage(FilmImage pf) {
+		this.images.remove(pf);
+		pf.setFilm(null);
 	}
 
-	public boolean getUsuarioVista(String usuarioLogin) {
-		return peliculasUsuario.stream().filter(pu -> pu.getUsuario().getLogin().equals(usuarioLogin))
-				.map(PeliculasUsuario::isVista).findFirst().orElse(false);
+	public boolean isSeenByUser(String usuarioLogin) {
+		return userFilms.stream().filter(pu -> pu.getUser().getLogin().equals(usuarioLogin))
+				.map(FilmUser::isSeen).findFirst().orElse(false);
 	}
 
-	public String getUsuarioRating(String usuarioLogin) {
-		return peliculasUsuario.stream().filter(pu -> pu.getUsuario().getLogin().equals(usuarioLogin))
+	public String getUserRating(String usuarioLogin) {
+		return userFilms.stream().filter(pu -> pu.getUser().getLogin().equals(usuarioLogin))
 				.map(pu -> pu.getLbRating() != null ? pu.getLbRating().toString() : "").findFirst().orElse("");
 	}
 
-	public void calcularSituacion() {
+	public void obtainSituation() {
 
-		boolean comprado = this.editions.stream().filter(e -> e.isComprado()).findAny().isPresent();
+		boolean purchased = this.editions.stream().anyMatch(e -> e.isPurchased());
 
-		if (comprado) {
-			this.situacion = "Comprado";
+		if (purchased) {
+			this.situation = "Comprado";
 		} else if (tieneOrdenPendiente()) {
-			this.situacion = "En pedido";
+			this.situation = "En pedido";
 		} else {
-			this.situacion = "No comprado";
+			this.situation = "No comprado";
 		}
 	}
 
 	private boolean tieneOrdenPendiente() {
-		boolean tieneOrdenPendiente = orders.stream().anyMatch(order -> !order.isRecibido());
+		boolean tieneOrdenPendiente = orders.stream().anyMatch(order -> !order.isReceived());
 		if (tieneOrdenPendiente) {
 			return true;
 		}
@@ -282,16 +281,16 @@ public class Pelicula {
 	}
 
 	public boolean isComprado() {
-		 return this.editions.stream().filter(e -> e.isComprado()).findAny().isPresent();
+		return this.editions.stream().anyMatch(e -> e.isPurchased());
 	}
-	
+
 	public String getCoverUrl() {
 		String coverUrl = null;
-		if (this.peliculaFotos != null && !this.peliculaFotos.isEmpty()) {
-			Optional<PeliculaFoto> aux = this.peliculaFotos.stream().findFirst();
+		if (this.images != null && !this.images.isEmpty()) {
+			Optional<FilmImage> aux = this.images.stream().findFirst();
 			if (aux.isPresent()) {
-				PeliculaFoto pf = aux.get();
-				if (pf.isCaratula()) {
+				FilmImage pf = aux.get();
+				if (pf.isCover()) {
 					coverUrl = pf.getUrl();
 				}
 			}
@@ -310,9 +309,9 @@ public class Pelicula {
 	}
 
 	public String obtainCode() {
-		
+
 		// Eliminar artículos del título
-		String procesado = tituloGest.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
+		String procesado = mgmntTitle.replaceAll("(?i)\\b(un|the|a|an|el|la|los|las| )\\b\\s*", "");
 
 		// reemplazar caracteres acentuados por sus equivalentes sin acento
 		procesado = procesado.replaceAll("[áàäâ]", "a");
@@ -326,24 +325,25 @@ public class Pelicula {
 		procesado = procesado.replaceAll("[ÍÌÏÎ]", "I");
 		procesado = procesado.replaceAll("[ÓÒÖÔ]", "O");
 		procesado = procesado.replaceAll("[ÚÙÜÛ]", "U");
-		
+
 		// reemplazar la ñ por n
 		procesado = procesado.replaceAll("[ñ]", "n");
 		procesado = procesado.replaceAll("[Ñ]", "N");
-		
+
 		// eliminar caracteres especiales y espacios
 		procesado = procesado.replaceAll("[^a-zA-Z0-9]", "");
-		
+
 		// Obtener los primeros tres caracteres del título procesado
 		String prefijo = procesado.length() >= 3 ? procesado.substring(0, 3).toUpperCase() : procesado.toUpperCase();
-		
-		String codGenero = genero.getCodigo();
 
-		return codGenero + "-" + prefijo + "-" + anyo;
+		String codGenero = genre.getCodigo();
+
+		return codGenero + "-" + prefijo + "-" + year;
 
 	}
 
-	public boolean isDiffInCode(String titleMgmt, int year, String genreCode) {
-		return (!this.getTituloGest().equals(titleMgmt) || this.getAnyo() != year || !this.getGenero().getCodigo().equals(genreCode));
+	public boolean isDiffInCode(String mgmtTitle, int year, String genreCode) {
+		return (!this.getMgmntTitle().equals(mgmtTitle) || this.getYear() != year
+				|| !this.getGenre().getCodigo().equals(genreCode));
 	}
 }

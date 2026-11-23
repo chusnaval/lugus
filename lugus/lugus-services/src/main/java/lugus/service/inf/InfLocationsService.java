@@ -16,7 +16,7 @@ public class InfLocationsService {
 
 	public List<InfLocations> findAllByGeneroAndFormato(final String genero, final int formato,
 			final boolean funda, final boolean steelbook) {
-		return repo.findAllById_GeneroAndId_FormatoAndId_FundaAndId_SteelbookAndContadorGreaterThan(genero, formato, funda,
+		return repo.findAllById_GenreAndId_FormatAndId_SlipCoverAndId_SteelbookAndCountGreaterThan(genero, formato, funda,
 				steelbook, 0);
 	}
 }

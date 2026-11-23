@@ -8,7 +8,9 @@ import lombok.*;
 @Builder
 public class FilmWanted {
 
-    private String titulo;
-    private int anyo;
-    private String formato;
+    private String title;
+    
+    private int year;
+
+    private String format;
 }

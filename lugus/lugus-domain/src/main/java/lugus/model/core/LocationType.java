@@ -38,7 +38,7 @@ public class LocationType {
 	 * 
 	 * @param id
 	 */
-	public LocationType(@NotBlank int id) {
+	public LocationType(@NotBlank final int id) {
 		super();
 		this.id = id;
 	}

@@ -26,7 +26,7 @@ import lugus.model.user.User;
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class PeliculasUsuario {
+public class FilmUser {
 
   
 	@Id
@@ -36,21 +36,25 @@ public class PeliculasUsuario {
     /** Relacion con el usuario */
     @ManyToOne(optional = false)
     @JoinColumn(name = "usuario_login", nullable = false)
-    private User usuario;
+    private User user;
 
     /** Relacion con pelicula */
     @ManyToOne(optional = false)
     @JoinColumn(name = "pelicula_id", nullable = false)
-    private Pelicula pelicula;
+    private Film film;
     
-    private java.time.LocalDateTime fechaAgregado;
+    @Column (name="fecha_agregado")
+    private java.time.LocalDateTime additionDate;
 
     @Column(name = "lbrating")
     private Float lbRating;
 
-    private boolean vista;
+    @Column (name="vista")
+    private boolean seen;
     
-    private boolean favorita;
+    @Column (name="favorita")
+    private boolean favorite;
 
-    private  java.time.LocalDateTime fechaVista;
+    @Column (name ="fecha_vista")
+    private  java.time.LocalDateTime seenDate;
 }

@@ -22,9 +22,9 @@ public class FilmWantedService {
                 """;
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> FilmWanted.builder()
-                .titulo(rs.getString("titulo"))
-                .anyo(rs.getInt("anyo"))
-                .formato(rs.getString("formato"))
+                .title(rs.getString("titulo"))
+                .year(rs.getInt("anyo"))
+                .format(rs.getString("formato"))
                 .build());
     }
 }

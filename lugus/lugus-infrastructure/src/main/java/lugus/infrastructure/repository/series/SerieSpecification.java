@@ -15,8 +15,8 @@ public class SerieSpecification {
 	}
 
 
-	public static Specification<Serie> porComprado(Boolean comprado) {
-		return (root, query, cb) -> (comprado == null) ? null : cb.equal(root.get("comprado"), comprado);
+	public static Specification<Serie> byPurchased(Boolean purchased) {
+		return (root, query, cb) -> (purchased == null) ? null : cb.equal(root.get("purchased"), purchased);
 	}
 	
 	public static Specification<Serie> porCompleta(Boolean completa) {

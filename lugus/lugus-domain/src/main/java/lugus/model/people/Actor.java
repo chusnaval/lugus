@@ -14,7 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 import lugus.model.series.Serie;
 import lugus.model.values.TitleType;
 
@@ -36,23 +36,23 @@ public class Actor {
     
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "pelicula_id", nullable = true) // FK → movie.id
-	private Pelicula pelicula;
+	private Film film;
 	
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "serie_id", nullable = true)
     private Serie serie;
     
 	@Column(name="persona_id")
-	private int persona;
+	private int people;
 	
 	@Column(name="nombre")
-	private String nombre;
+	private String name;
 	
 	@Column(name="orden")
-	private int orden;
+	private int order;
 	
 	@Column(name="personaje")
-	private String personaje;
+	private String character;
 	
 	
 }

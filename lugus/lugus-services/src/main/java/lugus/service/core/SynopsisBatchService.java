@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 import lugus.repository.films.PeliculaRepository;
 
 @Service
@@ -22,12 +22,12 @@ public class SynopsisBatchService {
     @Transactional
     public int translateAllPending() {
 
-        List<Pelicula> pending = repo.findAll().stream()
+        List<Film> pending = repo.findAll().stream()
             .filter(p -> p.getSynopsis() != null)
             .filter(p -> !p.isSynopsisTranslated())
             .toList();
 
-        for (Pelicula p : pending) {
+        for (Film p : pending) {
             String original = p.getSynopsis();
 
             String translated = translator.translate(original);

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lugus.dto.core.CountryCode;
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 import lugus.service.films.PeliculaService;
 import lugus.service.imdb.OmdbCacheService;
 
@@ -57,7 +57,7 @@ public class OmdbController {
 
 		Map<String, Object> json = recoverOmdbAndGetJson(imdbId);
 		
-		Optional<Pelicula> peliculaOpt = peliculaService.findByImdbId(imdbId);
+		Optional<Film> peliculaOpt = peliculaService.findByImdbId(imdbId);
 		if(peliculaOpt.isPresent() && imdbId.equals(peliculaOpt.get().getImdbId())) {
 				updateWithOmdb(peliculaOpt.get());
 		}
@@ -73,7 +73,7 @@ public class OmdbController {
 		return json;
 	}
 
-	private void updateWithOmdb(Pelicula p) {
+	private void updateWithOmdb(Film p) {
 		var cached = cacheService.getFromCache(p.getImdbId());
 		JsonNode node = mapper.valueToTree(cached.getJson());
 		boolean hasChanged = false;

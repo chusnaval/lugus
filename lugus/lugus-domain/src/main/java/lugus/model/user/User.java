@@ -21,9 +21,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lugus.converter.GeneroConverter;
-import lugus.model.films.PeliculasUsuario;
-import lugus.model.values.Genere;
+import lugus.converter.GenreConverter;
+import lugus.model.films.FilmUser;
+import lugus.model.values.Genre;
 
 @Entity
 @Table(name = "usuarios")
@@ -52,11 +52,11 @@ public class User {
         joinColumns = @JoinColumn(name = "login")
     )
     @Column(name = "genero")
-	@Convert(converter = GeneroConverter.class)
-    private List<Genere> favoritos = new ArrayList<>();
+	@Convert(converter = GenreConverter.class)
+    private List<Genre> favorites = new ArrayList<>();
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PeliculasUsuario> peliculas = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<FilmUser> films = new HashSet<>();
 
 
 }

@@ -15,6 +15,6 @@ public class ActorService {
 	private final  ActorRepository actorRepository;
 
 	public List<Actor> findByPeliculaIdOrderByOrdenAsc(int id) {
-		return actorRepository.findByPeliculaIdOrderByOrdenAsc(id);
+		return actorRepository.findByFilmIdOrderByOrderAsc(id);
 	}
 }

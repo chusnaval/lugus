@@ -28,13 +28,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lugus.converter.FormatoConverter;
-import lugus.converter.GeneroConverter;
+import lugus.converter.FormatConverter;
+import lugus.converter.GenreConverter;
 import lugus.model.core.Location;
 import lugus.model.people.Actor;
 import lugus.model.people.SeriesPersonal;
 import lugus.model.values.Format;
-import lugus.model.values.Genere;
+import lugus.model.values.Genre;
 import lugus.model.values.LangVersion;
 
 @Entity
@@ -58,7 +58,7 @@ public class Serie {
 	private String tituloGest;
 
 	@Column(nullable = false)
-	@Convert(converter = FormatoConverter.class)
+	@Convert(converter = FormatConverter.class)
 	private Format formato;
 
 	@JsonIgnore
@@ -73,8 +73,8 @@ public class Serie {
 	private Integer anyoFin;
 
 	@Column(nullable = false)
-	@Convert(converter = GeneroConverter.class)
-	private Genere genero;
+	@Convert(converter = GenreConverter.class)
+	private Genre genero;
 
 	@Column(nullable = false)
 	private String codigo;
@@ -82,8 +82,8 @@ public class Serie {
 	@Column(nullable = true)
 	private String notas;
 	
-	@Column
-	private boolean comprado;
+	@Column(name="comprado")
+	private boolean purchased;
 	
 	@Column(name = "usr_alta")
 	private String usrAlta;
@@ -132,7 +132,7 @@ public class Serie {
 		if (location == null) {
 			return "";
 		}
-		return location.getDescripcion();
+		return location.getDescription();
 	}
 
 	public boolean tieneCaratula() {

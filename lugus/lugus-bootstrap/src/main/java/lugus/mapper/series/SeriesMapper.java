@@ -8,7 +8,7 @@ import lugus.dto.series.SeasonDto;
 import lugus.model.series.Season;
 import lugus.model.series.Serie;
 import lugus.model.values.Format;
-import lugus.model.values.Genere;
+import lugus.model.values.Genre;
 
 @Component
 public class SeriesMapper {
@@ -33,13 +33,13 @@ public class SeriesMapper {
 		}
 
 		if (serie.getLocation() != null) {
-			dto.setLocation(serie.getLocation().getDescripcion());
+			dto.setLocation(serie.getLocation().getDescription());
 		}
 
 		createCasting(dto, serie);
 		createSeasons(dto, serie);
 
-		dto.setOwned(serie.isComprado());
+		dto.setOwned(serie.isPurchased());
 		dto.setCompleted(serie.isCompleta());
 		dto.setNotes(serie.getNotas());
 		dto.setCoverSrc(serie.getCoverUrl());
@@ -62,10 +62,10 @@ public class SeriesMapper {
 		serie.setCodigo(dto.getMgmtCode());
 
 		serie.setFormato(Format.getById(Short.valueOf(dto.getFormat())));
-		serie.setGenero(Genere.getById(dto.getGenreCode()));
+		serie.setGenero(Genre.getById(dto.getGenreCode()));
 
 		serie.setCompleta(dto.isCompleted());
-		serie.setComprado(dto.isOwned());
+		serie.setPurchased(dto.isOwned());
 		serie.setNotas(dto.getNotes());
 
 		return serie;
@@ -73,7 +73,7 @@ public class SeriesMapper {
 
 	private void createCasting(SerieDto dto, Serie film) {
 		film.getActores().stream()
-				.forEach(act -> dto.addCast(new CastDto(act.getPersona(), act.getOrden(),  act.getNombre(), act.getPersonaje())));
+				.forEach(act -> dto.addCast(new CastDto(act.getPeople(), act.getOrder(),  act.getName(), act.getCharacter())));
 
 	}
 }

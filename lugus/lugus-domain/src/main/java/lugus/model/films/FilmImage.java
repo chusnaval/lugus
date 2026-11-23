@@ -1,6 +1,5 @@
 package lugus.model.films;
 
-import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -19,36 +18,37 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
+import lugus.model.core.Source;
 
 @Entity
-@Table(name = "peliculas_enlaces")
+@Table(name = "peliculas_fotos")
 @Data
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class PeliculasEnlaces {
+public class FilmImage {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn(name = "pelicula_id", nullable = true) // FK → locations.code
-	private Pelicula pelicula;
 	
-	@Column(name = "fuenteId")
-	private int fuenteId;
-	
-	@Column(name = "url")
+	@Column(nullable = false)
 	private String url;
 	
-	@Column(name = "usr_alta")
-	private String usrAlta;
-
-	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
-	private Instant tsAlta;
-        
-
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "pelicula_id", nullable = true) // FK → locations.code
+	private Film film;
+	
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "fuente_id", nullable = true) // FK → peliculaFotos.codigo
+	private Source source;
+	
+    @Column(name="foto")
+	private byte[] content;
+    
+    @Column(name="caratula")
+    private boolean cover;
+	
 }

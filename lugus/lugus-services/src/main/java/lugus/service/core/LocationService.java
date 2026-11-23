@@ -63,7 +63,7 @@ public class LocationService {
 
 	public List<Location> findAllExcept(String id) {
 		
-		return locRepo.findByCodigoNot(id);
+		return locRepo.findByCodeNot(id);
 	}
 
 

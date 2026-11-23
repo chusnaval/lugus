@@ -8,12 +8,12 @@ import lugus.model.imdb.ImdbTitlePrincipalsId;
 
 public interface ImdbTitlePrincipalsRepository {
 
-	Optional<ImdbTitlePrincipals> findById(ImdbTitlePrincipalsId id);
+	Optional<ImdbTitlePrincipals> findById(final ImdbTitlePrincipalsId id);
 
-	ImdbTitlePrincipals save(ImdbTitlePrincipals imdbTitlePrincipals);
+	ImdbTitlePrincipals save(final ImdbTitlePrincipals imdbTitlePrincipals);
 
-	void deleteById(ImdbTitlePrincipalsId id);
+	void deleteById(final ImdbTitlePrincipalsId id);
 
-	List<ImdbTitlePrincipals> findAllByIdNconst(String nConst);
+	List<ImdbTitlePrincipals> findAllByIdNconst(final String nConst);
 
 }

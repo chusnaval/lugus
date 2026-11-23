@@ -10,10 +10,10 @@ public interface SeasonRepository {
 
 	List<Season> findAll();
 
-	Optional<Season> findById(Integer id);
+	Optional<Season> findById(final Integer id);
 
-	Season save(Season season);
+	Season save(final Season season);
 
-	void deleteById(Integer id);
+	void deleteById(final Integer id);
 
 }

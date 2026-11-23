@@ -12,10 +12,10 @@ public class TitleMapper {
 		dto.setYear(t.getYear());
 		dto.setType(t.getType().name());
 		dto.setPosterUrl(t.getPosterUrl());
-		dto.setPeliculaId(t.getPelicula() != null ? t.getPelicula().getId() : null);
+		dto.setPeliculaId(t.getFilm() != null ? t.getFilm().getId() : null);
 		dto.setSerieId(t.getSerie() != null ? t.getSerie().getId() : null);
 		dto.setImdbId(t.getImdb() != null ? t.getImdb().getTconst() : null);
-		if ((t.getPelicula() != null && t.getPelicula().isComprado())
+		if ((t.getFilm() != null && t.getFilm().isComprado())
 				|| (t.getSerie() != null && t.getSerie().isCompleta())) {
 			dto.setOwned(true);
 		} else {

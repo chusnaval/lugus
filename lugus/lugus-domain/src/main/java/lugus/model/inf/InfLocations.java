@@ -23,8 +23,8 @@ public class InfLocations {
 	private InfLocationsId id;
 	
 	
-	@Column
-	private int contador;
+	@Column(name="contador")
+	private int count;
 	
 
 }

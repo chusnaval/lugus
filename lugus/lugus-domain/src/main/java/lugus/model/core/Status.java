@@ -34,7 +34,7 @@ public class Status {
 	private String name;
 	
 	@OrderBy("id ASC")
-	@OneToMany(mappedBy = "estado")
+	@OneToMany(mappedBy = "status")
 	@ToString.Exclude
 	private Set<Edition> ediciones = new HashSet<>();
 }

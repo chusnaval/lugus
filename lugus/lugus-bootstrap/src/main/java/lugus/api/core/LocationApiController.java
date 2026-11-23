@@ -63,7 +63,7 @@ public class LocationApiController {
 		Optional<Location> location = service.findById(id);
 		if (location.isPresent()) {
 			Location obj = location.get();
-			obj.setDescripcion(newSource.getDescripcion());
+			obj.setDescription(newSource.getDescripcion());
 			obj.setLocationType(new LocationType( newSource.getLocationType().getId() ));
 			obj = service.save(obj);
 

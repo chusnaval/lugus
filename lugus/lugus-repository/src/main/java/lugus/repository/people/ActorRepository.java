@@ -11,12 +11,12 @@ public interface ActorRepository {
 
 	List<Actor> findAll();
 
-	Optional<Actor> findById(Integer id);
+	Optional<Actor> findById(final Integer id);
 
-	Actor save(Actor actor);
+	Actor save(final Actor actor);
 
-	void deleteById(Integer id);
+	void deleteById(final Integer id);
 
-	List<Actor> findByPeliculaIdOrderByOrdenAsc(int id);
+	List<Actor> findByFilmIdOrderByOrderAsc(int id);
 
 }

@@ -9,12 +9,12 @@ public interface ImdbDirectorRepository {
 
 	List<ImdbDirector> findAll();
 
-	Optional<ImdbDirector> findById(String id);
+	Optional<ImdbDirector> findById(final String id);
 
-	ImdbDirector save(ImdbDirector imdbDirector);
+	ImdbDirector save(final ImdbDirector imdbDirector);
 
-	void deleteById(String id);
+	void deleteById(final String id);
 
-	List<ImdbDirector> findByPrimaryName(String name);
+	List<ImdbDirector> findByPrimaryName(final String name);
 
 }

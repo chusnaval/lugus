@@ -16,13 +16,13 @@ public class GroupFilmsMapper {
 	public GroupFilmsDTO mapToDTO(GroupFilms gp) {
 		GroupFilmsDTO dto = new GroupFilmsDTO();
 		dto.setId(gp.getId());
-		dto.setOrden(gp.getOrden());
+		dto.setOrden(gp.getOrder());
 		dto.setTitle(gp.getTitle());
-		dto.setStatus(gp.getPelicula()!=null? (gp.getPelicula().isComprado()?"OWNED":"WISHLIST"):"NONE");
-		dto.setFilm(gp.getPelicula()!=null?gp.getPelicula().getId():-1);
-		dto.setYear(gp.getPelicula()!=null?gp.getPelicula().getAnyo():Integer.parseInt(gp.getItb().getStartyear()));
-		dto.setCover(gp.getPelicula()!=null?gp.getPelicula().getCoverUrl():"/covers/placeholder.png");
-		dto.setImdbId(gp.getPelicula()!=null?gp.getPelicula().getImdbId():gp.getItb().getTconst());
+		dto.setStatus(gp.getFilm()!=null? (gp.getFilm().isComprado()?"OWNED":"WISHLIST"):"NONE");
+		dto.setFilm(gp.getFilm()!=null?gp.getFilm().getId():-1);
+		dto.setYear(gp.getFilm()!=null?gp.getFilm().getYear():Integer.parseInt(gp.getItb().getStartyear()));
+		dto.setCover(gp.getFilm()!=null?gp.getFilm().getCoverUrl():"/covers/placeholder.png");
+		dto.setImdbId(gp.getFilm()!=null?gp.getFilm().getImdbId():gp.getItb().getTconst());
 		return dto;
 		
 	}

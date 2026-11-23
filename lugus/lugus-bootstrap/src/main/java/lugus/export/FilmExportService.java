@@ -13,30 +13,30 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.springframework.stereotype.Service;
 
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 
 @Service
 public class FilmExportService {
 
-	public String toMarkdown(List<Pelicula> list) {
+	public String toMarkdown(List<Film> list) {
 		StringBuilder md = new StringBuilder();
 		md.append("# Películas\n\n");
 		md.append("| Nº | Título | Año | Formato | Situación | Notas |\n");
 		md.append("|---|---|---:|---|\n");
 		int index = 1;
-		for (Pelicula item : list) {
+		for (Film item : list) {
 			
-			item.calcularSituacion();
+			item.getSituation();
 			md.append("| ")
 					.append(escapeMd(index++ + ""))
 					.append(" | ")
-					.append(escapeMd(item.getTitulo()))
+					.append(escapeMd(item.getTitle()))
 					.append(" | ")
-					.append(item.getAnyo())
+					.append(item.getYear())
 					.append(" | ")
 					.append(escapeMd(item.getFormatosConjunto()))
 					.append(" | ")
-					.append(escapeMd(item.getSituacion()))
+					.append(escapeMd(item.getSituation()))
 					.append(" | ")
 					.append(escapeMd(item.getNotasConjuntas()))
 					.append(" |\n");
@@ -45,7 +45,7 @@ public class FilmExportService {
 		return md.toString();
 	}
 
-	public byte[] toOds(List<Pelicula> list) throws IOException {
+	public byte[] toOds(List<Film> list) throws IOException {
 		String contentXml = buildOdsContentXml(list);
 		String manifestXml = """
 				<?xml version="1.0" encoding="UTF-8"?>
@@ -76,7 +76,7 @@ public class FilmExportService {
 		}
 	}
 
-	public byte[] toPdf(List<Pelicula> list) throws IOException {
+	public byte[] toPdf(List<Film> list) throws IOException {
 		try (PDDocument doc = new PDDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			PDPage page = new PDPage();
 			doc.addPage(page);
@@ -111,7 +111,7 @@ public class FilmExportService {
 				
 				int index = 1;
 				y -= leading;
-				for (Pelicula item : list) {
+				for (Film item : list) {
 					if (y < 60) {
 						break;
 					}
@@ -121,13 +121,13 @@ public class FilmExportService {
 					content.newLineAtOffset(margin, y);
 					content.showText(String.valueOf(index++));
 					content.newLineAtOffset(70, 0);
-					content.showText(trimForPdf(item.getTitulo(), 42));
+					content.showText(trimForPdf(item.getTitle(), 42));
 					content.newLineAtOffset(260, 0);
-					content.showText(String.valueOf(item.getAnyo()));
+					content.showText(String.valueOf(item.getYear()));
 					content.newLineAtOffset(70, 0);
 					content.showText(trimForPdf(item.getFormatosConjunto(), 34));
 					content.newLineAtOffset(70, 0);
-					content.showText(trimForPdf(item.getSituacion(), 42));
+					content.showText(trimForPdf(item.getSituation(), 42));
 					content.newLineAtOffset(120, 0);
 					content.showText(trimForPdf(item.getNotasConjuntas(), 50));
 					content.endText();
@@ -158,19 +158,19 @@ public class FilmExportService {
 				.replace("'", "&apos;");
 	}
 
-	private String buildOdsContentXml(List<Pelicula> list) {
+	private String buildOdsContentXml(List<Film> list) {
 		StringBuilder rows = new StringBuilder();
 
 		appendOdsRow(rows, "Nº", "Título", "Año", "Formato", "Situación", "Notas");
 		int index = 1;
-		for (Pelicula item : list) {
-			item.calcularSituacion();
+		for (Film item : list) {
+			item.getSituation();
 			appendOdsRow(rows,
 					String.valueOf(index++),
-					nullSafe(item.getTitulo()),
-					String.valueOf(item.getAnyo()),
+					nullSafe(item.getTitle()),
+					String.valueOf(item.getYear()),
 					nullSafe(item.getFormatosConjunto()),
-					nullSafe(item.getSituacion()),
+					nullSafe(item.getSituation()),
 					nullSafe(item.getNotasConjuntas()))
 			;
 		}

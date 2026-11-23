@@ -7,13 +7,13 @@ import lugus.model.core.Source;
 
 public interface SourceRepository {
 
-	Optional<Source> findById(Integer id);
+	Optional<Source> findById(final Integer id);
 
 	List<Source> findAll();
 
-	Source save(Source source);
+	Source save(final Source source);
 
-	void deleteById(Integer id);
+	void deleteById(final Integer id);
 
 	List<Source> findBySuggestIsNotNull();
 

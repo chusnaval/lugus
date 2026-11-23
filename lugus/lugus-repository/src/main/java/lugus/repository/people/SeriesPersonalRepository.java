@@ -11,10 +11,10 @@ public interface SeriesPersonalRepository {
 
 	List<SeriesPersonal> findAll();
 
-	Optional<SeriesPersonal> findById(Integer id);
+	Optional<SeriesPersonal> findById(final Integer id);
 
-	SeriesPersonal save(SeriesPersonal peliculasPersonal);
+	SeriesPersonal save(final SeriesPersonal peliculasPersonal);
 
-	void deleteById(Integer id);
+	void deleteById(final Integer id);
 
 }

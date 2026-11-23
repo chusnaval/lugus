@@ -14,6 +14,6 @@ public interface InfLocationsRepository {
 
 	void deleteById(InfLocationsId id);
 
-	public List<InfLocations> findAllById_GeneroAndId_FormatoAndId_FundaAndId_SteelbookAndContadorGreaterThan(final String genero,
-			final int formato, final boolean funda, final boolean steelbook, final int contador);
+	public List<InfLocations> findAllById_GenreAndId_FormatAndId_SlipCoverAndId_SteelbookAndCountGreaterThan(final String genero,
+			final int formato, final boolean funda, final boolean steelbook, final int count);
 }

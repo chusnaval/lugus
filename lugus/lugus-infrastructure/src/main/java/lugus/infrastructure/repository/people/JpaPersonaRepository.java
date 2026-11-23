@@ -2,9 +2,9 @@ package lugus.infrastructure.repository.people;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import lugus.model.people.Persona;
-import lugus.repository.people.PersonaRepository;
+import lugus.model.people.People;
+import lugus.repository.people.PeopleRepository;
 
-public interface JpaPersonaRepository extends PersonaRepository, JpaRepository<Persona, Integer> {
+public interface JpaPersonaRepository extends PeopleRepository, JpaRepository<People, Integer> {
 
 }

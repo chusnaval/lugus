@@ -19,11 +19,11 @@ GroupFilmsService {
 	private final GroupFilmsRepository groupFilmsRepository;
 	
 	public List<GroupFilms> findByGroup(Integer id) {
-		return groupFilmsRepository.findAllByGroupIdOrderByOrden(id);
+		return groupFilmsRepository.findAllByGroupIdOrderByOrder(id);
 	}
 	
 	public List<GroupFilms> findByPelicula(Integer id) {
-		return groupFilmsRepository.findAllByPeliculaIdOrderByGroupName(id);
+		return groupFilmsRepository.findAllByFilmIdOrderByGroupName(id);
 	}
 
 	public GroupFilms save(GroupFilms gf) {
@@ -31,9 +31,9 @@ GroupFilmsService {
 	}
 
 	public int nextOrderForGroup(Integer groupId) {
-		List<GroupFilms> list = groupFilmsRepository.findAllByGroupIdOrderByOrden(groupId);
+		List<GroupFilms> list = groupFilmsRepository.findAllByGroupIdOrderByOrder(groupId);
 		if (list == null || list.isEmpty()) return 1;
-		int max = list.stream().mapToInt(GroupFilms::getOrden).max().orElse(0);
+		int max = list.stream().mapToInt(GroupFilms::getOrder).max().orElse(0);
 		return max + 1;
 	}
 

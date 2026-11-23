@@ -28,11 +28,11 @@ public class FilmWantedExportService {
 			md.append("| ")
 					.append(escapeMd(index++ + ""))
 					.append(" | ")
-					.append(escapeMd(item.getTitulo()))
+					.append(escapeMd(item.getTitle()))
 					.append(" | ")
-					.append(item.getAnyo())
+					.append(item.getYear())
 					.append(" | ")
-					.append(escapeMd(item.getFormato()))
+					.append(escapeMd(item.getFormat()))
 					.append(" |\n");
 		}
 
@@ -111,11 +111,11 @@ public class FilmWantedExportService {
 					content.newLineAtOffset(margin, y);
 					content.showText(String.valueOf(index++));
 					content.newLineAtOffset(70, 0);
-					content.showText(trimForPdf(item.getTitulo(), 42));
+					content.showText(trimForPdf(item.getTitle(), 42));
 					content.newLineAtOffset(260, 0);
-					content.showText(String.valueOf(item.getAnyo()));
+					content.showText(String.valueOf(item.getYear()));
 					content.newLineAtOffset(70, 0);
-					content.showText(trimForPdf(item.getFormato(), 34));
+					content.showText(trimForPdf(item.getFormat(), 34));
 					content.endText();
 
 					y -= leading;
@@ -150,9 +150,9 @@ public class FilmWantedExportService {
 		appendOdsRow(rows, "Nº", "Título", "Año", "Formato");
 		for (FilmWanted item : list) {
 			appendOdsRow(rows, String.valueOf(index++),
-					nullSafe(item.getTitulo()),
-					String.valueOf(item.getAnyo()),
-					nullSafe(item.getFormato()));
+					nullSafe(item.getTitle()),
+					String.valueOf(item.getYear()),
+					nullSafe(item.getFormat()));
 		}
 
 		return """

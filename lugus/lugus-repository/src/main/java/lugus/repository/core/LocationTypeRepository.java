@@ -7,12 +7,12 @@ import lugus.model.core.LocationType;
 
 public interface LocationTypeRepository {
 
-	Optional<LocationType> findById(Integer id);
+	Optional<LocationType> findById(final int id);
 
 	List<LocationType> findAll();
 
 	LocationType save(LocationType obj);
 
-	void deleteById(Integer id);
+	void deleteById(int id);
 
 }

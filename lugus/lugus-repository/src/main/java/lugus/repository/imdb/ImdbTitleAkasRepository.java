@@ -6,12 +6,12 @@ import lugus.model.imdb.ImdbTitleAkas;
 
 public interface ImdbTitleAkasRepository {
 
-	Optional<ImdbTitleAkas> findById(String id);
+	Optional<ImdbTitleAkas> findById(final String id);
 
-	ImdbTitleAkas save(ImdbTitleAkas imdbTitleAkas);
+	ImdbTitleAkas save(final ImdbTitleAkas imdbTitleAkas);
 
-	void deleteById(String id);
+	void deleteById(final String id);
 
-	Optional<ImdbTitleAkas> findByTitleId(String titleId);
+	Optional<ImdbTitleAkas> findByTitleId(final String titleId);
 
 }

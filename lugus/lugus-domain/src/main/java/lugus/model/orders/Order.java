@@ -20,8 +20,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lugus.converter.FormatoConverter;
-import lugus.model.films.Pelicula;
+import lugus.converter.FormatConverter;
+import lugus.model.films.Film;
 import lugus.model.values.Format;
 
 
@@ -43,21 +43,22 @@ public class Order {
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "pelicula_id", nullable = true) // FK → estado.id
-	private Pelicula pelicula;
+	private Film film;
 	
 	@Column(name = "imdb_id")
 	private String imdbId;
 	
-	@Column(nullable = false)
-	@Convert(converter = FormatoConverter.class)
-	private Format formato;
+	@Column(name="formato", nullable = false)
+	@Convert(converter = FormatConverter.class)
+	private Format format;
 	
-	@Column(nullable = true)
-	private String notas;
+	@Column(name="notas", nullable = true)
+	private String notes;
 	
 	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
-	private Instant tsAlta;
+	private Instant tsCreation;
 	
-	private boolean recibido;
+	@Column (name="recibido")
+	private boolean received;
 	
 }

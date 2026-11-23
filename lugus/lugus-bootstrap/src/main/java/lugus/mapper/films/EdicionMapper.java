@@ -11,30 +11,30 @@ public class EdicionMapper {
 	public static EditionDto toDto(Edition edicion) {
 		EditionDto dto = new EditionDto();
 		dto.setId(edicion.getId());
-		dto.setMgmtCode(edicion.getCodigo());
+		dto.setMgmtCode(edicion.getCode());
 		if(edicion.getPack()!=null) {
-			dto.setPack(new PackDto(edicion.getPack().getId(), edicion.getPack().getTitulo()));
+			dto.setPack(new PackDto(edicion.getPack().getId(), edicion.getPack().getTitle()));
 		}
 		
 
-		if (edicion.getEstado() != null) {
-			dto.setCondition(new ConditionDto(edicion.getEstado().getId(), edicion.getEstado().getName()));
+		if (edicion.getStatus() != null) {
+			dto.setCondition(new ConditionDto(edicion.getStatus().getId(), edicion.getStatus().getName()));
 		}
 
-		if (edicion.getFormato() != null) {
-			dto.setFormat(new FormatDTO("" + edicion.getFormato().getId(), edicion.getFormato().name()));
+		if (edicion.getFormat() != null) {
+			dto.setFormat(new FormatDTO("" + edicion.getFormat().getId(), edicion.getFormat().name()));
 		}
 		
 
 		if (edicion.getLocation() != null) {
-			dto.setLocation(edicion.getLocation().getDescripcion());
-			dto.setLocationCode(edicion.getLocation().getCodigo());
+			dto.setLocation(edicion.getLocation().getDescription());
+			dto.setLocationCode(edicion.getLocation().getCode());
 		}
 
 		dto.setSteelbook(edicion.isSteelbook());
-		dto.setSlipcover(edicion.isFunda());
-		dto.setOwned(edicion.isComprado());
-		dto.setNotes(edicion.getNotas());
+		dto.setSlipcover(edicion.isSlipCover());
+		dto.setOwned(edicion.isPurchased());
+		dto.setNotes(edicion.getNotes());
 		
 		return dto;
 	}

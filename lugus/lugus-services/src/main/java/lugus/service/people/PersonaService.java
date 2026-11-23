@@ -5,16 +5,16 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lugus.model.people.Persona;
-import lugus.repository.people.PersonaRepository;
+import lugus.model.people.People;
+import lugus.repository.people.PeopleRepository;
 
 @Service
 @RequiredArgsConstructor
 public class PersonaService {
 
-	private final PersonaRepository personaRepository;
+	private final PeopleRepository personaRepository;
 
-	public Optional<Persona> findById(Integer id) {
+	public Optional<People> findById(Integer id) {
 		return personaRepository.findById(id);
 	}
 }

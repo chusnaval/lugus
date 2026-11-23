@@ -14,15 +14,15 @@ public interface GroupRepository {
 
 	List<Group> findAll();
 
-	Optional<Group> findById(Integer id);
+	Optional<Group> findById(final Integer id);
 
-	Group save(Group group);
+	Group save(final Group group);
 
-	void deleteById(Integer id);
+	void deleteById(final Integer id);
 
 	long count();
 
-	Page<Group> findAll(Specification<Group> spec, Pageable pageable);
+	Page<Group> findAll(final Specification<Group> spec, final Pageable pageable);
 
 	@Query("""
 			    SELECT COUNT(g)
@@ -32,15 +32,15 @@ public interface GroupRepository {
 			        FROM GroupFilms gf
 			        WHERE gf.group = g
 			        AND (
-			            gf.pelicula IS NULL
-			            OR gf.pelicula.id in ( 
-			            select pelicula.id from Edition where comprado = false
+			            gf.film IS NULL
+			            OR gf.film.id in ( 
+			            select film.id from Edition where purchased = false
 			            )
 			        )
 			    )
 			""")
 	int countIncompleteGroups();
 
-	Page<Group> findAll(Pageable pageable);
+	Page<Group> findAll(final Pageable pageable);
 
 }

@@ -7,10 +7,10 @@ import lugus.model.user.User;
 
 public interface UsuarioRepository {
 
-	Optional<User> findById(String id);
+	Optional<User> findById(final String id);
 
-	User save(User usuario);
+	User save(final User user);
 
-	void deleteById(String id);
+	void deleteById(final String id);
 
 }

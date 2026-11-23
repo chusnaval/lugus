@@ -22,7 +22,7 @@ import lugus.dto.groups.GroupDTO;
 import lugus.exception.LugusNotFoundException;
 import lugus.mapper.groups.GroupMapper;
 import lugus.model.groups.Group;
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 import lugus.service.films.PeliculaService;
 import lugus.service.groups.GroupsService;
 import lugus.service.imdb.ImdbBasicsService;
@@ -150,11 +150,11 @@ public class GroupApiController {
 		// search registered Pelicula (use repository's findByTitulo via service if available)
 		try {
 			// using service to search by title via repository method (will need a small wrapper)
-			List<Pelicula> pelis = peliculaService.findByTitulo(title);
+			List<Film> pelis = peliculaService.findByTitulo(title);
 			if (pelis != null) {
-				for (Pelicula p : pelis) {
+				for (Film p : pelis) {
 					// return minimal object
-					result.add(new SimpleFilm(p.getId(), p.getImdbId()!=null? p.getImdbId():"", p.getTitulo(), p.getAnyo()));
+					result.add(new SimpleFilm(p.getId(), p.getImdbId()!=null? p.getImdbId():"", p.getTitle(), p.getYear()));
 				}
 			}
 		} catch (Exception e) {

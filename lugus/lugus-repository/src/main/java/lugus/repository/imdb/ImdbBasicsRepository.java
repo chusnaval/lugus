@@ -8,7 +8,7 @@ public interface ImdbBasicsRepository {
 
 	List<ImdbBasics> findAll();
 	
-	List<ImdbBasics> findByTitleContainingIgnoreCaseAndRegionAndLanguage(String title, String region, String language);
+	List<ImdbBasics> findByTitleContainingIgnoreCaseAndRegionAndLanguage(final String title, final String region, final String language);
 
 	ImdbBasics findByTitleid(final String id);
 }

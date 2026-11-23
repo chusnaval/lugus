@@ -13,27 +13,27 @@ import lugus.model.values.TitleType;
 @Repository
 public interface TitleRepository {
 
-	Optional<Title> findById(Long titleId);
+	Optional<Title> findById(final Long titleId);
 	
-	Optional<Title> findByImdb_Tconst(String imdbId);
+	Optional<Title> findByImdb_Tconst(final String imdbId);
 
 	Title save(Title title);
 	
-	List<Title> searchByTitleContainingIgnoreCase(String query);
+	List<Title> searchByTitleContainingIgnoreCase(final String query);
 
 	@Query("""
 			    SELECT t FROM Title t
 			    WHERE LOWER(t.title) LIKE LOWER(CONCAT('%', :query, '%'))
 			""")
-	List<Title> search(@Param("query") String query);
+	List<Title> search(@Param("query") final String query);
 
-	Optional<Title> findByPelicula_Id(Integer id);
+	Optional<Title> findByFilm_Id(final Integer id);
 
-	Optional<Title> findBySerie_Id(Integer id);
+	Optional<Title> findBySerie_Id(final Integer id);
 
 	List<Title> findAll();
 
-	List<Title> findByType(TitleType external);
+	List<Title> findByType(final TitleType external);
 	
 	void deleteById(Long id);
 }

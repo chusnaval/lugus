@@ -34,7 +34,7 @@ public interface SerieRepository {
 
 	int countByTsAltaAfter(Instant limit);
 
-	int countByComprado(boolean value);
+	int countByPurchased(boolean value);
 
 	Optional<Serie> findByImdbId(String imdbId);
 

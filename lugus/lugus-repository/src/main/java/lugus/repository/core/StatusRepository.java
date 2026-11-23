@@ -5,9 +5,9 @@ import java.util.Optional;
 
 import lugus.model.core.Status;
 
-public interface EstadoRepository {
+public interface StatusRepository {
 
-	public Optional<Status> findById(Integer estadoCodigo);
+	public Optional<Status> findById(final int statusCode);
 
 	public List<Status> findAll();
 

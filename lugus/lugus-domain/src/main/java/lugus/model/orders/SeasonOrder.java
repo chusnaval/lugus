@@ -20,7 +20,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lugus.converter.FormatoConverter;
+import lugus.converter.FormatConverter;
 import lugus.model.series.Season;
 import lugus.model.values.Format;
 
@@ -47,7 +47,7 @@ public class SeasonOrder {
 	private String imdbId;
 	
 	@Column(nullable = false)
-	@Convert(converter = FormatoConverter.class)
+	@Convert(converter = FormatConverter.class)
 	private Format formato;
 	
 	@Column(nullable = true)

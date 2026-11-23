@@ -15,7 +15,7 @@ public class SourceMapper {
 	public SourceDTO mapToDTO(Source source) {
 		SourceDTO dto = new SourceDTO();
 		dto.setId(source.getId());
-		dto.setDescription(source.getDescripcion());
+		dto.setDescription(source.getDescription());
 		dto.setSuggest(source.getSuggest());
 		return dto;
 		
@@ -24,7 +24,7 @@ public class SourceMapper {
 	public Source mapToEntity(SourceDTO dto) {
 		Source source = new Source();
 		source.setId(dto.getId());
-		source.setDescripcion(dto.getDescription());
+		source.setDescription(dto.getDescription());
 		source.setSuggest(dto.getSuggest());
 		return source;
 	}

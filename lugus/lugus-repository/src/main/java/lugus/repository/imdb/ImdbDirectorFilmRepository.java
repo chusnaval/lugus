@@ -9,11 +9,11 @@ public interface ImdbDirectorFilmRepository {
 
 	List<ImdbDirectorFilm> findAll();
 
-	Optional<ImdbDirectorFilm> findById(String id);
+	Optional<ImdbDirectorFilm> findById(final String id);
 
-	ImdbDirectorFilm save(ImdbDirectorFilm imdbDirectorFilm);
+	ImdbDirectorFilm save(final ImdbDirectorFilm imdbDirectorFilm);
 
-	void deleteById(String id);
+	void deleteById(final String id);
 
 	List<ImdbDirectorFilm> findByTitleContainingIgnoreCase(final String title);
 	

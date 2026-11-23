@@ -17,9 +17,9 @@ public class LocationMapper {
 	
 	public LocationDTO mapToDTO(Location loc) {
 		LocationDTO dto = new LocationDTO();
-		dto.setCodigo(loc.getCodigo());
-		dto.setDescripcion(loc.getDescripcion());
-		dto.setCount(loc.getEdiciones().size());
+		dto.setCodigo(loc.getCode());
+		dto.setDescripcion(loc.getDescription());
+		dto.setCount(loc.getEditions().size());
 		dto.setLocationType(new LocationTypeDTO(loc.getLocationType().getId(), loc.getLocationType().getDescription(), loc.getLocationType().getLocations().size()));
 		return dto;
 		
@@ -27,8 +27,8 @@ public class LocationMapper {
 
 	public Location mapToEntity(LocationDTO dto) {
 		Location local = new Location();
-		local.setCodigo(dto.getCodigo());
-		local.setDescripcion(dto.getDescripcion());
+		local.setCode(dto.getCodigo());
+		local.setDescription(dto.getDescripcion());
 		if(dto.getLocationType()!=null) {
 			local.setLocationType(new LocationType(dto.getLocationType().getId()));
 		}

@@ -9,14 +9,14 @@ public interface GroupFilmsRepository {
 
 	List<GroupFilms> findAll();
 
-	Optional<GroupFilms> findById(Integer id);
+	Optional<GroupFilms> findById(final Integer id);
 
-	GroupFilms save(GroupFilms groupFilms);
+	GroupFilms save(final GroupFilms groupFilms);
 
-	void deleteById(Integer id);
+	void deleteById(final Integer id);
 
-	List<GroupFilms> findAllByGroupIdOrderByOrden(Integer id);
+	List<GroupFilms> findAllByGroupIdOrderByOrder(final Integer id);
 
-	List<GroupFilms> findAllByPeliculaIdOrderByGroupName(Integer id);
+	List<GroupFilms> findAllByFilmIdOrderByGroupName(final Integer id);
 
 }

@@ -27,15 +27,15 @@ public class GroupMapper {
 		dto.setMovieCount(group.getFilms().size());
 		String cover = "/covers/placeholder.png";
 		Optional<GroupTitle> gf = group.getFilms().stream().findFirst();
-		if (gf.isPresent() && gf.get().getTitle().getPelicula() != null) {
-			cover = gf.get().getTitle().getPelicula().getCoverUrl();
+		if (gf.isPresent() && gf.get().getTitle().getFilm() != null) {
+			cover = gf.get().getTitle().getFilm().getCoverUrl();
 		}else if (gf.isPresent() && gf.get().getTitle().getSerie() != null) {
 			cover = gf.get().getTitle().getSerie().getCoverUrl();
 		}else if (gf.isPresent() && gf.get().getTitle().getPosterUrl() != null) {
 			cover = gf.get().getTitle().getPosterUrl();
 		}
 		dto.setPercentageOwned(group.getFilms().stream()
-				.filter(gt -> (gt.getTitle().getPelicula() != null && gt.getTitle().getPelicula().isComprado())
+				.filter(gt -> (gt.getTitle().getFilm() != null && gt.getTitle().getFilm().isComprado())
 						|| (gt.getTitle().getSerie() != null && gt.getTitle().getSerie().isCompleta()))
 				.count() * 100.0 / group.getFilms().size());
 		dto.setCover(cover);
@@ -64,8 +64,8 @@ public class GroupMapper {
 		dto.setYear(title.getYear());
 		dto.setType(title.getType().name());
 		dto.setPosterUrl(title.getPosterUrl());
-		if (title.getPelicula() != null) {
-			dto.setPeliculaId(title.getPelicula().getId());
+		if (title.getFilm() != null) {
+			dto.setPeliculaId(title.getFilm().getId());
 		}
 		if (title.getSerie() != null) {
 			dto.setSerieId(title.getSerie().getId());
@@ -73,7 +73,7 @@ public class GroupMapper {
 		if (title.getImdb() != null) {
 			dto.setImdbId(title.getImdb().getTconst());
 		}
-		dto.setOwned((title.getPelicula() != null && title.getPelicula().isComprado())
+		dto.setOwned((title.getFilm() != null && title.getFilm().isComprado())
 				|| (title.getSerie() != null && title.getSerie().isCompleta()));
 		
 		return dto;

@@ -13,11 +13,11 @@ import lugus.dto.core.FormatDTO;
 import lugus.dto.films.EditionDto;
 import lugus.dto.films.FilmDto;
 import lugus.exception.LugusNotFoundException;
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 import lugus.model.imdb.ImdbTitleAkas;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.values.Format;
-import lugus.model.values.Genere;
+import lugus.model.values.Genre;
 import lugus.service.films.EdicionService;
 import lugus.service.imdb.ImdbTitleAkasService;
 import lugus.service.imdb.ImdbTitleBasicsService;
@@ -63,7 +63,7 @@ public class ImdbApiController {
 				String firstGenre = translate(film.getGenres()[0]);
 				String genres = String.join(",", film.getGenres());
 				dto.setGenreCode(firstGenre);
-				dto.setGenreDesc(Genere.getById(firstGenre).getDisplayName());
+				dto.setGenreDesc(Genre.getById(firstGenre).getDisplayName());
 				edto.setNotes(genres);
 				edto.setMgmtCode(edicionService.calculateCompleteCode(-1, createFakeFilm(dto)));
 			}
@@ -78,77 +78,76 @@ public class ImdbApiController {
 		return null;
 	}
 
-	private Pelicula createFakeFilm(FilmDto dto) {
-		Pelicula film = new Pelicula();
-		film.setTituloGest(dto.getTitleMgmt());
-		film.setAnyo(dto.getYear());
-		film.setGenero(Genere.getById(dto.getGenreCode()));
+	private Film createFakeFilm(FilmDto dto) {
+		Film film = new Film();
+		film.setMgmntTitle(dto.getTitleMgmt());
+		film.setYear(dto.getYear());
+		film.setGenre(Genre.getById(dto.getGenreCode()));
 		
 		return film;
 	}
 
 	private String translate(String firstGenre) {
-		String result = Genere.ACCION.getCodigo();
+		String result = null;
 		switch(firstGenre){
 		case "Action":
-			result = Genere.ACCION.getCodigo();
+			result = Genre.ACCION.getCodigo();
 			break;
 		case "Adventure":
-			result = Genere.AVENTURA.getCodigo();
+			result = Genre.AVENTURA.getCodigo();
 			break;
 		case "Animation":
-			result = Genere.ANIMACION.getCodigo();
+			result = Genre.ANIMACION.getCodigo();
 			break;
-		case "Biography":
-		case "Drama":
-		case "History":
-			result = Genere.DRAMA.getCodigo();
+		case "Biography", "Drama", "History":
+			result = Genre.DRAMA.getCodigo();
 			break;
 		case "Comedy":
-			result = Genere.COMEDIA.getCodigo();
+			result = Genre.COMEDIA.getCodigo();
 			break;
-		case "Crime":
-		case "Film-Noir":
-			result = Genere.CRIMEN.getCodigo();
+		case "Crime", "Film-Noir":
+			result = Genre.CRIMEN.getCodigo();
 			break;
 		case "Documentary":
-			result = Genere.DOCUMENTAL.getCodigo();
+			result = Genre.DOCUMENTAL.getCodigo();
 			break;
 		case "Family":
-			result = Genere.INFANTIL.getCodigo();
+			result = Genre.INFANTIL.getCodigo();
 			break;
 		case "Fantasy":
-			result = Genere.FANTASIA.getCodigo();
+			result = Genre.FANTASIA.getCodigo();
 			break;
 		case "Horror":
-			result = Genere.TERROR.getCodigo();
+			result = Genre.TERROR.getCodigo();
 			break;
-		case "Music":
-		case "Musical":
-			result = Genere.MUSICAL.getCodigo();
+		case "Music", "Musical":
+			result = Genre.MUSICAL.getCodigo();
 			break;
 		case "Mystery":
-			result = Genere.MISTERIO.getCodigo();
+			result = Genre.MISTERIO.getCodigo();
 			break;
 		case "Romance":
-			result = Genere.ROMANTICA.getCodigo();
+			result = Genre.ROMANTICA.getCodigo();
 			break;
 		case "Sci-Fi":
-			result = Genere.CIENCIA_FICCION.getCodigo();
+			result = Genre.CIENCIA_FICCION.getCodigo();
 			break;
 		case "Sport":
-			result = Genere.DEPORTES.getCodigo();
+			result = Genre.DEPORTES.getCodigo();
 			break;
 		case "Thriller":
-			result = Genere.THRILLER.getCodigo();
+			result = Genre.THRILLER.getCodigo();
 			break;
 		case "War":
-			result = Genere.BELICO.getCodigo();
+			result = Genre.BELICO.getCodigo();
 			break;
 		case "Western":
-			result = Genere.WESTERN.getCodigo();
+			result = Genre.WESTERN.getCodigo();
 			break;
+		default:
+			result = null;
 		}
+		
 		return result;
 	}
 

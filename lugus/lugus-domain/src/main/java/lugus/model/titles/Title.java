@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 import lugus.model.imdb.ImdbTitleBasics;
 import lugus.model.series.Serie;
 import lugus.model.values.TitleType;
@@ -46,7 +46,7 @@ public class Title {
     // Si es una película de tu colección
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pelicula_id")
-    private Pelicula pelicula;
+    private Film film;
 
     // Si es una serie de tu colección
     @ManyToOne(fetch = FetchType.LAZY)

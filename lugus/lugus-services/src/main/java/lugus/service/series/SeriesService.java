@@ -28,7 +28,7 @@ import lugus.model.series.Season;
 import lugus.model.series.Serie;
 import lugus.model.series.SerieFoto;
 import lugus.model.values.Format;
-import lugus.model.values.Genere;
+import lugus.model.values.Genre;
 import lugus.model.values.LangVersion;
 import lugus.repository.series.SerieRepository;
 import lugus.service.core.LocationService;
@@ -80,7 +80,7 @@ public class SeriesService {
 
 		Specification<Serie> spec = Specification.where(null);
 
-		spec = spec.and(SerieSpecification.porComprado(filter.getComprado()));
+		spec = spec.and(SerieSpecification.byPurchased(filter.getComprado()));
 		spec = spec.and(SerieSpecification.porFormato(filter.getFormato()));
 		spec = spec.and(SerieSpecification.porGenero(filter.getGenero()));
 		spec = spec.and(SerieSpecification.byLocation(filter.getLocation()));
@@ -107,7 +107,7 @@ public class SeriesService {
 
 		Specification<Serie> spec = Specification.where(null);
 
-		spec = spec.or(SerieSpecification.porComprado(false));
+		spec = spec.or(SerieSpecification.byPurchased(false));
 		spec = spec.or(SerieSpecification.porCompleta(false));
 
 		return serieRepo.findAll(spec, pageable);
@@ -117,11 +117,11 @@ public class SeriesService {
 		Sort sort;
 		if (field.isPresent() && "compra".equals(field.get())) {
 			if (direction.isPresent() && "ASC".equalsIgnoreCase(direction.get())) {
-				sort = Sort.by(Sort.Order.desc("tsModif").with(Sort.NullHandling.NULLS_LAST),
+				sort = Sort.by(Sort.Order.desc("tsModif").with(Sort.DEFAULT_DIRECTION),
 						Sort.Order.desc("tsAlta"));
 			} else {
 
-				sort = Sort.by(Sort.Order.asc("tsModif").with(Sort.NullHandling.NULLS_FIRST), Sort.Order.asc("tsAlta"));
+				sort = Sort.by(Sort.Order.asc("tsModif").with(Sort.DEFAULT_DIRECTION), Sort.Order.asc("tsAlta"));
 			}
 		} else {
 			sort = Sort.by(Direction.fromString(direction.orElse("ASC")), field.orElse("tituloGest"));
@@ -143,12 +143,12 @@ public class SeriesService {
 		if (dto.getFormat() != null) {
 			p.setFormato(Format.getById(Short.valueOf(dto.getFormat())));
 		}
-		p.setGenero(Genere.getById(dto.getGenreCode()));
+		p.setGenero(Genre.getById(dto.getGenreCode()));
 		if (loc.isPresent()) {
 			p.setLocation(loc.get());
 		}
 		p.setCodigo(dto.getMgmtCode());
-		p.setComprado(dto.isOwned());
+		p.setPurchased(dto.isOwned());
 		p.setNotas(dto.getNotes());
 		addCaratula(p, dto.getCoverSrc());
 		updateSeasons(p, dto.getSeasons());
@@ -203,7 +203,7 @@ public class SeriesService {
 
 		Specification<Serie> spec = Specification.where(null);
 
-		spec = spec.and(SerieSpecification.porComprado(true));
+		spec = spec.and(SerieSpecification.byPurchased(true));
 
 		return serieRepo.findAll(spec, pageable);
 	}
@@ -229,8 +229,8 @@ public class SeriesService {
 		return serieRepo.countByTsAltaAfter(limit);
 	}
 
-	public int countByComprado(boolean value) {
-		return serieRepo.countByComprado(value);
+	public int countByPurchased(boolean value) {
+		return serieRepo.countByPurchased(value);
 	}
 
 	public boolean isFilmRegistered(String tconst) {

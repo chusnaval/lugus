@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 
-public enum Genere {
+public enum Genre {
 
 	ANIMACION("ANI", Category.ARTE_ENTRETENIMIENTO, 1), ANIME("ANM", Category.ARTE_ENTRETENIMIENTO, 2),
 	INFANTIL("INF", Category.ARTE_ENTRETENIMIENTO, 3), MUSICAL("MUS", Category.ARTE_ENTRETENIMIENTO, 4),
@@ -31,7 +31,7 @@ public enum Genere {
 	@Getter
 	private int orden;
 
-	private Genere(String codigo, Category categoria, int orden) {
+	private Genre(String codigo, Category categoria, int orden) {
 		this.codigo = codigo;
 		this.categoria = categoria;
 		this.orden = orden;
@@ -43,8 +43,8 @@ public enum Genere {
 	 * @param i
 	 * @return
 	 */
-	public static Genere getById(String code) {
-		for (Genere aux : values()) {
+	public static Genre getById(String code) {
+		for (Genre aux : values()) {
 			if (aux.getCodigo().equals(code)) {
 				return aux;
 			}
@@ -58,8 +58,8 @@ public enum Genere {
 				.map(s -> Character.toUpperCase(s.charAt(0)) + s.substring(1)).collect(Collectors.joining(" "));
 	}
 
-	public static List<Genere> valoresOrdenados() {
-		return Arrays.stream(Genere.values()).sorted(Comparator.comparing(Genere::getDisplayName))
+	public static List<Genre> valoresOrdenados() {
+		return Arrays.stream(Genre.values()).sorted(Comparator.comparing(Genre::getDisplayName))
 				.collect(Collectors.toList());
 
 	}

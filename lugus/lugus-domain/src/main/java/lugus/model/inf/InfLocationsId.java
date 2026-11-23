@@ -17,17 +17,17 @@ public class InfLocationsId implements Serializable {
     private static final long serialVersionUID = 1L;
 	
 	@Column(name="genero")
-	private String genero;
+	private String genre;
 	
 	@Column(name="codigo")
-	private String codigo;
+	private String code;
 	
 	@Column(name="funda")
-	private boolean funda;
+	private boolean slipCover;
 	
 	@Column(name="steelbook")
 	private boolean steelbook;
 	
 	@Column(name="formato")
-	private int formato;
+	private int format;
 }

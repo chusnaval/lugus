@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 import lugus.model.imdb.ImdbTitleBasics;
 
 @Entity
@@ -34,10 +34,10 @@ public class GroupFilms {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "peliculas_id", nullable = true)
-	private Pelicula pelicula;
+	private Film film;
 
-	@Column(nullable = false)
-	private int orden;
+	@Column(name="orden", nullable = false)
+	private int order;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(nullable = false, name = "imdb_id")
@@ -51,8 +51,8 @@ public class GroupFilms {
 	 */
 	public String getTitle() {
 		String titulo = "";
-		if (pelicula != null) {
-			titulo = pelicula.getTitulo();
+		if (film != null) {
+			titulo = film.getTitle();
 		}else {
 			titulo = itb.getPrimarytitle();
 		}
@@ -62,8 +62,8 @@ public class GroupFilms {
 	
 	public String getYear() {
 		String result = "";
-		if (pelicula != null) {
-			result += pelicula.getAnyo();
+		if (film != null) {
+			result += film.getYear();
 		}else {
 			result += itb.getStartyear();
 		}

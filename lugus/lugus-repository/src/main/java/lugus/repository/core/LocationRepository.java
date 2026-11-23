@@ -15,18 +15,18 @@ public interface LocationRepository {
 
 	List<Location> findAll();
 
-	List<Location> findAll(Sort sort);
+	List<Location> findAll(final Sort sort);
 
-	Optional<Location> findById(String id);
+	Optional<Location> findById(final String id);
 
-	Location save(Location location);
+	Location save(final Location location);
 
-	void deleteById(String id);
+	void deleteById(final String id);
 
-	List<Location> findAllByLocationType(LocationType tipoObj, Sort sort);
+	List<Location> findAllByLocationType(final LocationType tipoObj, final Sort sort);
 
-	Page<Location> findAll(Specification<Location> spec, Pageable pageable);
+	Page<Location> findAll(final Specification<Location> spec, final Pageable pageable);
 
-	List<Location> findByCodigoNot(String code);
+	List<Location> findByCodeNot(final String code);
 
 }

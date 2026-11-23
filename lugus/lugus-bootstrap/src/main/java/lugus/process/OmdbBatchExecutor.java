@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 import lugus.dto.core.CountryCode;
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 import lugus.model.imdb.OmdbCache;
 import lugus.model.series.Serie;
 import lugus.model.titles.Title;
@@ -134,16 +134,16 @@ public class OmdbBatchExecutor {
 	}
 
 	private void updatePeliculas() throws JsonProcessingException {
-		List<Pelicula> peliculas = peliculaService.findAll();
+		List<Film> peliculas = peliculaService.findAll();
 
 		int total = peliculas.size();
 		int index = 1;
 
-		for (Pelicula p : peliculas) {
+		for (Film p : peliculas) {
 			String imdbId = p.getImdbId();
 
 			if (imdbId == null || imdbId.isBlank()) {
-				System.out.println("Saltando película sin IMDb ID: " + p.getTitulo());
+				System.out.println("Saltando película sin IMDb ID: " + p.getTitle());
 				continue;
 			}
 
@@ -163,13 +163,13 @@ public class OmdbBatchExecutor {
 	public void updateCountry() {
 		int count = peliculaService.findAll().size();
 		int index = 1;
-		for (Pelicula p : peliculaService.findAll()) {
+		for (Film p : peliculaService.findAll()) {
 			if (p.getImdbId() == null || p.getImdbId().isBlank()) {
-				System.out.println("Saltando película sin IMDb ID: " + p.getTitulo());
+				System.out.println("Saltando película sin IMDb ID: " + p.getTitle());
 				continue;
 			}
 			if (p.getCountry() != null && !p.getCountry().isBlank()) {
-				System.out.println("Saltando película con país ya seteado: " + p.getTitulo());
+				System.out.println("Saltando película con país ya seteado: " + p.getTitle());
 				continue;
 			}
 			OmdbCache cached = cacheService.getFromCache(p.getImdbId());
@@ -195,10 +195,10 @@ public class OmdbBatchExecutor {
 				p.setCountry(String.join(",", values));
 
 				peliculaService.save(p);
-				System.out.println("Actualizada película: " + p.getTitulo() + " con país: " + country + " en posición "
+				System.out.println("Actualizada película: " + p.getTitle() + " con país: " + country + " en posición "
 						+ index + "/" + count);
 			} else {
-				System.out.println("No se encontró en cache, saltando: " + p.getTitulo());
+				System.out.println("No se encontró en cache, saltando: " + p.getTitle());
 			}
 		}
 		System.out.println(
@@ -208,13 +208,13 @@ public class OmdbBatchExecutor {
 	public void updateRuntime() {
 		int count = peliculaService.findAll().size();
 		int index = 1;
-		for (Pelicula p : peliculaService.findAll()) {
+		for (Film p : peliculaService.findAll()) {
 			if (p.getImdbId() == null || p.getImdbId().isBlank()) {
-				System.out.println("Saltando película sin IMDb ID: " + p.getTitulo());
+				System.out.println("Saltando película sin IMDb ID: " + p.getTitle());
 				continue;
 			}
 			if (p.getDuration() != 0 ) {
-				System.out.println("Saltando película con duracion ya seteado: " + p.getTitulo());
+				System.out.println("Saltando película con duracion ya seteado: " + p.getTitle());
 				continue;
 			}
 			OmdbCache cached = cacheService.getFromCache(p.getImdbId());
@@ -232,10 +232,10 @@ public class OmdbBatchExecutor {
 				p.setDuration(minutes);
 
 				peliculaService.save(p);
-				System.out.println("Actualizada película: " + p.getTitulo() + " con runtime: " + minutes + " en posición "
+				System.out.println("Actualizada película: " + p.getTitle() + " con runtime: " + minutes + " en posición "
 						+ index++ + "/" + count);
 			} else {
-				System.out.println("No se encontró en cache, saltando: " + p.getTitulo());
+				System.out.println("No se encontró en cache, saltando: " + p.getTitle());
 			}
 		}
 		System.out.println(

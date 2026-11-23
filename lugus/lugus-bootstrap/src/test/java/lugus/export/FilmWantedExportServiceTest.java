@@ -71,8 +71,8 @@ class FilmWantedExportServiceTest {
 
 	private List<FilmWanted> sample() {
 		return List.of(
-				FilmWanted.builder().titulo("The Matrix").anyo(1999).formato("DVD").build(),
-				FilmWanted.builder().titulo("Arrival").anyo(2016).formato("BluRay").build());
+				FilmWanted.builder().title("The Matrix").year(1999).format("DVD").build(),
+				FilmWanted.builder().title("Arrival").year(2016).format("BluRay").build());
 	}
 
 	private String extractZipEntry(byte[] zip, String entryName) throws IOException {

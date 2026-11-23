@@ -2,7 +2,7 @@ package lugus.service.people;
 
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
-import lugus.repository.people.InsertPersonalSeriesDataRepository;
+import lugus.repository.people.InsertStaffSeriesDataRepository;
 
 
 
@@ -10,7 +10,7 @@ import lugus.repository.people.InsertPersonalSeriesDataRepository;
 @RequiredArgsConstructor
 public class InsertPersonalSeriesDataService {
 
-	private final InsertPersonalSeriesDataRepository repo;
+	private final InsertStaffSeriesDataRepository repo;
 	
 	
 	public void insert(final int serieId, final String imdb) {

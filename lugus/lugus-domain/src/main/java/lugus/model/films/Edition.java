@@ -22,7 +22,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lugus.converter.FormatoConverter;
+import lugus.converter.FormatConverter;
 import lugus.model.core.Status;
 import lugus.model.core.Location;
 import lugus.model.values.Format;
@@ -43,45 +43,45 @@ public class Edition {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "pelicula_id", nullable = true) // FK → estado.id
-	private Pelicula pelicula;
+	private Film film;
 
-	@Column(nullable = false)
-	@Convert(converter = FormatoConverter.class)
-	private Format formato;
+	@Column(name="formato", nullable = false)
+	@Convert(converter = FormatConverter.class)
+	private Format format;
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "localizacion_codigo", nullable = true) // FK → location.code
 	private Location location;
 
-	@Column(nullable = false)
-	private String codigo;
+	@Column(name="codigo", nullable = false)
+	private String code;
 
-	@Column(nullable = true)
-	private String notas;
+	@Column(name="notas", nullable = true)
+	private String notes;
 
 	@ManyToOne
 	@JoinColumn(name = "padre_id")
 	@ToString.Exclude
 	private Pack pack;
 
-	@Column
+	@Column(name="steelbook")
 	private boolean steelbook;
 
-	@Column
-	private boolean funda;
+	@Column(name="funda")
+	private boolean slipCover;
 
-	@Column
-	private boolean comprado;
+	@Column(name="comprado")
+	private boolean purchased;
 
 	@Column(name = "usr_alta")
-	private String usrAlta;
+	private String usrCreation;
 
 	@Column(name = "ts_alta", nullable = false, columnDefinition = "TIMESTAMP")
-	private Instant tsAlta;
+	private Instant tsCreation;
 
 	@Column(name = "ts_compra", nullable = true, columnDefinition = "TIMESTAMP")
-	private Instant tsCompra;
+	private Instant tsPurchase;
 
 	@Column(name = "usr_modif")
 	private String usrModif;
@@ -90,13 +90,20 @@ public class Edition {
 	private Instant tsModif;
 
 	@Column(name = "ts_baja", columnDefinition = "TIMESTAMP")
-	private Instant tsBaja;
+	private Instant tsDeletion;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "estado_id", nullable = true) // FK → estado.id
-	private Status estado;
+	private Status status;
 
+	/**
+	 * Obtain initial code from the film
+	 * @return
+	 */
 	public String obtainInitialCode() {
-		return pelicula.obtainCode();
+		if(film == null){
+			return "";
+		}
+		return film.obtainCode();
 	}
 }

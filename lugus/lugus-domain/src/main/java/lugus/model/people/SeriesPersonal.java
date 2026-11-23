@@ -39,7 +39,7 @@ public class SeriesPersonal {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "persona_id", nullable = true) // FK → people.id
-	private Persona persona;
+	private People persona;
 	
 	@Column
 	private String notas;

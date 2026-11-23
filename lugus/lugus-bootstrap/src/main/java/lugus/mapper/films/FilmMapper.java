@@ -12,23 +12,23 @@ import lugus.dto.films.FilmDto;
 import lugus.dto.films.GroupDto;
 import lugus.model.core.Location;
 import lugus.model.films.Edition;
-import lugus.model.films.Pelicula;
+import lugus.model.films.Film;
 import lugus.model.groups.GroupFilms;
 import lugus.model.values.Format;
-import lugus.model.values.Genere;
+import lugus.model.values.Genre;
 
 @Component
 public class FilmMapper {
 	
 	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 	
-	public FilmDto mapToFilmDTO(Pelicula film, String login) {
+	public FilmDto mapToFilmDTO(Film film, String login) {
 		FilmDto dto = mapToFilmDTO(film);
 		if (login != null) {
 			dto.setFavorite(film.isFavorite(login));
 			dto.setMine(film.isMine(login));
-			dto.setLastSeen(film.getFechaVista(login)!=null?film.getFechaVista(login).format(formatter):null);
-			String aux = film.getUsuarioRating(login);
+			dto.setLastSeen(film.getLastSeenDate(login)!=null?film.getLastSeenDate(login).format(formatter):null);
+			String aux = film.getUserRating(login);
 			if(!ObjectUtils.isEmpty(aux)) {
 				dto.setLbRating(Double.valueOf(aux));
 			}else
@@ -39,12 +39,12 @@ public class FilmMapper {
 		return dto;
 	}
 
-	public FilmDto mapToFilmDTO(Pelicula film) {
+	public FilmDto mapToFilmDTO(Film film) {
 		FilmDto dto = new FilmDto();
 		dto.setId(film.getId());
-		dto.setTitle(film.getTitulo());
-		dto.setTitleMgmt(film.getTituloGest());
-		dto.setYear(film.getAnyo());
+		dto.setTitle(film.getTitle());
+		dto.setTitleMgmt(film.getMgmntTitle());
+		dto.setYear(film.getYear());
 		
 		for(Edition edicion : film.getEditions()) {
 			dto.addEdition(EdicionMapper.toDto(edicion));
@@ -54,9 +54,9 @@ public class FilmMapper {
 		createCasting(dto, film);
 		
 		
-		if (film.getGenero() != null) {
-			dto.setGenreCode(film.getGenero().getCodigo());
-			dto.setGenreDesc(film.getGenero().getDisplayName());
+		if (film.getGenre() != null) {
+			dto.setGenreCode(film.getGenre().getCodigo());
+			dto.setGenreDesc(film.getGenre().getDisplayName());
 		}
 
 		dto.setImdbId(film.getImdbId());
@@ -82,19 +82,19 @@ public class FilmMapper {
 		return dto;
 	}
 
-	private void createDirectors(FilmDto dto, Pelicula film) {
-		film.getDirectores().stream()
-				.forEach(dir -> dto.addDirector(new DirectorDTO(dir.getPersona(), dir.getNombre())));
+	private void createDirectors(FilmDto dto, Film film) {
+		film.getDirectors().stream()
+				.forEach(dir -> dto.addDirector(new DirectorDTO(dir.getPeople(), dir.getName())));
 
 	}
 
-	private void createCasting(FilmDto dto, Pelicula film) {
-		film.getActores().stream()
-				.forEach(act -> dto.addCast(new CastDto(act.getPersona(), act.getOrden(), act.getNombre(), act.getPersonaje())));
+	private void createCasting(FilmDto dto, Film film) {
+		film.getActors().stream()
+				.forEach(act -> dto.addCast(new CastDto(act.getPeople(), act.getOrder(), act.getName(), act.getCharacter())));
 
 	}
 
-	private GroupDto getFirstGroup(Pelicula film) {
+	private GroupDto getFirstGroup(Film film) {
 		GroupDto group = new GroupDto();
 
 		for (GroupFilms gf : film.getGroups()) {
@@ -106,27 +106,27 @@ public class FilmMapper {
 		return group;
 	}
 
-	public Pelicula mapToFilm(FilmDto dto) {
-		Pelicula pelicula = new Pelicula();
-		pelicula.setTitulo(dto.getTitle());
-		pelicula.setTituloGest(dto.getTitleMgmt());
-		pelicula.setAnyo(dto.getYear());
+	public Film mapToFilm(FilmDto dto) {
+		Film pelicula = new Film();
+		pelicula.setTitle(dto.getTitle());
+		pelicula.setMgmntTitle(dto.getTitleMgmt());
+		pelicula.setYear(dto.getYear());
 		
 		for(EditionDto dtoEd : dto.getEditions()) {
 			Edition edicion = new Edition();
 			edicion.setLocation(new Location());
-			edicion.getLocation().setCodigo(dtoEd.getLocation());
-			edicion.setCodigo(dtoEd.getMgmtCode());
-			edicion.setFormato(Format.getById(Short.valueOf(dtoEd.getFormat().getCodigo())));
+			edicion.getLocation().setCode(dtoEd.getLocation());
+			edicion.setCode(dtoEd.getMgmtCode());
+			edicion.setFormat(Format.getById(Short.valueOf(dtoEd.getFormat().getCodigo())));
 			edicion.setSteelbook(dtoEd.isSteelbook());
-			edicion.setFunda(dtoEd.isSlipcover());
-			edicion.setComprado(dtoEd.isOwned());
-			edicion.setNotas(dtoEd.getNotes());
+			edicion.setSlipCover(dtoEd.isSlipcover());
+			edicion.setPurchased(dtoEd.isOwned());
+			edicion.setNotes(dtoEd.getNotes());
 			
-			pelicula.addEdicion(edicion);
+			pelicula.addEdition(edicion);
 		}
 
-		pelicula.setGenero(Genere.getById(dto.getGenreCode()));
+		pelicula.setGenre(Genre.getById(dto.getGenreCode()));
 		pelicula.setImdbId(dto.getImdbId());
 		pelicula.setRating(dto.getRating());
 		pelicula.setVotes(dto.getVotes());
